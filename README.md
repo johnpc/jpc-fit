@@ -1,6 +1,6 @@
 # fit.jpc.io
 
-A dead-simple calorie tracking app, for web and ios (must use iOS to use HealthKit data).
+A dead-simple daily calorie tracking app, for web and ios (must use iOS to use HealthKit data).
 
 The data resets every day, so each day you can start fresh to meet your health goals.
 

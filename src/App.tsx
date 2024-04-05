@@ -1,11 +1,11 @@
 import "@aws-amplify/ui-react/styles.css";
-import {Header} from "./components/Header";
-import {Footer} from "./components/Footer";
-import {useEffect, useState} from "react";
-import {getHealthKitData, hasPermission} from "./helpers/getHealthKitData";
-import {RequestPermission} from "./components/RequestPermission";
-import {CalorieData} from "./components/CalorieData";
-import {withAuthenticator} from "@aws-amplify/ui-react";
+import { Header } from "./components/Header";
+import { Footer } from "./components/Footer";
+import { useEffect, useState } from "react";
+import { getHealthKitData, hasPermission } from "./helpers/getHealthKitData";
+import { RequestPermission } from "./components/RequestPermission";
+import { CalorieData } from "./components/CalorieData";
+import { withAuthenticator } from "@aws-amplify/ui-react";
 function App() {
   const [activeCalories, setActiveCalories] = useState<number>();
   const [baseCalories, setBaseCalories] = useState<number>();
@@ -15,7 +15,7 @@ function App() {
     const p = await hasPermission();
     setPermission(p);
     if (p) {
-      const {activeCalories, baseCalories, weight} = await getHealthKitData();
+      const { activeCalories, baseCalories, weight } = await getHealthKitData();
       setActiveCalories(activeCalories);
       setBaseCalories(baseCalories);
       setWeight(weight);
