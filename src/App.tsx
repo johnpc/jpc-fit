@@ -6,6 +6,7 @@ import { hasPermission } from "./helpers/getHealthKitData";
 import { RequestPermission } from "./components/RequestPermission";
 import { CalorieData } from "./components/CalorieData";
 import { withAuthenticator } from "@aws-amplify/ui-react";
+import { App as CapacitorApp } from "@capacitor/app";
 function App() {
   const [permission, setPermission] = useState<boolean>(false);
   const setup = async () => {
@@ -14,6 +15,19 @@ function App() {
   };
   useEffect(() => {
     setup();
+    CapacitorApp.addListener("appStateChange", ({ isActive }) => {
+      console.log({ appStateChange: true, isActive });
+      if (isActive) {
+        setup();
+      }
+    });
+    CapacitorApp.addListener("resume", () => {
+      setup();
+    });
+    return () => {
+      CapacitorApp.removeAllListeners();
+    }
+
   }, []);
 
   return (
