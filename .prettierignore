@@ -1,0 +1,8 @@
+node_modules
+ios
+.amplify
+dist
+*.svg
+*.png
+.gitignore
+.prettierignore
