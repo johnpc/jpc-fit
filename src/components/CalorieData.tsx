@@ -6,8 +6,10 @@ import {
   TableCell,
   TableBody,
   Heading,
+  Loader,
 } from "@aws-amplify/ui-react";
 import { useEffect, useState } from "react";
+import { App } from "@capacitor/app";
 import {
   FoodEntity,
   GoalEntity,
@@ -26,32 +28,59 @@ import {
 } from "../data/entities";
 import AddCalorieFab from "./AddCalorieFab";
 import { Delete, MonitorWeight, Edit } from "@mui/icons-material";
+import { getHealthKitData } from "../helpers/getHealthKitData";
 
-export const CalorieData = (props: {
-  activeCalories: number;
-  baseCalories: number;
-  weight: number;
-}) => {
+export const CalorieData = () => {
   const [foods, setFoods] = useState<FoodEntity[]>([]);
   const [goal, setGoal] = useState<GoalEntity>();
   const [weight, setWeight] = useState<WeightEntity>();
+  const [activeCalories, setActiveCalories] = useState<number>();
+  const [baseCalories, setBaseCalories] = useState<number>();
 
+  const setup = async () => {
+    const { activeCalories, baseCalories, weight } = await getHealthKitData();
+    setActiveCalories(activeCalories);
+    setBaseCalories(baseCalories);
+    setWeight((await getWeight()) ?? { currentWeight: weight });
+    setFoods(await listFood(new Date()));
+    setGoal(await getGoal());
+  };
   useEffect(() => {
-    const setup = async () => {
-      setFoods(await listFood(new Date()));
-      setGoal(await getGoal());
-      setWeight(await getWeight());
-    };
     setup();
     const createFoodSubscription = createFoodListener(setup);
     const deleteFoodSubscription = deleteFoodListener(setup);
     const createGoalSubscription = createGoalListener(setup);
     const createWeightSubscription = createWeightListener(setup);
+    App.addListener("appStateChange", ({ isActive }) => {
+      console.log({ appStateChange: true, isActive });
+      if (isActive) {
+        setup();
+      }
+    });
+
+    App.addListener("appUrlOpen", (data) => {
+      console.log({ appUrlOpen: true, data });
+      console.log("App opened with URL:", data);
+    });
+
+    App.addListener("appRestoredResult", (data) => {
+      console.log({ appRestoredResult: true, data });
+      console.log("Restored state:", data);
+    });
+
+    App.addListener("resume", () => {
+      console.log({ resume: true });
+    });
+
+    App.addListener("pause", () => {
+      console.log({ pause: true });
+    });
     return () => {
       unsubscribeListener(createFoodSubscription);
       unsubscribeListener(deleteFoodSubscription);
       unsubscribeListener(createGoalSubscription);
       unsubscribeListener(createWeightSubscription);
+      App.removeAllListeners();
     };
   }, []);
 
@@ -78,8 +107,14 @@ export const CalorieData = (props: {
     (sum: number, food: FoodEntity) => sum + food.calories,
     0,
   );
-  const targetCalories =
-    goal?.dietCalories ?? props.activeCalories + props.baseCalories;
+
+  if (
+    activeCalories === undefined ||
+    baseCalories === undefined ||
+    weight === undefined
+  )
+    return <Loader />;
+  const targetCalories = goal?.dietCalories ?? activeCalories + baseCalories;
   const remainingCalories = targetCalories - consumedCalories;
   return (
     <>
@@ -88,7 +123,8 @@ export const CalorieData = (props: {
           Remaining Calories:{" "}
           <span style={{ color: remainingCalories > 0 ? "green" : "red" }}>
             {remainingCalories}
-          </span>
+          </span>{" "}
+          for {new Date().toLocaleDateString()}
         </Heading>
       </Card>
       <Card>
@@ -103,12 +139,12 @@ export const CalorieData = (props: {
           <TableBody>
             <TableRow>
               <TableCell>Active Calories</TableCell>
-              <TableCell>{props.activeCalories}</TableCell>
+              <TableCell>{activeCalories}</TableCell>
               <TableCell></TableCell>
             </TableRow>
             <TableRow>
               <TableCell>Base Calories</TableCell>
-              <TableCell>{props.baseCalories}</TableCell>
+              <TableCell>{baseCalories}</TableCell>
               <TableCell></TableCell>
             </TableRow>
             <TableRow>
@@ -120,7 +156,7 @@ export const CalorieData = (props: {
             </TableRow>
             <TableRow>
               <TableCell>Weight</TableCell>
-              <TableCell>{weight?.currentWeight ?? props.weight}</TableCell>
+              <TableCell>{weight.currentWeight}</TableCell>
               <TableCell onClick={() => handleEditWeight()}>
                 <MonitorWeight />
               </TableCell>

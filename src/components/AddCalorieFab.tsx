@@ -9,6 +9,7 @@ import {
   Fastfood,
   LocalPizza,
   RamenDining,
+  Restaurant,
 } from "@mui/icons-material";
 
 const actions = [
@@ -16,6 +17,7 @@ const actions = [
   { icon: <RamenDining />, name: "200" },
   { icon: <LocalPizza />, name: "500" },
   { icon: <Fastfood />, name: "1000" },
+  { icon: <Restaurant />, name: "Custom" },
 ];
 
 export default function AddCalorieFab() {
@@ -23,7 +25,17 @@ export default function AddCalorieFab() {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
   const handleAction = async (actionName: string) => {
-    const calorieAmount = parseInt(actionName);
+    let calorieAmount = 0;
+    if (actionName === "Custom") {
+      calorieAmount = parseInt(prompt("Enter calorie amount")!);
+      if (Number.isNaN(calorieAmount) || calorieAmount < 1) {
+        alert("Invalid integer");
+        return;
+      }
+    } else {
+      calorieAmount = parseInt(actionName);
+    }
+
     await createFood(calorieAmount);
     handleClose();
   };
