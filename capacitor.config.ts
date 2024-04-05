@@ -2,7 +2,7 @@ import { CapacitorConfig } from "@capacitor/cli";
 
 const config: CapacitorConfig = {
   appId: "com.johncorser.fit",
-  appName: "jpc-fit-vite",
+  appName: "fit.jpc",
   webDir: "dist",
   bundledWebRuntime: false,
   ios: {
