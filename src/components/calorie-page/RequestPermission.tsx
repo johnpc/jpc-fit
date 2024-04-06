@@ -19,6 +19,7 @@ export const RequestPermission = (props: {
     await props.onPermissionGranted();
     setLoading(false);
   };
+
   const onLaunchHealthkitClick = () => {
     window.location.href = "x-apple-health://browse";
   };

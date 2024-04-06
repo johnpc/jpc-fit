@@ -13,35 +13,29 @@ import { App } from "@capacitor/app";
 import {
   FoodEntity,
   GoalEntity,
-  WeightEntity,
   createFoodListener,
   createGoal,
   createGoalListener,
-  createWeight,
-  createWeightListener,
   deleteFood,
   deleteFoodListener,
   getGoal,
-  getWeight,
   listFood,
   unsubscribeListener,
-} from "../data/entities";
+} from "../../data/entities";
 import AddCalorieFab from "./AddCalorieFab";
-import { Delete, MonitorWeight, Edit } from "@mui/icons-material";
-import { getHealthKitData } from "../helpers/getHealthKitData";
+import { Delete, Edit } from "@mui/icons-material";
+import { getHealthKitData } from "../../helpers/getHealthKitData";
 
 export const CalorieData = () => {
   const [foods, setFoods] = useState<FoodEntity[]>([]);
   const [goal, setGoal] = useState<GoalEntity>();
-  const [weight, setWeight] = useState<WeightEntity>();
   const [activeCalories, setActiveCalories] = useState<number>();
   const [baseCalories, setBaseCalories] = useState<number>();
 
   const setup = async () => {
-    const { activeCalories, baseCalories, weight } = await getHealthKitData();
+    const { activeCalories, baseCalories } = await getHealthKitData();
     setActiveCalories(activeCalories);
     setBaseCalories(baseCalories);
-    setWeight((await getWeight()) ?? { currentWeight: weight });
     setFoods(await listFood(new Date()));
     setGoal(await getGoal());
   };
@@ -50,7 +44,6 @@ export const CalorieData = () => {
     const createFoodSubscription = createFoodListener(setup);
     const deleteFoodSubscription = deleteFoodListener(setup);
     const createGoalSubscription = createGoalListener(setup);
-    const createWeightSubscription = createWeightListener(setup);
     App.addListener("appStateChange", ({ isActive }) => {
       console.log({ appStateChange: true, isActive });
       if (isActive) {
@@ -75,11 +68,11 @@ export const CalorieData = () => {
     App.addListener("pause", () => {
       console.log({ pause: true });
     });
+
     return () => {
       unsubscribeListener(createFoodSubscription);
       unsubscribeListener(deleteFoodSubscription);
       unsubscribeListener(createGoalSubscription);
-      unsubscribeListener(createWeightSubscription);
       App.removeAllListeners();
     };
   }, []);
@@ -94,25 +87,12 @@ export const CalorieData = () => {
     await createGoal(newGoal);
   };
 
-  const handleEditWeight = async () => {
-    const newWeight = parseInt(prompt("Enter your weight")!);
-    if (Number.isNaN(newWeight) || newWeight < 1) {
-      alert("Invalid integer");
-      return;
-    }
-
-    await createWeight(newWeight);
-  };
   const consumedCalories = foods.reduce(
     (sum: number, food: FoodEntity) => sum + food.calories,
     0,
   );
 
-  if (
-    activeCalories === undefined ||
-    baseCalories === undefined ||
-    weight === undefined
-  )
+  if (activeCalories === undefined || baseCalories === undefined)
     return <Loader />;
   const targetCalories = goal?.dietCalories ?? activeCalories + baseCalories;
   const remainingCalories = targetCalories - consumedCalories;
@@ -154,13 +134,6 @@ export const CalorieData = () => {
                 <Edit />
               </TableCell>
             </TableRow>
-            <TableRow>
-              <TableCell>Weight</TableCell>
-              <TableCell>{weight.currentWeight}</TableCell>
-              <TableCell onClick={() => handleEditWeight()}>
-                <MonitorWeight />
-              </TableCell>
-            </TableRow>
           </TableBody>
         </Table>
       </Card>
@@ -170,14 +143,16 @@ export const CalorieData = () => {
             <TableHead>
               <TableRow>
                 <TableCell as="th">Time</TableCell>
+                <TableCell as="th">Name</TableCell>
                 <TableCell as="th">Calories</TableCell>
                 <TableCell as="th">Delete</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {foods.map((food) => (
-                <TableRow>
+                <TableRow key={food.id}>
                   <TableCell>{food.createdAt.toLocaleTimeString()}</TableCell>
+                  <TableCell>{food.name ?? "No name"}</TableCell>
                   <TableCell>{food.calories}</TableCell>
                   <TableCell onClick={() => deleteFood(food)}>
                     <Delete />

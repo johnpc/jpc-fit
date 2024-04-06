@@ -11,6 +11,7 @@ export type FoodEntity = {
   id: string;
   calories: number;
   day: string;
+  name?: string | undefined | null;
   createdAt: Date;
 };
 
@@ -20,6 +21,18 @@ export type GoalEntity = {
 
 export type WeightEntity = {
   currentWeight: number;
+};
+
+export type HeightEntity = {
+  currentHeight: number;
+};
+
+export type QuickAddEntity = {
+  id: string;
+  name: string;
+  calories: number;
+  icon: string;
+  createdAt: Date;
 };
 
 export const getGoal = async (): Promise<GoalEntity | undefined> => {
@@ -51,6 +64,16 @@ export const getWeight = async (): Promise<WeightEntity | undefined> => {
     .find((g) => g);
 };
 
+export const getHeight = async (): Promise<HeightEntity | undefined> => {
+  const allHeights = (await client.models.Height.list()).data;
+  return allHeights
+    .sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    )
+    .find((g) => g);
+};
+
 export const createWeight = async (
   currentWeight: number,
 ): Promise<WeightEntity> => {
@@ -62,11 +85,59 @@ export const createWeight = async (
   };
 };
 
+export const createHeight = async (
+  currentHeight: number,
+): Promise<HeightEntity> => {
+  const createdHeight = await client.models.Height.create({
+    currentHeight,
+  });
+  return {
+    ...createdHeight.data,
+  };
+};
+
+export const createQuickAdd = async (
+  name: string,
+  calories: number,
+  icon: string,
+): Promise<QuickAddEntity> => {
+  const createdQuickAdd = await client.models.QuickAdd.create({
+    name,
+    calories,
+    icon,
+  });
+  return {
+    ...createdQuickAdd.data,
+    createdAt: new Date(createdQuickAdd.data.createdAt),
+  };
+};
+
+export const deleteQuickAdd = async (quickAdd: QuickAddEntity) => {
+  await client.models.QuickAdd.delete({ id: quickAdd.id });
+};
+
+export const listQuickAdds = async (): Promise<QuickAddEntity[]> => {
+  const quickAdds = await client.models.QuickAdd.list({
+    selectionSet: ["id", "name", "calories", "icon", "createdAt"],
+  });
+  return (
+    quickAdds.data
+      ?.sort(
+        (a, b) =>
+          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+      )
+      .map((food) => ({
+        ...food,
+        createdAt: new Date(food.createdAt),
+      })) ?? []
+  );
+};
+
 export const listFood = async (date: Date): Promise<FoodEntity[]> => {
   const foods = await client.models.Food.listByDay(
     { day: date.toLocaleDateString() },
     {
-      selectionSet: ["id", "day", "calories", "createdAt"],
+      selectionSet: ["id", "day", "calories", "createdAt", "name"],
     },
   );
   return (
@@ -82,8 +153,12 @@ export const listFood = async (date: Date): Promise<FoodEntity[]> => {
   );
 };
 
-export const createFood = async (calories: number): Promise<FoodEntity> => {
+export const createFood = async (
+  name: string,
+  calories: number,
+): Promise<FoodEntity> => {
   const createdFood = await client.models.Food.create({
+    name,
     calories,
     day: new Date().toLocaleDateString(),
   });
@@ -99,6 +174,30 @@ export const deleteFood = async (food: FoodEntity) => {
 
 export const createFoodListener = (fn: () => void) => {
   const listener = client.models.Food.onCreate().subscribe({
+    next: async () => {
+      fn();
+    },
+    error: (error: Error) => {
+      console.error("Subscription error", error);
+    },
+  });
+  return listener;
+};
+
+export const createQuickAddListener = (fn: () => void) => {
+  const listener = client.models.QuickAdd.onCreate().subscribe({
+    next: async () => {
+      fn();
+    },
+    error: (error: Error) => {
+      console.error("Subscription error", error);
+    },
+  });
+  return listener;
+};
+
+export const deleteQuickAddListener = (fn: () => void) => {
+  const listener = client.models.QuickAdd.onDelete().subscribe({
     next: async () => {
       fn();
     },
@@ -144,6 +243,19 @@ export const createWeightListener = (fn: () => void) => {
   });
   return listener;
 };
+
+export const createHeightListener = (fn: () => void) => {
+  const listener = client.models.Height.onCreate().subscribe({
+    next: async () => {
+      fn();
+    },
+    error: (error: Error) => {
+      console.error("Subscription error", error);
+    },
+  });
+  return listener;
+};
+
 export const unsubscribeListener = (subscription: Subscription) => {
   return subscription.unsubscribe();
 };
