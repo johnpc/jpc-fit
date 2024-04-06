@@ -10,6 +10,7 @@ import {
   TableHead,
   TableRow,
   TableCell,
+  Label,
 } from "@aws-amplify/ui-react";
 import { findIcon, iconList } from "../../helpers/iconMap";
 import { MenuItem, Select, SelectChangeEvent } from "@mui/material";
@@ -123,9 +124,22 @@ export default function QuickAddConfiguration() {
         variation="outlined"
         direction="column"
       >
-        <Input onChange={onChangeName} size="large" placeholder="Lunch" />
-        <Input onChange={onChangeCalories} size="large" placeholder="250" />
-        <Select onChange={onSelectIcon} label="Icon" value={icon}>
+        <Label htmlFor="name">Name:</Label>
+        <Input
+          onChange={onChangeName}
+          size="large"
+          placeholder="Lunch"
+          id="name"
+        />
+        <Label htmlFor="calories">Calories:</Label>
+        <Input
+          onChange={onChangeCalories}
+          size="large"
+          placeholder="250"
+          id="calories"
+        />
+        <Label htmlFor="icon">Icon:</Label>
+        <Select onChange={onSelectIcon} label="Icon" value={icon} id="icon">
           {iconList.map(
             (args: { iconName: string; component: React.ReactElement }) => (
               <MenuItem key={args.iconName} value={args.iconName}>
