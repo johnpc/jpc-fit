@@ -176,6 +176,13 @@ export const CalorieData = () => {
               </TableCell>
             </TableRow>
             <TableRow>
+              <TableCell>Consumed</TableCell>
+              <TableCell>
+                {foods.reduce((sum, food) => sum + (food.calories ?? 0), 0)} cals
+              </TableCell>
+              <TableCell></TableCell>
+            </TableRow>
+            <TableRow>
               <TableCell>Protein</TableCell>
               <TableCell>
                 {foods.reduce((sum, food) => sum + (food.protein ?? 0), 0)}g
