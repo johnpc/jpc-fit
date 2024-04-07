@@ -7,6 +7,8 @@ import {
   TableBody,
   Heading,
   Loader,
+  Text,
+  Button,
 } from "@aws-amplify/ui-react";
 import { useEffect, useState } from "react";
 import { App } from "@capacitor/app";
@@ -23,10 +25,17 @@ import {
   unsubscribeListener,
 } from "../../data/entities";
 import AddCalorieFab from "./AddCalorieFab";
-import { Delete, Edit } from "@mui/icons-material";
+import {
+  ArrowBackIos,
+  ArrowForwardIos,
+  Delete,
+  Edit,
+} from "@mui/icons-material";
 import { getHealthKitData } from "../../helpers/getHealthKitData";
+import { addDays, subDays } from "date-fns";
 
 export const CalorieData = () => {
+  const [date, setDate] = useState<Date>(new Date());
   const [foods, setFoods] = useState<FoodEntity[]>([]);
   const [goal, setGoal] = useState<GoalEntity>();
   const [activeCalories, setActiveCalories] = useState<number>();
@@ -36,7 +45,7 @@ export const CalorieData = () => {
     const { activeCalories, baseCalories } = await getHealthKitData();
     setActiveCalories(activeCalories);
     setBaseCalories(baseCalories);
-    setFoods(await listFood(new Date()));
+    setFoods(await listFood(date));
     setGoal(await getGoal());
   };
   useEffect(() => {
@@ -75,7 +84,7 @@ export const CalorieData = () => {
       unsubscribeListener(createGoalSubscription);
       App.removeAllListeners();
     };
-  }, []);
+  }, [date]);
 
   const handleEditGoal = async () => {
     const newGoal = parseInt(prompt("Enter new goal")!);
@@ -85,6 +94,15 @@ export const CalorieData = () => {
     }
 
     await createGoal(newGoal);
+  };
+
+  const handleSubtractDate = async () => {
+    const day = subDays(date, 1);
+    setDate(day);
+  };
+  const handleAddDate = async () => {
+    const day = addDays(date, 1);
+    setDate(day);
   };
 
   const consumedCalories = foods.reduce(
@@ -98,13 +116,21 @@ export const CalorieData = () => {
   const remainingCalories = targetCalories - consumedCalories;
   return (
     <>
+      <>
+        <Text as="div" textAlign={'center'}>
+          <ArrowBackIos style={{paddingTop: '10px'}} onClick={handleSubtractDate} />
+          <Text as="span" fontWeight={'bold'} margin={'15%'}>{date.toLocaleDateString()}</Text>
+          <ArrowForwardIos style={{paddingTop: '10px'}} onClick={handleAddDate} />
+          {date.toLocaleDateString() === new Date().toLocaleDateString() ? null : <Button onClick={() => setDate(new Date)}>today</Button>}
+        </Text>
+      </>
       <Card>
         <Heading>
           Remaining Calories:{" "}
           <span style={{ color: remainingCalories > 0 ? "green" : "red" }}>
             {remainingCalories}
           </span>{" "}
-          for {new Date().toLocaleDateString()}
+          for {date.toLocaleDateString()}
         </Heading>
       </Card>
       <Card>

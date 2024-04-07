@@ -133,6 +133,24 @@ export const listQuickAdds = async (): Promise<QuickAddEntity[]> => {
   );
 };
 
+export const listAllFood = async (): Promise<FoodEntity[]> => {
+  const foods = await client.models.Food.list({
+    limit: 10000,
+    selectionSet: ["id", "day", "calories", "createdAt", "name"],
+  });
+  return (
+    foods.data
+      ?.sort(
+        (a, b) =>
+          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+      )
+      .map((food) => ({
+        ...food,
+        createdAt: new Date(food.createdAt),
+      })) ?? []
+  );
+};
+
 export const listFood = async (date: Date): Promise<FoodEntity[]> => {
   const foods = await client.models.Food.listByDay(
     { day: date.toLocaleDateString() },
