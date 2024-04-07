@@ -42,7 +42,7 @@ export default function AddCalorieFab() {
   const handleClose = () => setOpen(false);
   const handleAction = async (quickAdd: QuickAddEntity) => {
     let calorieAmount = 0;
-    let proteinAmount = quickAdd.calories ?? 0;
+    let proteinAmount = quickAdd.protein ?? 0;
     if (quickAdd.id === customQuickAdd.id) {
       calorieAmount = parseInt(prompt("Enter calorie amount")!);
       if (Number.isNaN(calorieAmount) || calorieAmount < 1) {
