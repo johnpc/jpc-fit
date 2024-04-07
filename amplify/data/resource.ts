@@ -5,6 +5,7 @@ const schema = a.schema({
     .model({
       name: a.string(),
       calories: a.integer().required(),
+      protein: a.integer(),
       day: a.string().required(),
     })
     .secondaryIndexes((index) => [index("day")])
@@ -19,6 +20,7 @@ const schema = a.schema({
     .model({
       name: a.string().required(),
       calories: a.integer().required(),
+      protein: a.integer(),
       icon: a.string().required(),
     })
     .authorization([a.allow.owner()]),

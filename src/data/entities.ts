@@ -10,6 +10,7 @@ const client = generateClient<Schema>({
 export type FoodEntity = {
   id: string;
   calories: number;
+  protein?: number | undefined | null;
   day: string;
   name?: string | undefined | null;
   createdAt: Date;
@@ -31,6 +32,7 @@ export type QuickAddEntity = {
   id: string;
   name: string;
   calories: number;
+  protein?: number | undefined | null;
   icon: string;
   createdAt: Date;
 };
@@ -100,11 +102,13 @@ export const createQuickAdd = async (
   name: string,
   calories: number,
   icon: string,
+  protein?: number,
 ): Promise<QuickAddEntity> => {
   const createdQuickAdd = await client.models.QuickAdd.create({
     name,
     calories,
     icon,
+    protein,
   });
   return {
     ...createdQuickAdd.data,
@@ -118,7 +122,7 @@ export const deleteQuickAdd = async (quickAdd: QuickAddEntity) => {
 
 export const listQuickAdds = async (): Promise<QuickAddEntity[]> => {
   const quickAdds = await client.models.QuickAdd.list({
-    selectionSet: ["id", "name", "calories", "icon", "createdAt"],
+    selectionSet: ["id", "name", "calories", "protein", "icon", "createdAt"],
   });
   return (
     quickAdds.data
@@ -136,7 +140,7 @@ export const listQuickAdds = async (): Promise<QuickAddEntity[]> => {
 export const listAllFood = async (): Promise<FoodEntity[]> => {
   const foods = await client.models.Food.list({
     limit: 10000,
-    selectionSet: ["id", "day", "calories", "createdAt", "name"],
+    selectionSet: ["id", "day", "calories", "protein", "createdAt", "name"],
   });
   return (
     foods.data
@@ -155,7 +159,7 @@ export const listFood = async (date: Date): Promise<FoodEntity[]> => {
   const foods = await client.models.Food.listByDay(
     { day: date.toLocaleDateString() },
     {
-      selectionSet: ["id", "day", "calories", "createdAt", "name"],
+      selectionSet: ["id", "day", "calories", "protein", "createdAt", "name"],
     },
   );
   return (
@@ -174,10 +178,12 @@ export const listFood = async (date: Date): Promise<FoodEntity[]> => {
 export const createFood = async (
   name: string,
   calories: number,
+  protein: number,
 ): Promise<FoodEntity> => {
   const createdFood = await client.models.Food.create({
     name,
     calories,
+    protein,
     day: new Date().toLocaleDateString(),
   });
   return {
