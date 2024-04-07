@@ -87,10 +87,17 @@ export const getHealthKitData = async (today: Date): Promise<HealthKitData> => {
     ...queryOptions,
     sampleName: SampleNames.STEP_COUNT,
   });
-  const stepsValue = stepsData.resultData.reduce(
-    (value, item) => (value += item.value),
-    0,
+  const hasAppleWatch = stepsData.resultData.find(
+    (result) => result.device?.name === "Apple Watch",
   );
+
+  const stepsValue = stepsData.resultData
+    .filter((result) =>
+      hasAppleWatch
+        ? result.device?.name === "Apple Watch"
+        : result.device?.name === "iPhone",
+    )
+    .reduce((value, item) => (value += item.value), 0);
 
   return {
     activeCalories: +activeCalorieValue.toFixed(),
