@@ -35,28 +35,28 @@ export const customQuickAdd: QuickAddEntity = {
 export const defaultQuickAdds: QuickAddEntity[] = [
   {
     icon: "BakeryDining",
-    name: "Default Quick Add - 100",
+    name: "Tiny",
     calories: 100,
     createdAt: new Date(),
     id: "dqa-100",
   },
   {
     icon: "RamenDining",
-    name: "Default Quick Add - 200",
+    name: "Small",
     calories: 200,
     createdAt: new Date(),
     id: "dqa-200",
   },
   {
     icon: "LocalPizza",
-    name: "Default Quick Add - 500",
+    name: "Medium",
     calories: 500,
     createdAt: new Date(),
     id: "dqa-500",
   },
   {
     icon: "Fastfood",
-    name: "Default Quick Add - 1000",
+    name: "Large",
     calories: 1000,
     createdAt: new Date(),
     id: "dqa-1000",

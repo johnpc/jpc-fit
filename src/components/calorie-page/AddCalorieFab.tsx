@@ -26,7 +26,7 @@ export default function AddCalorieFab() {
     if (!quickAdds.length) {
       setQuickAdds(defaultQuickAdds);
     } else {
-      setQuickAdds(quickAdds);
+      setQuickAdds([...quickAdds, customQuickAdd]);
     }
   };
   React.useEffect(() => {
@@ -57,7 +57,7 @@ export default function AddCalorieFab() {
   };
 
   const css = `
-    .MuiSpeedDialAction-staticTooltipLabel { width: 20pc; text-align: right; }
+    .MuiSpeedDialAction-staticTooltipLabel { width: 15pc; text-align: right; }
   `;
   return (
     <>
@@ -71,7 +71,7 @@ export default function AddCalorieFab() {
         onOpen={handleOpen}
         open={open}
       >
-        {[...quickAdds, customQuickAdd].map((action) => (
+        {quickAdds.map((action) => (
           <SpeedDialAction
             key={action.name}
             style={{ textAlign: "right", width: "100%" }}

@@ -43,7 +43,8 @@ export const CalorieData = () => {
   const [steps, setSteps] = useState<number>();
 
   const setup = async () => {
-    const { activeCalories, baseCalories, steps } = await getHealthKitData(date);
+    const { activeCalories, baseCalories, steps } =
+      await getHealthKitData(date);
     setActiveCalories(activeCalories);
     setBaseCalories(baseCalories);
     setFoods(await listFood(date));
