@@ -27,7 +27,7 @@ export default function WeightPage() {
   const [height, setHeight] = useState<HeightEntity>();
 
   const setup = async () => {
-    const { weight } = await getHealthKitData();
+    const { weight } = await getHealthKitData(new Date());
     setWeight((await getWeight()) ?? { currentWeight: weight });
     setHeight((await getHeight()) ?? { currentHeight: 0 });
   };

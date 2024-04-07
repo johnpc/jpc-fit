@@ -40,13 +40,15 @@ export const CalorieData = () => {
   const [goal, setGoal] = useState<GoalEntity>();
   const [activeCalories, setActiveCalories] = useState<number>();
   const [baseCalories, setBaseCalories] = useState<number>();
+  const [steps, setSteps] = useState<number>();
 
   const setup = async () => {
-    const { activeCalories, baseCalories } = await getHealthKitData();
+    const { activeCalories, baseCalories, steps } = await getHealthKitData(date);
     setActiveCalories(activeCalories);
     setBaseCalories(baseCalories);
     setFoods(await listFood(date));
     setGoal(await getGoal());
+    setSteps(steps);
   };
   useEffect(() => {
     setup();
@@ -117,11 +119,22 @@ export const CalorieData = () => {
   return (
     <>
       <>
-        <Text as="div" textAlign={'center'}>
-          <ArrowBackIos style={{paddingTop: '10px'}} onClick={handleSubtractDate} />
-          <Text as="span" fontWeight={'bold'} margin={'15%'}>{date.toLocaleDateString()}</Text>
-          <ArrowForwardIos style={{paddingTop: '10px'}} onClick={handleAddDate} />
-          {date.toLocaleDateString() === new Date().toLocaleDateString() ? null : <Button onClick={() => setDate(new Date)}>today</Button>}
+        <Text as="div" textAlign={"center"}>
+          <ArrowBackIos
+            style={{ paddingTop: "10px" }}
+            onClick={handleSubtractDate}
+          />
+          <Text as="span" fontWeight={"bold"} margin={"15%"}>
+            {date.toLocaleDateString()}
+          </Text>
+          <ArrowForwardIos
+            style={{ paddingTop: "10px" }}
+            onClick={handleAddDate}
+          />
+          {date.toLocaleDateString() ===
+          new Date().toLocaleDateString() ? null : (
+            <Button onClick={() => setDate(new Date())}>today</Button>
+          )}
         </Text>
       </>
       <Card>
@@ -143,6 +156,13 @@ export const CalorieData = () => {
             </TableRow>
           </TableHead>
           <TableBody>
+            {!steps ? null : (
+              <TableRow>
+                <TableCell>Steps</TableCell>
+                <TableCell>{steps}</TableCell>
+                <TableCell></TableCell>
+              </TableRow>
+            )}
             <TableRow>
               <TableCell>Active Calories</TableCell>
               <TableCell>{activeCalories}</TableCell>

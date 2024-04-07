@@ -1,6 +1,6 @@
-import {useEffect, useState} from "react";
-import {StreakInfo, getStreakInfo} from "../../helpers/getStreakInfo";
-import {createFoodListener, unsubscribeListener} from "../../data/entities";
+import { useEffect, useState } from "react";
+import { StreakInfo, getStreakInfo } from "../../helpers/getStreakInfo";
+import { createFoodListener, unsubscribeListener } from "../../data/entities";
 import {
   Loader,
   useTheme,
@@ -11,7 +11,7 @@ import {
 } from "@aws-amplify/ui-react";
 
 export default function Streak() {
-  const {tokens} = useTheme();
+  const { tokens } = useTheme();
 
   const [streakInfo, setStreakInfo] = useState<StreakInfo>();
   const setup = async () => {
