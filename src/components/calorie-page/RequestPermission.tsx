@@ -1,4 +1,5 @@
-import { Card, Text, Button } from "@aws-amplify/ui-react";
+import { Card, Button, Label } from "@aws-amplify/ui-react";
+import { Divider } from "@mui/material";
 import { CapacitorHealthkit } from "@perfood/capacitor-healthkit";
 import { useState } from "react";
 
@@ -21,14 +22,25 @@ export const RequestPermission = (props: {
   };
 
   const onLaunchHealthkitClick = () => {
-    window.location.href = "x-apple-health://browse";
+    window.location.href = "x-apple-health://Sources/jpc.fit";
   };
   return (
     <Card>
-      <Text as="span">No HealthKit data available. Grant permission?</Text>
-      <Button isLoading={loading} margin={"10px"} onClick={onPermissionClick}>
-        Permission
+      <Label as="div">
+        HealthKit data is required to use this app. Grant permission?
+      </Label>
+      <br />
+      <Button
+        variation="primary"
+        isLoading={loading}
+        margin={"10px"}
+        onClick={onPermissionClick}
+      >
+        Grant Permission
       </Button>
+      <Divider style={{ margin: "10px" }} />
+      <Label as="div">Not authorizing?</Label>
+      <br />
       <Button margin={"10px"} onClick={onLaunchHealthkitClick}>
         Launch Healthkit
       </Button>

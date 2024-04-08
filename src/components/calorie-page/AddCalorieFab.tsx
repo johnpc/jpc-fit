@@ -52,8 +52,7 @@ export default function AddCalorieFab() {
 
       proteinAmount = parseInt(prompt("Enter protein in grams")!);
       if (Number.isNaN(proteinAmount) || proteinAmount < 1) {
-        alert("Invalid integer");
-        return;
+        proteinAmount = 0;
       }
     } else {
       calorieAmount = quickAdd.calories;
