@@ -10,8 +10,8 @@ import {
   Text,
   Button,
 } from "@aws-amplify/ui-react";
-import {useEffect, useState} from "react";
-import {App} from "@capacitor/app";
+import { useEffect, useState } from "react";
+import { App } from "@capacitor/app";
 import {
   FoodEntity,
   GoalEntity,
@@ -20,14 +20,21 @@ import {
   createGoalListener,
   deleteFood,
   deleteFoodListener,
+  deleteGoal,
+  deleteGoalListener,
   getGoal,
   listFood,
   unsubscribeListener,
 } from "../../data/entities";
 import AddCalorieFab from "./AddCalorieFab";
-import {ArrowBackIos, ArrowForwardIos, Delete, Edit} from "@mui/icons-material";
-import {getHealthKitData} from "../../helpers/getHealthKitData";
-import {addDays, subDays} from "date-fns";
+import {
+  ArrowBackIos,
+  ArrowForwardIos,
+  Delete,
+  Edit,
+} from "@mui/icons-material";
+import { getHealthKitData } from "../../helpers/getHealthKitData";
+import { addDays, subDays } from "date-fns";
 
 export const CalorieData = () => {
   const [date, setDate] = useState<Date>(new Date());
@@ -38,7 +45,8 @@ export const CalorieData = () => {
   const [steps, setSteps] = useState<number>();
 
   const setup = async () => {
-    const {activeCalories, baseCalories, steps} = await getHealthKitData(date);
+    const { activeCalories, baseCalories, steps } =
+      await getHealthKitData(date);
     setActiveCalories(activeCalories);
     setBaseCalories(baseCalories);
     setFoods(await listFood(date));
@@ -50,35 +58,37 @@ export const CalorieData = () => {
     const createFoodSubscription = createFoodListener(setup);
     const deleteFoodSubscription = deleteFoodListener(setup);
     const createGoalSubscription = createGoalListener(setup);
-    App.addListener("appStateChange", ({isActive}) => {
-      console.log({appStateChange: true, isActive});
+    const deleteGoalSubscription = deleteGoalListener(setup);
+    App.addListener("appStateChange", ({ isActive }) => {
+      console.log({ appStateChange: true, isActive });
       if (isActive) {
         setup();
       }
     });
 
     App.addListener("appUrlOpen", (data) => {
-      console.log({appUrlOpen: true, data});
+      console.log({ appUrlOpen: true, data });
       console.log("App opened with URL:", data);
     });
 
     App.addListener("appRestoredResult", (data) => {
-      console.log({appRestoredResult: true, data});
+      console.log({ appRestoredResult: true, data });
       console.log("Restored state:", data);
     });
 
     App.addListener("resume", () => {
-      console.log({resume: true});
+      console.log({ resume: true });
     });
 
     App.addListener("pause", () => {
-      console.log({pause: true});
+      console.log({ pause: true });
     });
 
     return () => {
       unsubscribeListener(createFoodSubscription);
       unsubscribeListener(deleteFoodSubscription);
       unsubscribeListener(createGoalSubscription);
+      unsubscribeListener(deleteGoalSubscription);
       App.removeAllListeners();
     };
   }, [date]);
@@ -93,6 +103,10 @@ export const CalorieData = () => {
     await createGoal(newGoal);
   };
 
+  const handleDeleteGoal = async () => {
+    await deleteGoal();
+  };
+
   const handleSubtractDate = async () => {
     const day = subDays(date, 1);
     setDate(day);
@@ -104,7 +118,7 @@ export const CalorieData = () => {
 
   const consumedCalories = foods.reduce(
     (sum: number, food: FoodEntity) => sum + food.calories,
-    0
+    0,
   );
 
   if (activeCalories === undefined || baseCalories === undefined)
@@ -116,14 +130,14 @@ export const CalorieData = () => {
       <>
         <Text as="div" textAlign={"center"}>
           <ArrowBackIos
-            style={{paddingTop: "10px"}}
+            style={{ paddingTop: "10px" }}
             onClick={handleSubtractDate}
           />
           <Text as="span" fontWeight={"bold"} margin={"15%"}>
             {date.toLocaleDateString()}
           </Text>
           <ArrowForwardIos
-            style={{paddingTop: "10px"}}
+            style={{ paddingTop: "10px" }}
             onClick={handleAddDate}
           />
           {date.toLocaleDateString() ===
@@ -135,7 +149,7 @@ export const CalorieData = () => {
       <Card>
         <Heading>
           Remaining Calories:{" "}
-          <span style={{color: remainingCalories > 0 ? "green" : "red"}}>
+          <span style={{ color: remainingCalories > 0 ? "green" : "red" }}>
             {remainingCalories}
           </span>{" "}
           for {date.toLocaleDateString()}
@@ -171,14 +185,21 @@ export const CalorieData = () => {
             <TableRow>
               <TableCell>Goal</TableCell>
               <TableCell>{targetCalories} cals</TableCell>
-              <TableCell onClick={() => handleEditGoal()}>
-                <Edit />
-              </TableCell>
+              {goal?.dietCalories ? (
+                <TableCell onClick={() => handleDeleteGoal()}>
+                  <Delete />
+                </TableCell>
+              ) : (
+                <TableCell onClick={() => handleEditGoal()}>
+                  <Edit />
+                </TableCell>
+              )}
             </TableRow>
             <TableRow>
               <TableCell>Consumed</TableCell>
               <TableCell>
-                {foods.reduce((sum, food) => sum + (food.calories ?? 0), 0)} cals
+                {foods.reduce((sum, food) => sum + (food.calories ?? 0), 0)}{" "}
+                cals
               </TableCell>
               <TableCell></TableCell>
             </TableRow>

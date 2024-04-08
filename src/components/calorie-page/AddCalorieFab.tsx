@@ -11,7 +11,7 @@ import {
   listQuickAdds,
   unsubscribeListener,
 } from "../../data/entities";
-import {findIcon} from "../../helpers/iconMap";
+import { findIcon } from "../../helpers/iconMap";
 import {
   customQuickAdd,
   defaultQuickAdds,
@@ -72,7 +72,7 @@ export default function AddCalorieFab() {
       <Backdrop open={open} />
       <SpeedDial
         ariaLabel="SpeedDial tooltip"
-        sx={{position: "absolute", bottom: 16, right: 16}}
+        sx={{ position: "absolute", bottom: 16, right: 16 }}
         icon={<SpeedDialIcon />}
         onClose={handleClose}
         onOpen={handleOpen}
@@ -81,7 +81,7 @@ export default function AddCalorieFab() {
         {quickAdds.map((action) => (
           <SpeedDialAction
             key={action.name}
-            style={{textAlign: "right", width: "100%"}}
+            style={{ textAlign: "right", width: "100%" }}
             icon={findIcon(action.icon)}
             tooltipTitle={`${action.name}${action.calories ? " (" + action.calories + " cals)" : ""}`}
             tooltipOpen

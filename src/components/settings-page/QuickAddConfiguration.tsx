@@ -12,8 +12,8 @@ import {
   TableCell,
   Label,
 } from "@aws-amplify/ui-react";
-import {findIcon, iconList} from "../../helpers/iconMap";
-import {MenuItem, Select, SelectChangeEvent} from "@mui/material";
+import { findIcon, iconList } from "../../helpers/iconMap";
+import { MenuItem, Select, SelectChangeEvent } from "@mui/material";
 import {
   QuickAddEntity,
   createQuickAdd,
@@ -23,7 +23,7 @@ import {
   listQuickAdds,
   unsubscribeListener,
 } from "../../data/entities";
-import {Delete} from "@mui/icons-material";
+import { Delete } from "@mui/icons-material";
 
 export const customQuickAdd: QuickAddEntity = {
   icon: "Restaurant",
@@ -159,11 +159,11 @@ export default function QuickAddConfiguration() {
         <Label htmlFor="icon">Icon:</Label>
         <Select onChange={onSelectIcon} label="Icon" value={icon} id="icon">
           {iconList.map(
-            (args: {iconName: string; component: React.ReactElement}) => (
+            (args: { iconName: string; component: React.ReactElement }) => (
               <MenuItem key={args.iconName} value={args.iconName}>
                 {args.component}
               </MenuItem>
-            )
+            ),
           )}
         </Select>
         <Button
@@ -183,9 +183,11 @@ export default function QuickAddConfiguration() {
             <TableRow>
               <TableCell as="th">Name</TableCell>
               <TableCell as="th">Icon</TableCell>
-              <TableCell as="th">Calories</TableCell>
-              <TableCell as="th">Protein</TableCell>
-              <TableCell as="th">Delete</TableCell>
+              <TableCell as="th">Cals</TableCell>
+              <TableCell as="th">Pr</TableCell>
+              <TableCell as="th">
+                <Delete />
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>

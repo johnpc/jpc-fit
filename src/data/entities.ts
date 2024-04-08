@@ -56,6 +56,14 @@ export const createGoal = async (dietCalories: number): Promise<GoalEntity> => {
   };
 };
 
+export const deleteGoal = async (): Promise<void> => {
+  const goals = await client.models.Goal.list();
+  const promises = goals.data.map((goal) =>
+    client.models.Goal.delete({ id: goal.id }),
+  );
+  await Promise.all(promises);
+};
+
 export const getWeight = async (): Promise<WeightEntity | undefined> => {
   const allWeights = (await client.models.Weight.list()).data;
   return allWeights
@@ -246,6 +254,18 @@ export const deleteFoodListener = (fn: () => void) => {
 
 export const createGoalListener = (fn: () => void) => {
   const listener = client.models.Goal.onCreate().subscribe({
+    next: async () => {
+      fn();
+    },
+    error: (error: Error) => {
+      console.error("Subscription error", error);
+    },
+  });
+  return listener;
+};
+
+export const deleteGoalListener = (fn: () => void) => {
+  const listener = client.models.Goal.onDelete().subscribe({
     next: async () => {
       fn();
     },
