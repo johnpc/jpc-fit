@@ -17,6 +17,7 @@ export const RequestPermission = (props: {
       read: readPermissions,
       write: [],
     });
+    localStorage.setItem('hasPermission', 'hasPermission');
     await props.onPermissionGranted();
     setLoading(false);
   };
@@ -27,7 +28,7 @@ export const RequestPermission = (props: {
   return (
     <Card>
       <Label as="div">
-        HealthKit data is required to use this app. Grant permission?
+        HealthKit data provides the best experience for this app. Grant permission?
       </Label>
       <br />
       <Button
@@ -39,7 +40,7 @@ export const RequestPermission = (props: {
         Grant Permission
       </Button>
       <Divider style={{ margin: "10px" }} />
-      <Label as="div">Not authorizing?</Label>
+      <Label as="div">Problem with permissions?</Label>
       <br />
       <Button margin={"10px"} onClick={onLaunchHealthkitClick}>
         Launch Healthkit

@@ -4,7 +4,7 @@ import {
   OtherData,
   SampleNames,
 } from "@perfood/capacitor-healthkit";
-import { endOfDay, startOfDay, subDays } from "date-fns";
+import { endOfDay, startOfDay } from "date-fns";
 
 type HealthKitData = {
   activeCalories: number;
@@ -22,30 +22,18 @@ export const hasPermission = async (): Promise<boolean> => {
     return true;
   }
 
-  const yesterday = subDays(new Date(), 1);
-  const { activeCalories, baseCalories, weight, steps } =
-    await getHealthKitData(yesterday);
-  const noData =
-    activeCalories === 0 && baseCalories === 0 && weight === 0 && steps === 0;
-  console.log({
-    fn: "hasPermission",
-    activeCalories,
-    baseCalories,
-    weight,
-    steps,
-    noData,
-  });
-  return !noData;
+  return localStorage.getItem("hasPermission") === "hasPermission";
 };
 
 export const getHealthKitData = async (today: Date): Promise<HealthKitData> => {
+  const defaultHealthKitData = {
+    activeCalories: 250,
+    baseCalories: 1500,
+    weight: 150,
+    steps: 0,
+  };
   if (!isIos()) {
-    return {
-      activeCalories: 250,
-      baseCalories: 1500,
-      weight: 150,
-      steps: 0,
-    };
+    return defaultHealthKitData;
   }
 
   const startDate = startOfDay(today).toISOString();
@@ -99,10 +87,21 @@ export const getHealthKitData = async (today: Date): Promise<HealthKitData> => {
     )
     .reduce((value, item) => (value += item.value), 0);
 
-  return {
+  const calculatedHealthKitData = {
     activeCalories: +activeCalorieValue.toFixed(),
     baseCalories: +baseCalorieValue.toFixed(),
     weight: +weightValue.toFixed(),
     steps: +stepsValue.toFixed(),
   };
+
+  if (
+    calculatedHealthKitData.activeCalories === 0 &&
+    calculatedHealthKitData.baseCalories === 0 &&
+    calculatedHealthKitData.weight === 0 &&
+    calculatedHealthKitData.steps === 0
+  ) {
+    return defaultHealthKitData;
+  }
+
+  return calculatedHealthKitData;
 };
