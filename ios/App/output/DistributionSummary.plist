@@ -12,7 +12,7 @@
 			<key>bitcode</key>
 			<false/>
 			<key>buildNumber</key>
-			<string>12</string>
+			<string>13</string>
 			<key>certificate</key>
 			<dict>
 				<key>SHA1</key>
@@ -87,6 +87,38 @@
 					</dict>
 					<key>versionNumber</key>
 					<string>4.1.1</string>
+				</dict>
+				<dict>
+					<key>architectures</key>
+					<array>
+						<string>arm64</string>
+					</array>
+					<key>bitcode</key>
+					<false/>
+					<key>buildNumber</key>
+					<string>1</string>
+					<key>certificate</key>
+					<dict>
+						<key>SHA1</key>
+						<string>28B02E25FD2FB3582BD068000991B38F73C4BF30</string>
+						<key>dateExpires</key>
+						<string>12/5/24</string>
+						<key>type</key>
+						<string>Cloud Managed Apple Distribution</string>
+					</dict>
+					<key>name</key>
+					<string>CapacitorLocalNotifications.framework</string>
+					<key>symbols</key>
+					<true/>
+					<key>team</key>
+					<dict>
+						<key>id</key>
+						<string>JW5SC3NYUV</string>
+						<key>name</key>
+						<string>John Corser</string>
+					</dict>
+					<key>versionNumber</key>
+					<string>4.1.5</string>
 				</dict>
 				<dict>
 					<key>architectures</key>

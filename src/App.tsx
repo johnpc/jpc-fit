@@ -3,7 +3,7 @@ import { Header } from "./components/Header";
 import { Footer } from "./components/Footer";
 import { useEffect, useState } from "react";
 import { hasPermission } from "./helpers/getHealthKitData";
-import { RequestPermission } from "./components/calorie-page/RequestPermission";
+import { RequestPermission } from "./components/settings-page/RequestPermission";
 import { withAuthenticator } from "@aws-amplify/ui-react";
 import { App as CapacitorApp } from "@capacitor/app";
 import TabsView from "./components/TabsView";
