@@ -1,8 +1,7 @@
-import {Card, Button, Label} from "@aws-amplify/ui-react";
+import { Card, Button, Label } from "@aws-amplify/ui-react";
 import { LocalNotifications } from "@capacitor/local-notifications";
-import {Divider} from "@mui/material";
-import {CapacitorHealthkit} from "@perfood/capacitor-healthkit";
-import {useState} from "react";
+import { CapacitorHealthkit } from "@perfood/capacitor-healthkit";
+import { useState } from "react";
 
 export const RequestPermission = (props: {
   onPermissionGranted: () => Promise<void>;
@@ -10,7 +9,7 @@ export const RequestPermission = (props: {
   const [loading, setLoading] = useState<boolean>(false);
 
   const onPermissionClick = async () => {
-    console.log({permissionClick: true});
+    console.log({ permissionClick: true });
     setLoading(true);
     const readPermissions = ["calories", "steps", "weight", "activity"];
     await CapacitorHealthkit.requestAuthorization({
@@ -19,14 +18,13 @@ export const RequestPermission = (props: {
       write: [],
     });
 
-    const date = new Date();
     await LocalNotifications.requestPermissions();
     await LocalNotifications.schedule({
       notifications: [
         {
           title: "Have you logged lunch?",
           body: "Log your food",
-          id: date.getTime() + 2,
+          id: 13,
           schedule: {
             allowWhileIdle: true,
             on: {
@@ -37,7 +35,7 @@ export const RequestPermission = (props: {
         {
           title: "Have you logged dinner?",
           body: "Log your food",
-          id: date.getTime() + 3,
+          id: 20,
           schedule: {
             allowWhileIdle: true,
             on: {
@@ -58,24 +56,24 @@ export const RequestPermission = (props: {
   return (
     <Card>
       <Label as="div">
-        HealthKit data and notifications provide the best experience for this app. Grant
-        permission?
+        HealthKit data and notifications provide the best experience for this
+        app. Grant permission?
       </Label>
       <br />
-      <Button
-        variation="primary"
-        isLoading={loading}
-        margin={"10px"}
-        onClick={onPermissionClick}
-      >
-        Grant Permission
-      </Button>
-      <Divider style={{margin: "10px"}} />
-      <Label as="div">Problem with permissions?</Label>
-      <br />
-      <Button margin={"10px"} onClick={onLaunchHealthkitClick}>
-        Launch Healthkit
-      </Button>
+      {!localStorage.getItem("hasPermission") ? (
+        <Button
+          variation="primary"
+          isLoading={loading}
+          margin={"10px"}
+          onClick={onPermissionClick}
+        >
+          Grant Permission
+        </Button>
+      ) : (
+        <Button margin={"10px"} onClick={onLaunchHealthkitClick}>
+          Launch Healthkit
+        </Button>
+      )}
     </Card>
   );
 };
