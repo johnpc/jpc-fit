@@ -15,7 +15,6 @@ const schema = a.schema({
       dietCalories: a.integer().required(),
     })
     .authorization([a.allow.owner()]),
-
   QuickAdd: a
     .model({
       name: a.string().required(),
@@ -32,6 +31,11 @@ const schema = a.schema({
   Height: a
     .model({
       currentHeight: a.integer().required(),
+    })
+    .authorization([a.allow.owner()]),
+  Preferences: a
+    .model({
+      hideProtein: a.boolean().required(),
     })
     .authorization([a.allow.owner()]),
 });

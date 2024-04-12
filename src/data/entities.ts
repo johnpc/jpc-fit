@@ -16,6 +16,11 @@ export type FoodEntity = {
   createdAt: Date;
 };
 
+export type PreferencesEntity = {
+  id?: string;
+  hideProtein: boolean;
+};
+
 export type GoalEntity = {
   dietCalories: number;
 };
@@ -82,6 +87,41 @@ export const getHeight = async (): Promise<HeightEntity | undefined> => {
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
     )
     .find((g) => g);
+};
+
+export const getPreferences = async (): Promise<PreferencesEntity> => {
+  const allPreferences = (await client.models.Preferences.list()).data ?? [];
+  const preferences = allPreferences
+    .sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    )
+    .find((g) => g);
+
+  if (!preferences) {
+    return {
+      id: undefined,
+      hideProtein: false,
+    };
+  }
+  return preferences;
+};
+
+export const updatePreferences = async (
+  preferences: PreferencesEntity,
+): Promise<PreferencesEntity> => {
+  if (!preferences.id) {
+    const preference = await client.models.Preferences.create({
+      hideProtein: preferences.hideProtein,
+    });
+    return preference.data;
+  } else {
+    const preference = await client.models.Preferences.update({
+      id: preferences.id,
+      hideProtein: preferences.hideProtein,
+    });
+    return preference.data;
+  }
 };
 
 export const createWeight = async (
@@ -254,6 +294,30 @@ export const deleteFoodListener = (fn: () => void) => {
 
 export const createGoalListener = (fn: () => void) => {
   const listener = client.models.Goal.onCreate().subscribe({
+    next: async () => {
+      fn();
+    },
+    error: (error: Error) => {
+      console.error("Subscription error", error);
+    },
+  });
+  return listener;
+};
+
+export const createPreferencesListener = (fn: () => void) => {
+  const listener = client.models.Preferences.onCreate().subscribe({
+    next: async () => {
+      fn();
+    },
+    error: (error: Error) => {
+      console.error("Subscription error", error);
+    },
+  });
+  return listener;
+};
+
+export const updatePreferencesListener = (fn: () => void) => {
+  const listener = client.models.Preferences.onUpdate().subscribe({
     next: async () => {
       fn();
     },

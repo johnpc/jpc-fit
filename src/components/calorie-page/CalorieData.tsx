@@ -15,16 +15,20 @@ import { App } from "@capacitor/app";
 import {
   FoodEntity,
   GoalEntity,
+  PreferencesEntity,
   createFoodListener,
   createGoal,
   createGoalListener,
+  createPreferencesListener,
   deleteFood,
   deleteFoodListener,
   deleteGoal,
   deleteGoalListener,
   getGoal,
+  getPreferences,
   listFood,
   unsubscribeListener,
+  updatePreferencesListener,
 } from "../../data/entities";
 import AddCalorieFab from "./AddCalorieFab";
 import {
@@ -43,6 +47,7 @@ export const CalorieData = () => {
   const [activeCalories, setActiveCalories] = useState<number>();
   const [baseCalories, setBaseCalories] = useState<number>();
   const [steps, setSteps] = useState<number>();
+  const [preferences, setPreferences] = useState<PreferencesEntity>();
 
   const setup = async () => {
     const { activeCalories, baseCalories, steps } =
@@ -52,6 +57,7 @@ export const CalorieData = () => {
     setFoods(await listFood(date));
     setGoal(await getGoal());
     setSteps(steps);
+    setPreferences(await getPreferences());
   };
   useEffect(() => {
     setup();
@@ -59,6 +65,8 @@ export const CalorieData = () => {
     const deleteFoodSubscription = deleteFoodListener(setup);
     const createGoalSubscription = createGoalListener(setup);
     const deleteGoalSubscription = deleteGoalListener(setup);
+    const createPreferencesSubscription = createPreferencesListener(setup);
+    const updatePreferencesSubscription = updatePreferencesListener(setup);
     App.addListener("appStateChange", ({ isActive }) => {
       console.log({ appStateChange: true, isActive });
       if (isActive) {
@@ -89,6 +97,8 @@ export const CalorieData = () => {
       unsubscribeListener(deleteFoodSubscription);
       unsubscribeListener(createGoalSubscription);
       unsubscribeListener(deleteGoalSubscription);
+      unsubscribeListener(createPreferencesSubscription);
+      unsubscribeListener(updatePreferencesSubscription);
       App.removeAllListeners();
     };
   }, [date]);
@@ -203,13 +213,15 @@ export const CalorieData = () => {
               </TableCell>
               <TableCell></TableCell>
             </TableRow>
-            <TableRow>
-              <TableCell>Protein</TableCell>
-              <TableCell>
-                {foods.reduce((sum, food) => sum + (food.protein ?? 0), 0)}g
-              </TableCell>
-              <TableCell></TableCell>
-            </TableRow>
+            {preferences?.hideProtein ? null : (
+              <TableRow>
+                <TableCell>Protein</TableCell>
+                <TableCell>
+                  {foods.reduce((sum, food) => sum + (food.protein ?? 0), 0)}g
+                </TableCell>
+                <TableCell></TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </Card>
@@ -221,7 +233,9 @@ export const CalorieData = () => {
                 <TableCell as="th">Time</TableCell>
                 <TableCell as="th">Name</TableCell>
                 <TableCell as="th">Cals</TableCell>
-                <TableCell as="th">Pr</TableCell>
+                {preferences?.hideProtein ? null : (
+                  <TableCell as="th">Pr</TableCell>
+                )}
                 <TableCell as="th">
                   <Delete />
                 </TableCell>
@@ -239,7 +253,9 @@ export const CalorieData = () => {
                   </TableCell>
                   <TableCell>{food.name ?? "No name"}</TableCell>
                   <TableCell>{food.calories}</TableCell>
-                  <TableCell>{food.protein ?? 0}g</TableCell>
+                  {preferences?.hideProtein ? null : (
+                    <TableCell>{food.protein ?? 0}g</TableCell>
+                  )}
                   <TableCell onClick={() => deleteFood(food)}>❌</TableCell>
                 </TableRow>
               ))}

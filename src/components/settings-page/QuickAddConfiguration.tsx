@@ -15,13 +15,17 @@ import {
 import { findIcon, iconList } from "../../helpers/iconMap";
 import { MenuItem, Select, SelectChangeEvent } from "@mui/material";
 import {
+  PreferencesEntity,
   QuickAddEntity,
+  createPreferencesListener,
   createQuickAdd,
   createQuickAddListener,
   deleteQuickAdd,
   deleteQuickAddListener,
+  getPreferences,
   listQuickAdds,
   unsubscribeListener,
+  updatePreferencesListener,
 } from "../../data/entities";
 import { Delete } from "@mui/icons-material";
 
@@ -76,6 +80,7 @@ export default function QuickAddConfiguration() {
   const [protein, setProtein] = React.useState<number>();
   const [icon, setIcon] = React.useState<string>("Fastfood");
   const [isLoading, setIsLoading] = React.useState<boolean>();
+  const [preferences, setPreferences] = React.useState<PreferencesEntity>();
 
   const setup = async () => {
     const quickAdds = await listQuickAdds();
@@ -84,15 +89,21 @@ export default function QuickAddConfiguration() {
     } else {
       setQuickAdds(quickAdds);
     }
+    setPreferences(await getPreferences());
   };
 
   React.useEffect(() => {
     setup();
     const createQuickAddSubscription = createQuickAddListener(setup);
     const deleteQuickAddSubscription = deleteQuickAddListener(setup);
+    const createPreferencesSubscription = createPreferencesListener(setup);
+    const updatePreferencesSubscription = updatePreferencesListener(setup);
+
     return () => {
       unsubscribeListener(createQuickAddSubscription);
       unsubscribeListener(deleteQuickAddSubscription);
+      unsubscribeListener(createPreferencesSubscription);
+      unsubscribeListener(updatePreferencesSubscription);
     };
   }, []);
 
@@ -149,13 +160,17 @@ export default function QuickAddConfiguration() {
           placeholder="250"
           id="calories"
         />
-        <Label htmlFor="protein">Protein (g):</Label>
-        <Input
-          onChange={onChangeProtein}
-          size="large"
-          placeholder="12"
-          id="calories"
-        />
+        {preferences?.hideProtein ? null : (
+          <>
+            <Label htmlFor="protein">Protein (g):</Label>
+            <Input
+              onChange={onChangeProtein}
+              size="large"
+              placeholder="12"
+              id="calories"
+            />
+          </>
+        )}
         <Label htmlFor="icon">Icon:</Label>
         <Select onChange={onSelectIcon} label="Icon" value={icon} id="icon">
           {iconList.map(
@@ -184,7 +199,9 @@ export default function QuickAddConfiguration() {
               <TableCell as="th">Name</TableCell>
               <TableCell as="th">Icon</TableCell>
               <TableCell as="th">Cals</TableCell>
-              <TableCell as="th">Pr</TableCell>
+              {preferences?.hideProtein ? null : (
+                <TableCell as="th">Pr</TableCell>
+              )}
               <TableCell as="th">
                 <Delete />
               </TableCell>
@@ -196,7 +213,9 @@ export default function QuickAddConfiguration() {
                 <TableCell>{quickAdd.name}</TableCell>
                 <TableCell>{findIcon(quickAdd.icon)}</TableCell>
                 <TableCell>{quickAdd.calories}</TableCell>
-                <TableCell>{quickAdd.protein}</TableCell>
+                {preferences?.hideProtein ? null : (
+                  <TableCell>{quickAdd.protein}</TableCell>
+                )}
                 <TableCell onClick={() => handleDeleteQuickAdd(quickAdd)}>
                   {quickAdd.id.startsWith("dqa-") ? null : <Delete />}
                 </TableCell>

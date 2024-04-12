@@ -4,12 +4,16 @@ import SpeedDial from "@mui/material/SpeedDial";
 import SpeedDialIcon from "@mui/material/SpeedDialIcon";
 import SpeedDialAction from "@mui/material/SpeedDialAction";
 import {
+  PreferencesEntity,
   QuickAddEntity,
   createFood,
+  createPreferencesListener,
   createQuickAddListener,
   deleteQuickAddListener,
+  getPreferences,
   listQuickAdds,
   unsubscribeListener,
+  updatePreferencesListener,
 } from "../../data/entities";
 import { findIcon } from "../../helpers/iconMap";
 import {
@@ -20,6 +24,7 @@ import {
 export default function AddCalorieFab() {
   const [open, setOpen] = React.useState(false);
   const [quickAdds, setQuickAdds] = React.useState<QuickAddEntity[]>([]);
+  const [preferences, setPreferences] = React.useState<PreferencesEntity>();
 
   const setup = async () => {
     const quickAdds = await listQuickAdds();
@@ -28,14 +33,19 @@ export default function AddCalorieFab() {
     } else {
       setQuickAdds([...quickAdds, customQuickAdd]);
     }
+    setPreferences(await getPreferences());
   };
   React.useEffect(() => {
     setup();
     const createQuickAddSubscription = createQuickAddListener(setup);
     const deleteQuickAddSubscription = deleteQuickAddListener(setup);
+    const createPreferencesSubscription = createPreferencesListener(setup);
+    const updatePreferencesSubscription = updatePreferencesListener(setup);
     return () => {
       unsubscribeListener(createQuickAddSubscription);
       unsubscribeListener(deleteQuickAddSubscription);
+      unsubscribeListener(createPreferencesSubscription);
+      unsubscribeListener(updatePreferencesSubscription);
     };
   }, []);
   const handleOpen = () => setOpen(true);
@@ -50,9 +60,13 @@ export default function AddCalorieFab() {
         return;
       }
 
-      proteinAmount = parseInt(prompt("Enter protein in grams")!);
-      if (Number.isNaN(proteinAmount) || proteinAmount < 1) {
+      if (preferences?.hideProtein) {
         proteinAmount = 0;
+      } else {
+        proteinAmount = parseInt(prompt("Enter protein in grams")!);
+        if (Number.isNaN(proteinAmount) || proteinAmount < 1) {
+          proteinAmount = 0;
+        }
       }
     } else {
       calorieAmount = quickAdd.calories;
