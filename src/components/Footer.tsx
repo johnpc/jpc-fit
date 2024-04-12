@@ -7,7 +7,9 @@ import {
   Text,
   Button,
   useTheme,
+  Link,
 } from "@aws-amplify/ui-react";
+import { Capacitor } from "@capacitor/core";
 
 export const Footer = () => {
   const { tokens } = useTheme();
@@ -38,10 +40,15 @@ export const Footer = () => {
               alignContent="flex-start"
               gap={tokens.space.xs}
             >
-              <Text as="span">fit.jpc.io is open source.</Text>
               <Button as="a" href="https://github.com/johnpc/jpc-golf-gen2">
                 <Image alt="github" src="/github.png" />
               </Button>
+              <Text as="span">fit.jpc.io is open source.</Text>
+              {Capacitor.getPlatform() === "ios" ? null : (
+                <Link href="https://apps.apple.com/us/app/jpc-fit/id6482482386">
+                  Download iOS app
+                </Link>
+              )}
             </Flex>
           </Flex>
         </Flex>
