@@ -263,7 +263,7 @@ export const CalorieData = () => {
           </Table>
         </Card>
       ) : null}
-      <AddCalorieFab />
+      <AddCalorieFab date={date} />
     </>
   );
 };

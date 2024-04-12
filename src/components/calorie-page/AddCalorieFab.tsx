@@ -21,7 +21,7 @@ import {
   defaultQuickAdds,
 } from "../settings-page/QuickAddConfiguration";
 
-export default function AddCalorieFab() {
+export default function AddCalorieFab(props: {date: Date}) {
   const [open, setOpen] = React.useState(false);
   const [quickAdds, setQuickAdds] = React.useState<QuickAddEntity[]>([]);
   const [preferences, setPreferences] = React.useState<PreferencesEntity>();
@@ -72,7 +72,7 @@ export default function AddCalorieFab() {
       calorieAmount = quickAdd.calories;
     }
 
-    await createFood(quickAdd.name, calorieAmount, proteinAmount);
+    await createFood(quickAdd.name, calorieAmount, proteinAmount, props.date);
     handleClose();
   };
 

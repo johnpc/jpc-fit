@@ -6,7 +6,6 @@ import {
   Flex,
   Text,
   useTheme,
-  Link,
 } from "@aws-amplify/ui-react";
 
 export const Header = () => {

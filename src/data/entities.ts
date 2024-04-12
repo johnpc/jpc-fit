@@ -227,12 +227,13 @@ export const createFood = async (
   name: string,
   calories: number,
   protein: number,
+  date: Date,
 ): Promise<FoodEntity> => {
   const createdFood = await client.models.Food.create({
     name,
     calories,
     protein,
-    day: new Date().toLocaleDateString(),
+    day: date.toLocaleDateString(),
   });
   return {
     ...createdFood.data,
