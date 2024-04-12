@@ -49,7 +49,7 @@ export const defaultQuickAdds: QuickAddEntity[] = [
   {
     icon: "RamenDining",
     name: "Small",
-    calories: 200,
+    calories: 250,
     protein: 0,
     createdAt: new Date(),
     id: "dqa-200",
