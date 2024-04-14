@@ -21,7 +21,7 @@ import {
   defaultQuickAdds,
 } from "../settings-page/QuickAddConfiguration";
 
-export default function AddCalorieFab(props: {date: Date}) {
+export default function AddCalorieFab(props: { date: Date }) {
   const [open, setOpen] = React.useState(false);
   const [quickAdds, setQuickAdds] = React.useState<QuickAddEntity[]>([]);
   const [preferences, setPreferences] = React.useState<PreferencesEntity>();

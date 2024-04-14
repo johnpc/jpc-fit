@@ -1,20 +1,25 @@
-import { listAllFood } from "../data/entities";
+import { FoodEntity, listAllFood } from "../data/entities";
 import { subDays } from "date-fns";
+import { getHealthKitData } from "./getHealthKitData";
 
+export type DayInfo = {
+  tracked: boolean;
+  day: string;
+  consumedCalories: number;
+  burnedCalories: number;
+};
 export type StreakInfo = {
   currentStreakDays: number;
-  today: { tracked: boolean; day: string };
-  yesterday: { tracked: boolean; day: string };
-  twoDaysAgo: { tracked: boolean; day: string };
-  threeDaysAgo: { tracked: boolean; day: string };
-  fourDaysAgo: { tracked: boolean; day: string };
-  fiveDaysAgo: { tracked: boolean; day: string };
-  sixDaysAgo: { tracked: boolean; day: string };
+  today: DayInfo;
+  yesterday: DayInfo;
+  twoDaysAgo: DayInfo;
+  threeDaysAgo: DayInfo;
+  fourDaysAgo: DayInfo;
+  fiveDaysAgo: DayInfo;
+  sixDaysAgo: DayInfo;
 };
-export const getStreakInfo = async (): Promise<StreakInfo> => {
+export const getStreakInfo = async (today: Date): Promise<StreakInfo> => {
   const allFoods = await listAllFood();
-  const today = new Date();
-
   let currentStreak = 0;
   let tracked = false;
   do {
@@ -26,33 +31,27 @@ export const getStreakInfo = async (): Promise<StreakInfo> => {
     }
   } while (tracked);
 
-  const info = {
-    currentStreakDays: currentStreak,
-    today: { tracked: false, day: "" },
-    yesterday: { tracked: false, day: "" },
-    twoDaysAgo: { tracked: false, day: "" },
-    threeDaysAgo: { tracked: false, day: "" },
-    fourDaysAgo: { tracked: false, day: "" },
-    fiveDaysAgo: { tracked: false, day: "" },
-    sixDaysAgo: { tracked: false, day: "" },
-  };
-
-  [
-    "today",
-    "yesterday",
-    "twoDaysAgo",
-    "threeDaysAgo",
-    "fourDaysAgo",
-    "fiveDaysAgo",
-    "sixDaysAgo",
-  ].forEach((key: string, index: number) => {
-    const day = subDays(today, index);
+  const getDayInfo = async (day: Date): Promise<DayInfo> => {
+    const healthKitData = await getHealthKitData(day);
     const dayString = day.toLocaleDateString();
     const tracked = !!allFoods.find((food) => food.day === dayString);
+    const consumedCalories = allFoods
+      .filter((food) => food.day === dayString)
+      .reduce((sum: number, food: FoodEntity) => sum + food.calories, 0);
+    const burnedCalories =
+      healthKitData.activeCalories + healthKitData.baseCalories;
     const [d, m] = day.toLocaleDateString().split("/");
-    // @ts-expect-error info is all
-    info[key] = { tracked, day: [d, m].join("/") };
-  });
+    return { tracked, day: [d, m].join("/"), consumedCalories, burnedCalories };
+  };
 
-  return info;
+  return {
+    currentStreakDays: currentStreak,
+    today: await getDayInfo(today),
+    yesterday: await getDayInfo(subDays(today, 1)),
+    twoDaysAgo: await getDayInfo(subDays(today, 2)),
+    threeDaysAgo: await getDayInfo(subDays(today, 3)),
+    fourDaysAgo: await getDayInfo(subDays(today, 4)),
+    fiveDaysAgo: await getDayInfo(subDays(today, 5)),
+    sixDaysAgo: await getDayInfo(subDays(today, 6)),
+  };
 };

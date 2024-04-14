@@ -15,7 +15,7 @@ export default function Streak() {
 
   const [streakInfo, setStreakInfo] = useState<StreakInfo>();
   const setup = async () => {
-    const s = await getStreakInfo();
+    const s = await getStreakInfo(new Date());
     setStreakInfo(s);
   };
   useEffect(() => {
