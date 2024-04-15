@@ -7,47 +7,17 @@ import {
   PreferencesEntity,
   QuickAddEntity,
   createFood,
-  createPreferencesListener,
-  createQuickAddListener,
-  deleteQuickAddListener,
-  getPreferences,
-  listQuickAdds,
-  unsubscribeListener,
-  updatePreferencesListener,
 } from "../../data/entities";
 import { findIcon } from "../../helpers/iconMap";
-import {
-  customQuickAdd,
-  defaultQuickAdds,
-} from "../settings-page/QuickAddConfiguration";
+import { customQuickAdd } from "../settings-page/QuickAddConfiguration";
 
-export default function AddCalorieFab(props: { date: Date }) {
+export default function AddCalorieFab(props: {
+  preferences?: PreferencesEntity;
+  quickAdds: QuickAddEntity[];
+  date: Date;
+}) {
   const [open, setOpen] = React.useState(false);
-  const [quickAdds, setQuickAdds] = React.useState<QuickAddEntity[]>([]);
-  const [preferences, setPreferences] = React.useState<PreferencesEntity>();
 
-  const setup = async () => {
-    const quickAdds = await listQuickAdds();
-    if (!quickAdds.length) {
-      setQuickAdds(defaultQuickAdds);
-    } else {
-      setQuickAdds([...quickAdds, customQuickAdd]);
-    }
-    setPreferences(await getPreferences());
-  };
-  React.useEffect(() => {
-    setup();
-    const createQuickAddSubscription = createQuickAddListener(setup);
-    const deleteQuickAddSubscription = deleteQuickAddListener(setup);
-    const createPreferencesSubscription = createPreferencesListener(setup);
-    const updatePreferencesSubscription = updatePreferencesListener(setup);
-    return () => {
-      unsubscribeListener(createQuickAddSubscription);
-      unsubscribeListener(deleteQuickAddSubscription);
-      unsubscribeListener(createPreferencesSubscription);
-      unsubscribeListener(updatePreferencesSubscription);
-    };
-  }, []);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
   const handleAction = async (quickAdd: QuickAddEntity) => {
@@ -60,7 +30,7 @@ export default function AddCalorieFab(props: { date: Date }) {
         return;
       }
 
-      if (preferences?.hideProtein) {
+      if (props.preferences?.hideProtein) {
         proteinAmount = 0;
       } else {
         proteinAmount = parseInt(prompt("Enter protein in grams")!);
@@ -91,7 +61,7 @@ export default function AddCalorieFab(props: { date: Date }) {
         onOpen={handleOpen}
         open={open}
       >
-        {quickAdds.map((action) => (
+        {props.quickAdds.map((action) => (
           <SpeedDialAction
             key={action.name}
             style={{ textAlign: "right", width: "100%" }}

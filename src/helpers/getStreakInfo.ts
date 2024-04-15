@@ -1,4 +1,4 @@
-import { FoodEntity, listAllFood } from "../data/entities";
+import { FoodEntity } from "../data/entities";
 import { subDays } from "date-fns";
 import { getHealthKitData } from "./getHealthKitData";
 
@@ -18,8 +18,10 @@ export type StreakInfo = {
   fiveDaysAgo: DayInfo;
   sixDaysAgo: DayInfo;
 };
-export const getStreakInfo = async (today: Date): Promise<StreakInfo> => {
-  const allFoods = await listAllFood();
+export const getStreakInfo = async (
+  allFoods: FoodEntity[],
+  today: Date,
+): Promise<StreakInfo> => {
   let currentStreak = 0;
   let tracked = false;
   do {

@@ -17,15 +17,8 @@ import { MenuItem, Select, SelectChangeEvent } from "@mui/material";
 import {
   PreferencesEntity,
   QuickAddEntity,
-  createPreferencesListener,
   createQuickAdd,
-  createQuickAddListener,
   deleteQuickAdd,
-  deleteQuickAddListener,
-  getPreferences,
-  listQuickAdds,
-  unsubscribeListener,
-  updatePreferencesListener,
 } from "../../data/entities";
 import { Delete } from "@mui/icons-material";
 
@@ -73,39 +66,15 @@ export const defaultQuickAdds: QuickAddEntity[] = [
   customQuickAdd,
 ];
 
-export default function QuickAddConfiguration() {
-  const [quickAdds, setQuickAdds] = React.useState<QuickAddEntity[]>([]);
+export default function QuickAddConfiguration(props: {
+  preferences?: PreferencesEntity;
+  quickAdds: QuickAddEntity[];
+}) {
   const [name, setName] = React.useState<string>();
   const [calories, setCalories] = React.useState<number>();
   const [protein, setProtein] = React.useState<number>();
   const [icon, setIcon] = React.useState<string>("Fastfood");
   const [isLoading, setIsLoading] = React.useState<boolean>();
-  const [preferences, setPreferences] = React.useState<PreferencesEntity>();
-
-  const setup = async () => {
-    const quickAdds = await listQuickAdds();
-    if (!quickAdds.length) {
-      setQuickAdds(defaultQuickAdds);
-    } else {
-      setQuickAdds(quickAdds);
-    }
-    setPreferences(await getPreferences());
-  };
-
-  React.useEffect(() => {
-    setup();
-    const createQuickAddSubscription = createQuickAddListener(setup);
-    const deleteQuickAddSubscription = deleteQuickAddListener(setup);
-    const createPreferencesSubscription = createPreferencesListener(setup);
-    const updatePreferencesSubscription = updatePreferencesListener(setup);
-
-    return () => {
-      unsubscribeListener(createQuickAddSubscription);
-      unsubscribeListener(deleteQuickAddSubscription);
-      unsubscribeListener(createPreferencesSubscription);
-      unsubscribeListener(updatePreferencesSubscription);
-    };
-  }, []);
 
   const onChangeName = (event: React.ChangeEvent<HTMLInputElement>) => {
     setName(event.target.value);
@@ -160,7 +129,7 @@ export default function QuickAddConfiguration() {
           placeholder="250"
           id="calories"
         />
-        {preferences?.hideProtein ? null : (
+        {props.preferences?.hideProtein ? null : (
           <>
             <Label htmlFor="protein">Protein (g):</Label>
             <Input
@@ -199,7 +168,7 @@ export default function QuickAddConfiguration() {
               <TableCell as="th">Name</TableCell>
               <TableCell as="th">Icon</TableCell>
               <TableCell as="th">Cals</TableCell>
-              {preferences?.hideProtein ? null : (
+              {props.preferences?.hideProtein ? null : (
                 <TableCell as="th">Pr</TableCell>
               )}
               <TableCell as="th">
@@ -208,12 +177,12 @@ export default function QuickAddConfiguration() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {quickAdds.map((quickAdd) => (
+            {props.quickAdds.map((quickAdd) => (
               <TableRow key={quickAdd.id}>
                 <TableCell>{quickAdd.name}</TableCell>
                 <TableCell>{findIcon(quickAdd.icon)}</TableCell>
                 <TableCell>{quickAdd.calories}</TableCell>
-                {preferences?.hideProtein ? null : (
+                {props.preferences?.hideProtein ? null : (
                   <TableCell>{quickAdd.protein}</TableCell>
                 )}
                 <TableCell onClick={() => handleDeleteQuickAdd(quickAdd)}>

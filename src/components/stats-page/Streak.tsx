@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { StreakInfo, getStreakInfo } from "../../helpers/getStreakInfo";
-import { createFoodListener, unsubscribeListener } from "../../data/entities";
+import { FoodEntity } from "../../data/entities";
 import {
   Loader,
   useTheme,
@@ -10,20 +10,16 @@ import {
   Text,
 } from "@aws-amplify/ui-react";
 
-export default function Streak() {
+export default function Streak(props: { allFoods: FoodEntity[] }) {
   const { tokens } = useTheme();
 
   const [streakInfo, setStreakInfo] = useState<StreakInfo>();
   const setup = async () => {
-    const s = await getStreakInfo(new Date());
+    const s = await getStreakInfo(props.allFoods, new Date());
     setStreakInfo(s);
   };
   useEffect(() => {
     setup();
-    const createFoodSubscription = createFoodListener(setup);
-    return () => {
-      unsubscribeListener(createFoodSubscription);
-    };
   }, []);
 
   if (!streakInfo) return <Loader />;

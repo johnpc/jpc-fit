@@ -1,42 +1,19 @@
 import { Card, SwitchField } from "@aws-amplify/ui-react";
-import { useEffect, useState } from "react";
-import {
-  PreferencesEntity,
-  createPreferencesListener,
-  getPreferences,
-  unsubscribeListener,
-  updatePreferences,
-  updatePreferencesListener,
-} from "../../data/entities";
+import { useState } from "react";
+import { PreferencesEntity, updatePreferences } from "../../data/entities";
 
-export default function Preferences() {
-  const [preferences, setPreferences] = useState<PreferencesEntity>();
+export default function Preferences(props: {
+  preferences?: PreferencesEntity;
+}) {
   const [isUpdating, setIsUpdating] = useState<boolean>();
-  const setup = async () => {
-    setPreferences(await getPreferences());
-  };
-  useEffect(() => {
-    setup();
-    const createPreferencesSubscription = createPreferencesListener(setup);
-    const updatePreferencesSubscription = updatePreferencesListener(setup);
-    return () => {
-      unsubscribeListener(createPreferencesSubscription);
-      unsubscribeListener(updatePreferencesSubscription);
-    };
-  }, []);
 
   const onUpdatePreferences = async (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     setIsUpdating(true);
     const shouldHideProtein = event.target.checked;
-    console.log({
-      event,
-      value: event.target.value,
-      checked: event.target.checked,
-    });
     await updatePreferences({
-      ...preferences,
+      ...props.preferences,
       hideProtein: shouldHideProtein,
     });
     setIsUpdating(false);
@@ -44,8 +21,8 @@ export default function Preferences() {
   return (
     <Card textAlign={"left"}>
       <SwitchField
-        isChecked={preferences?.hideProtein}
-        isDisabled={isUpdating || !preferences}
+        isChecked={props.preferences?.hideProtein}
+        isDisabled={isUpdating}
         onChange={onUpdatePreferences}
         label="Hide Protein"
         labelPosition="start"

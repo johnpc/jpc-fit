@@ -1,11 +1,12 @@
+import { FoodEntity } from "../data/entities";
 import Streak from "./stats-page/Streak";
 import WeeklyOverview from "./stats-page/WeeklyOverview";
 
-export default function StatsPage() {
+export default function StatsPage(props: { allFoods: FoodEntity[] }) {
   return (
     <>
-      <Streak />
-      <WeeklyOverview />
+      <Streak {...props} />
+      <WeeklyOverview {...props} />
     </>
   );
 }

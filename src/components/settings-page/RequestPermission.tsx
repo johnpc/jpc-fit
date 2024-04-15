@@ -9,7 +9,6 @@ export const RequestPermission = (props: {
   const [loading, setLoading] = useState<boolean>(false);
 
   const onPermissionClick = async () => {
-    console.log({ permissionClick: true });
     setLoading(true);
     const readPermissions = ["calories", "steps", "weight", "activity"];
     await CapacitorHealthkit.requestAuthorization({

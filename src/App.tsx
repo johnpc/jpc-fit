@@ -17,7 +17,6 @@ function App() {
   useEffect(() => {
     setup();
     CapacitorApp.addListener("appStateChange", ({ isActive }) => {
-      console.log({ appStateChange: true, isActive });
       if (isActive) {
         setup();
       }

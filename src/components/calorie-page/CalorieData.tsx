@@ -16,19 +16,10 @@ import {
   FoodEntity,
   GoalEntity,
   PreferencesEntity,
-  createFoodListener,
+  QuickAddEntity,
   createGoal,
-  createGoalListener,
-  createPreferencesListener,
   deleteFood,
-  deleteFoodListener,
   deleteGoal,
-  deleteGoalListener,
-  getGoal,
-  getPreferences,
-  listFood,
-  unsubscribeListener,
-  updatePreferencesListener,
 } from "../../data/entities";
 import AddCalorieFab from "./AddCalorieFab";
 import {
@@ -40,68 +31,40 @@ import {
 import { getHealthKitData } from "../../helpers/getHealthKitData";
 import { addDays, subDays } from "date-fns";
 
-export const CalorieData = () => {
+export const CalorieData = (props: {
+  goal?: GoalEntity;
+  preferences?: PreferencesEntity;
+  allFoods: FoodEntity[];
+  quickAdds: QuickAddEntity[];
+}) => {
   const [date, setDate] = useState<Date>(new Date());
   const [foods, setFoods] = useState<FoodEntity[]>([]);
-  const [goal, setGoal] = useState<GoalEntity>();
   const [activeCalories, setActiveCalories] = useState<number>();
   const [baseCalories, setBaseCalories] = useState<number>();
   const [steps, setSteps] = useState<number>();
-  const [preferences, setPreferences] = useState<PreferencesEntity>();
 
   const setup = async () => {
     const { activeCalories, baseCalories, steps } =
       await getHealthKitData(date);
     setActiveCalories(activeCalories);
     setBaseCalories(baseCalories);
-    setFoods(await listFood(date));
-    setGoal(await getGoal());
     setSteps(steps);
-    setPreferences(await getPreferences());
+    setFoods(
+      props.allFoods.filter((food) => food.day === date.toLocaleDateString()),
+    );
   };
   useEffect(() => {
     setup();
-    const createFoodSubscription = createFoodListener(setup);
-    const deleteFoodSubscription = deleteFoodListener(setup);
-    const createGoalSubscription = createGoalListener(setup);
-    const deleteGoalSubscription = deleteGoalListener(setup);
-    const createPreferencesSubscription = createPreferencesListener(setup);
-    const updatePreferencesSubscription = updatePreferencesListener(setup);
     App.addListener("appStateChange", ({ isActive }) => {
-      console.log({ appStateChange: true, isActive });
       if (isActive) {
         setup();
       }
     });
 
-    App.addListener("appUrlOpen", (data) => {
-      console.log({ appUrlOpen: true, data });
-      console.log("App opened with URL:", data);
-    });
-
-    App.addListener("appRestoredResult", (data) => {
-      console.log({ appRestoredResult: true, data });
-      console.log("Restored state:", data);
-    });
-
-    App.addListener("resume", () => {
-      console.log({ resume: true });
-    });
-
-    App.addListener("pause", () => {
-      console.log({ pause: true });
-    });
-
     return () => {
-      unsubscribeListener(createFoodSubscription);
-      unsubscribeListener(deleteFoodSubscription);
-      unsubscribeListener(createGoalSubscription);
-      unsubscribeListener(deleteGoalSubscription);
-      unsubscribeListener(createPreferencesSubscription);
-      unsubscribeListener(updatePreferencesSubscription);
       App.removeAllListeners();
     };
-  }, [date]);
+  }, [date, props.allFoods]);
 
   const handleEditGoal = async () => {
     const newGoal = parseInt(prompt("Enter new goal")!);
@@ -133,7 +96,8 @@ export const CalorieData = () => {
 
   if (activeCalories === undefined || baseCalories === undefined)
     return <Loader />;
-  const targetCalories = goal?.dietCalories ?? activeCalories + baseCalories;
+  const targetCalories =
+    props.goal?.dietCalories ?? activeCalories + baseCalories;
   const remainingCalories = targetCalories - consumedCalories;
   return (
     <>
@@ -195,7 +159,7 @@ export const CalorieData = () => {
             <TableRow>
               <TableCell>Goal</TableCell>
               <TableCell>{targetCalories} cals</TableCell>
-              {goal?.dietCalories ? (
+              {props.goal?.dietCalories ? (
                 <TableCell onClick={() => handleDeleteGoal()}>
                   <Delete />
                 </TableCell>
@@ -213,7 +177,7 @@ export const CalorieData = () => {
               </TableCell>
               <TableCell></TableCell>
             </TableRow>
-            {preferences?.hideProtein ? null : (
+            {props.preferences?.hideProtein ? null : (
               <TableRow>
                 <TableCell>Protein</TableCell>
                 <TableCell>
@@ -233,7 +197,7 @@ export const CalorieData = () => {
                 <TableCell as="th">Time</TableCell>
                 <TableCell as="th">Name</TableCell>
                 <TableCell as="th">Cals</TableCell>
-                {preferences?.hideProtein ? null : (
+                {props.preferences?.hideProtein ? null : (
                   <TableCell as="th">Pr</TableCell>
                 )}
                 <TableCell as="th">
@@ -253,7 +217,7 @@ export const CalorieData = () => {
                   </TableCell>
                   <TableCell>{food.name ?? "No name"}</TableCell>
                   <TableCell>{food.calories}</TableCell>
-                  {preferences?.hideProtein ? null : (
+                  {props.preferences?.hideProtein ? null : (
                     <TableCell>{food.protein ?? 0}g</TableCell>
                   )}
                   <TableCell onClick={() => deleteFood(food)}>❌</TableCell>
@@ -263,7 +227,11 @@ export const CalorieData = () => {
           </Table>
         </Card>
       ) : null}
-      <AddCalorieFab date={date} />
+      <AddCalorieFab
+        preferences={props.preferences}
+        quickAdds={props.quickAdds}
+        date={date}
+      />
     </>
   );
 };
