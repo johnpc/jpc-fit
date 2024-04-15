@@ -20,7 +20,7 @@ export default function Streak(props: { allFoods: FoodEntity[] }) {
   };
   useEffect(() => {
     setup();
-  }, []);
+  }, [props.allFoods]);
 
   if (!streakInfo) return <Loader />;
   return (

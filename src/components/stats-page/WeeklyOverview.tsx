@@ -24,7 +24,7 @@ export default function WeeklyOverview(props: { allFoods: FoodEntity[] }) {
   };
   useEffect(() => {
     setup();
-  }, [date]);
+  }, [props.allFoods, date]);
 
   if (!streakInfo) return <Loader />;
   const { burnedCalories, consumedCalories } = (
