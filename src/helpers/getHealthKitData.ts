@@ -36,6 +36,13 @@ export const getHealthKitData = async (today: Date): Promise<HealthKitData> => {
     return defaultHealthKitData;
   }
 
+  const localStorageCacheKey = `hkData-${today.toLocaleDateString()}`;
+  const storedHKData = localStorage.getItem(localStorageCacheKey);
+  if (storedHKData) {
+    console.log(`Cache hit for ${today.toLocaleDateString()}`);
+    return JSON.parse(storedHKData);
+  }
+
   const startDate = startOfDay(today).toISOString();
   const endDate = endOfDay(today).toISOString();
   const queryOptions = {
@@ -100,8 +107,21 @@ export const getHealthKitData = async (today: Date): Promise<HealthKitData> => {
     calculatedHealthKitData.weight === 0 &&
     calculatedHealthKitData.steps === 0
   ) {
+    if (today.toLocaleDateString() !== new Date().toLocaleDateString()) {
+      localStorage.setItem(
+        localStorageCacheKey,
+        JSON.stringify(defaultHealthKitData),
+      );
+    }
     return defaultHealthKitData;
   }
 
+  if (today.toLocaleDateString() !== new Date().toLocaleDateString()) {
+    console.log(`updated cache for ${today.toLocaleDateString()}`);
+    localStorage.setItem(
+      localStorageCacheKey,
+      JSON.stringify(calculatedHealthKitData),
+    );
+  }
   return calculatedHealthKitData;
 };

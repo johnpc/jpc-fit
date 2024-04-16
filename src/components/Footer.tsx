@@ -40,7 +40,7 @@ export const Footer = () => {
               alignContent="flex-start"
               gap={tokens.space.xs}
             >
-              <Button as="a" href="https://github.com/johnpc/jpc-golf-gen2">
+              <Button as="a" href="https://github.com/johnpc/jpc-fit">
                 <Image alt="github" src="/github.png" />
               </Button>
               <Text as="span">fit.jpc.io is open source.</Text>

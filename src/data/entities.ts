@@ -245,10 +245,10 @@ export const deleteFood = async (food: FoodEntity) => {
   await client.models.Food.delete({ id: food.id });
 };
 
-export const createFoodListener = (fn: () => void) => {
+export const createFoodListener = (fn: (food: FoodEntity) => void) => {
   const listener = client.models.Food.onCreate().subscribe({
-    next: async () => {
-      fn();
+    next: async (food: Schema["Food"]) => {
+      fn({ ...food, createdAt: new Date(food.updatedAt) });
     },
     error: (error: Error) => {
       console.error("Subscription error", error);

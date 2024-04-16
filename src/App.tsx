@@ -1,7 +1,7 @@
 import "@aws-amplify/ui-react/styles.css";
 import { Header } from "./components/Header";
 import { Footer } from "./components/Footer";
-import { useEffect, useState } from "react";
+import { Profiler, useEffect, useState } from "react";
 import { hasPermission } from "./helpers/getHealthKitData";
 import { RequestPermission } from "./components/settings-page/RequestPermission";
 import { Link, withAuthenticator } from "@aws-amplify/ui-react";
@@ -28,9 +28,26 @@ function App() {
       CapacitorApp.removeAllListeners();
     };
   }, []);
+  function onRenderCallback(
+    id: string, // the "id" prop of the Profiler tree that has just committed
+    phase: string, // either "mount" (if the tree just mounted) or "update" (if it re-rendered)
+    actualDuration: number, // time spent rendering the committed update
+    baseDuration: number, // estimated time to render the entire subtree without memoization
+    startTime: number, // when React began rendering this update
+    commitTime: number, // when React committed this update
+  ) {
+    console.log({
+      id,
+      phase,
+      actualDuration,
+      baseDuration,
+      startTime,
+      commitTime,
+    });
+  }
 
   return (
-    <>
+    <Profiler id="App" onRender={onRenderCallback}>
       <Header />
       {permission ? (
         <TabsView />
@@ -38,7 +55,7 @@ function App() {
         <RequestPermission onPermissionGranted={setup} />
       )}
       <Footer />
-    </>
+    </Profiler>
   );
 }
 

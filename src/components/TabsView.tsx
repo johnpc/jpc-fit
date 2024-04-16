@@ -53,9 +53,9 @@ export default function TabsView() {
       await setupQuickAdds();
     };
     setup();
-    const createFoodSubscription = createFoodListener(async () =>
-      setAllFoods(await listAllFood()),
-    );
+    const createFoodSubscription = createFoodListener(async () => {
+      setAllFoods(await listAllFood());
+    });
     const deleteFoodSubscription = deleteFoodListener(async () =>
       setAllFoods(await listAllFood()),
     );
