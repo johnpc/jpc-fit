@@ -80,11 +80,21 @@ export default function TabsView() {
     };
     setup();
     const createFoodSubscription = createFoodListener(async () => {
-      setAllFoods(await listAllFood());
+      const allFoods = await listAllFood();
+      setAllFoods(allFoods);
+      const preferences = await getPreferences();
+      setPreferences(preferences);
+      const streak = await getStreakInfo(allFoods, new Date(), preferences);
+      setStreak(streak);
     });
-    const deleteFoodSubscription = deleteFoodListener(async () =>
-      setAllFoods(await listAllFood()),
-    );
+    const deleteFoodSubscription = deleteFoodListener(async () => {
+      const allFoods = await listAllFood();
+      setAllFoods(allFoods);
+      const preferences = await getPreferences();
+      setPreferences(preferences);
+      const streak = await getStreakInfo(allFoods, new Date(), preferences);
+      setStreak(streak);
+    });
     const createGoalSubscription = createGoalListener(async () =>
       setGoal(await getGoal()),
     );
@@ -139,6 +149,7 @@ export default function TabsView() {
     <>
       <Tabs
         justifyContent="flex-start"
+        spacing="equal"
         defaultValue="Calories"
         items={[
           {

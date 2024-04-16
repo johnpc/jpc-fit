@@ -49,7 +49,14 @@ export const RequestPermission = (props: {
     setLoading(false);
   };
 
-  const onLaunchHealthkitClick = () => {
+  const onLaunchHealthkitClick = async () => {
+    const readPermissions = ["calories", "steps", "weight", "activity"];
+    await CapacitorHealthkit.requestAuthorization({
+      all: [],
+      read: readPermissions,
+      write: [],
+    });
+
     window.location.href = "x-apple-health://Sources/jpc.fit";
   };
   return (

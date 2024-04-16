@@ -55,7 +55,14 @@ export default function AddCalorieFab(props: {
       <Backdrop open={open} />
       <SpeedDial
         ariaLabel="SpeedDial tooltip"
-        sx={{ position: "absolute", bottom: 16, right: 16 }}
+        sx={{
+          position: "fixed",
+          bottom: 60,
+          right: 42,
+          margin: 0,
+          top: "auto",
+          left: "auto",
+        }}
         icon={<SpeedDialIcon />}
         onClose={handleClose}
         onOpen={handleOpen}
