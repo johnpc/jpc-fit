@@ -1,4 +1,4 @@
-import { Tabs } from "@aws-amplify/ui-react";
+import { Loader, Tabs } from "@aws-amplify/ui-react";
 import CaloriePage from "./CaloriePage";
 import WeightPage from "./WeightPage";
 import SettingsPage from "./SettingsPage";
@@ -27,13 +27,19 @@ import {
   customQuickAdd,
   defaultQuickAdds,
 } from "./settings-page/QuickAddConfiguration";
+import { StreakInfo, getStreakInfo } from "../helpers/getStreakInfo";
+import { App } from "@capacitor/app";
 
 export default function TabsView() {
   const [allFoods, setAllFoods] = useState<FoodEntity[]>([]);
   const [goal, setGoal] = useState<GoalEntity>();
-  const [preferences, setPreferences] = useState<PreferencesEntity>();
+  const [preferences, setPreferences] = useState<PreferencesEntity>({
+    hideProtein: true,
+    hideSteps: true,
+  });
   const [quickAdds, setQuickAdds] =
     useState<QuickAddEntity[]>(defaultQuickAdds);
+  const [streak, setStreak] = useState<StreakInfo>();
 
   const setupQuickAdds = async () => {
     const quickAdds = await listQuickAdds();
@@ -46,11 +52,31 @@ export default function TabsView() {
 
   useEffect(() => {
     const setup = async () => {
+      const start = Date.now();
       const allFoods = await listAllFood();
       setAllFoods(allFoods);
+      const gotFoodsTime = Date.now();
+      const gotAllFoods = gotFoodsTime - start;
       setGoal(await getGoal());
+      const gotGoalTime = Date.now();
+      const gotGoal = gotGoalTime - start - gotAllFoods;
       setPreferences(await getPreferences());
+      const gotPreferencesTime = Date.now();
+      const gotPreferences = gotPreferencesTime - start - gotGoal;
       await setupQuickAdds();
+      const gotQuickAddsTime = Date.now();
+      const gotQuickAdds = gotQuickAddsTime - start - gotPreferences;
+      const streak = await getStreakInfo(allFoods, new Date(), preferences);
+      setStreak(streak);
+      const gotStreakTime = Date.now();
+      const gotStreak = gotStreakTime - start - gotQuickAdds;
+      console.log({
+        gotAllFoods,
+        gotGoal,
+        gotPreferences,
+        gotQuickAdds,
+        gotStreak,
+      });
     };
     setup();
     const createFoodSubscription = createFoodListener(async () => {
@@ -67,12 +93,34 @@ export default function TabsView() {
     );
     const createQuickAddSubscription = createQuickAddListener(setupQuickAdds);
     const deleteQuickAddSubscription = deleteQuickAddListener(setupQuickAdds);
-    const createPreferencesSubscription = createPreferencesListener(async () =>
-      setPreferences(await getPreferences()),
+    const createPreferencesSubscription = createPreferencesListener(
+      async () => {
+        const allFoods = await listAllFood();
+        setAllFoods(allFoods);
+        const preferences = await getPreferences();
+        setPreferences(preferences);
+        const streak = await getStreakInfo(allFoods, new Date(), preferences);
+        setStreak(streak);
+      },
     );
-    const updatePreferencesSubscription = updatePreferencesListener(async () =>
-      setPreferences(await getPreferences()),
+    const updatePreferencesSubscription = updatePreferencesListener(
+      async () => {
+        const allFoods = await listAllFood();
+        setAllFoods(allFoods);
+        const preferences = await getPreferences();
+        setPreferences(preferences);
+        const streak = await getStreakInfo(allFoods, new Date(), preferences);
+        setStreak(streak);
+      },
     );
+    App.addListener("appStateChange", async ({ isActive }) => {
+      if (isActive) {
+        const allFoods = await listAllFood();
+        setAllFoods(allFoods);
+        const streak = await getStreakInfo(allFoods, new Date(), preferences);
+        setStreak(streak);
+      }
+    });
     return () => {
       unsubscribeListener(createFoodSubscription);
       unsubscribeListener(deleteFoodSubscription);
@@ -82,9 +130,11 @@ export default function TabsView() {
       unsubscribeListener(deleteQuickAddSubscription);
       unsubscribeListener(createPreferencesSubscription);
       unsubscribeListener(updatePreferencesSubscription);
+      App.removeAllListeners();
     };
   }, []);
 
+  if (!streak) return <Loader variation="linear" />;
   return (
     <>
       <Tabs
@@ -100,14 +150,25 @@ export default function TabsView() {
                 quickAdds={quickAdds}
                 goal={goal}
                 preferences={preferences}
+                streakInfo={streak}
               />
             ),
           },
-          { label: "Weight", value: "Weight", content: <WeightPage /> },
+          {
+            label: "Weight",
+            value: "Weight",
+            content: <WeightPage preferences={preferences} />,
+          },
           {
             label: "Stats",
             value: "Stats",
-            content: <StatsPage allFoods={allFoods} />,
+            content: (
+              <StatsPage
+                allFoods={allFoods}
+                streakInfo={streak}
+                preferences={preferences}
+              />
+            ),
           },
           {
             label: "Settings",

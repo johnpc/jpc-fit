@@ -5,7 +5,7 @@ import Preferences from "./settings-page/Preferences";
 import { PreferencesEntity, QuickAddEntity } from "../data/entities";
 
 export default function SettingsPage(props: {
-  preferences?: PreferencesEntity;
+  preferences: PreferencesEntity;
   quickAdds: QuickAddEntity[];
 }) {
   return (

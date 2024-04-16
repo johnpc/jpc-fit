@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { StreakInfo, getStreakInfo } from "../../helpers/getStreakInfo";
-import { FoodEntity } from "../../data/entities";
+import { FoodEntity, PreferencesEntity } from "../../data/entities";
 import {
   Loader,
   View,
@@ -15,12 +15,18 @@ import {
 import { addDays, subDays } from "date-fns";
 import { ArrowBackIos, ArrowForwardIos } from "@mui/icons-material";
 
-export default function WeeklyOverview(props: { allFoods: FoodEntity[] }) {
-  const [streakInfo, setStreakInfo] = useState<StreakInfo>();
+export default function WeeklyOverview(props: {
+  allFoods: FoodEntity[];
+  streakInfo: StreakInfo;
+  preferences: PreferencesEntity;
+}) {
+  const [streakInfo, setStreakInfo] = useState<StreakInfo>(props.streakInfo);
   const [date, setDate] = useState<Date>(new Date());
   const setup = async () => {
-    const s = await getStreakInfo(props.allFoods, date);
-    setStreakInfo(s);
+    if (props.streakInfo.today.day !== date.toLocaleDateString()) {
+      const s = await getStreakInfo(props.allFoods, date, props.preferences);
+      setStreakInfo(s);
+    }
   };
   useEffect(() => {
     setup();

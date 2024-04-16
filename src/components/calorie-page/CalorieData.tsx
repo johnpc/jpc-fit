@@ -11,7 +11,6 @@ import {
   Button,
 } from "@aws-amplify/ui-react";
 import { useEffect, useState } from "react";
-import { App } from "@capacitor/app";
 import {
   FoodEntity,
   GoalEntity,
@@ -28,43 +27,46 @@ import {
   Delete,
   Edit,
 } from "@mui/icons-material";
-import { getHealthKitData } from "../../helpers/getHealthKitData";
 import { addDays, subDays } from "date-fns";
+import { DayInfo, StreakInfo, getDayInfo } from "../../helpers/getStreakInfo";
 
 export const CalorieData = (props: {
   goal?: GoalEntity;
   preferences?: PreferencesEntity;
   allFoods: FoodEntity[];
   quickAdds: QuickAddEntity[];
+  streakInfo: StreakInfo;
 }) => {
   const [date, setDate] = useState<Date>(new Date());
-  const [foods, setFoods] = useState<FoodEntity[]>([]);
-  const [activeCalories, setActiveCalories] = useState<number>();
-  const [baseCalories, setBaseCalories] = useState<number>();
-  const [steps, setSteps] = useState<number>();
-
+  const [dayInfo, setDayInfo] = useState<DayInfo>();
+  const foods = props.allFoods.filter(
+    (food) => food.day === date.toLocaleDateString(),
+  );
   const setup = async () => {
-    const { activeCalories, baseCalories, steps } =
-      await getHealthKitData(date);
-    setActiveCalories(activeCalories);
-    setBaseCalories(baseCalories);
-    setSteps(steps);
-    setFoods(
-      props.allFoods.filter((food) => food.day === date.toLocaleDateString()),
-    );
+    if (date.toLocaleDateString() === props.streakInfo.today.day) {
+      setDayInfo(props.streakInfo.today);
+    } else if (date.toLocaleDateString() === props.streakInfo.yesterday.day) {
+      setDayInfo(props.streakInfo.yesterday);
+    } else if (date.toLocaleDateString() === props.streakInfo.twoDaysAgo.day) {
+      setDayInfo(props.streakInfo.twoDaysAgo);
+    } else if (
+      date.toLocaleDateString() === props.streakInfo.threeDaysAgo.day
+    ) {
+      setDayInfo(props.streakInfo.threeDaysAgo);
+    } else if (date.toLocaleDateString() === props.streakInfo.fourDaysAgo.day) {
+      setDayInfo(props.streakInfo.fourDaysAgo);
+    } else if (date.toLocaleDateString() === props.streakInfo.fiveDaysAgo.day) {
+      setDayInfo(props.streakInfo.fiveDaysAgo);
+    } else if (date.toLocaleDateString() === props.streakInfo.sixDaysAgo.day) {
+      setDayInfo(props.streakInfo.sixDaysAgo);
+    } else {
+      const dayInfo = await getDayInfo(props.allFoods, date, props.preferences);
+      setDayInfo(dayInfo);
+    }
   };
   useEffect(() => {
     setup();
-    App.addListener("appStateChange", ({ isActive }) => {
-      if (isActive) {
-        setup();
-      }
-    });
-
-    return () => {
-      App.removeAllListeners();
-    };
-  }, [date, props.allFoods]);
+  }, [date, props.streakInfo, props.allFoods, props.preferences]);
 
   const handleEditGoal = async () => {
     const newGoal = parseInt(prompt("Enter new goal")!);
@@ -94,10 +96,8 @@ export const CalorieData = (props: {
     0,
   );
 
-  if (activeCalories === undefined || baseCalories === undefined)
-    return <Loader />;
-  const targetCalories =
-    props.goal?.dietCalories ?? activeCalories + baseCalories;
+  if (dayInfo?.burnedCalories === undefined) return <Loader />;
+  const targetCalories = props.goal?.dietCalories ?? dayInfo.burnedCalories;
   const remainingCalories = targetCalories - consumedCalories;
   return (
     <>
@@ -139,21 +139,21 @@ export const CalorieData = (props: {
             </TableRow>
           </TableHead>
           <TableBody>
-            {!steps ? null : (
+            {!dayInfo.steps ? null : (
               <TableRow>
                 <TableCell>Steps</TableCell>
-                <TableCell>{steps}</TableCell>
+                <TableCell>{dayInfo.steps}</TableCell>
                 <TableCell></TableCell>
               </TableRow>
             )}
             <TableRow>
               <TableCell>Active Calories</TableCell>
-              <TableCell>{activeCalories} cals</TableCell>
+              <TableCell>{dayInfo.activeCalories} cals</TableCell>
               <TableCell></TableCell>
             </TableRow>
             <TableRow>
               <TableCell>Base Calories</TableCell>
-              <TableCell>{baseCalories} cals</TableCell>
+              <TableCell>{dayInfo.baseCalories} cals</TableCell>
               <TableCell></TableCell>
             </TableRow>
             <TableRow>

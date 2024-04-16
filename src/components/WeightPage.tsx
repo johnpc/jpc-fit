@@ -10,6 +10,7 @@ import {
 import { Height, MonitorWeight } from "@mui/icons-material";
 import {
   HeightEntity,
+  PreferencesEntity,
   WeightEntity,
   createHeight,
   createHeightListener,
@@ -22,12 +23,12 @@ import {
 import { useEffect, useState } from "react";
 import { getHealthKitData } from "../helpers/getHealthKitData";
 
-export default function WeightPage() {
+export default function WeightPage(props: { preferences: PreferencesEntity }) {
   const [weight, setWeight] = useState<WeightEntity>();
   const [height, setHeight] = useState<HeightEntity>();
 
   const setup = async () => {
-    const { weight } = await getHealthKitData(new Date());
+    const { weight } = await getHealthKitData(new Date(), props.preferences);
     setWeight((await getWeight()) ?? { currentWeight: weight });
     setHeight((await getHeight()) ?? { currentHeight: 0 });
   };

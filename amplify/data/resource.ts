@@ -35,7 +35,8 @@ const schema = a.schema({
     .authorization([a.allow.owner()]),
   Preferences: a
     .model({
-      hideProtein: a.boolean().required(),
+      hideProtein: a.boolean(),
+      hideSteps: a.boolean(),
     })
     .authorization([a.allow.owner()]),
 });

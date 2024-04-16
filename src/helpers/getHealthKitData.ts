@@ -5,6 +5,7 @@ import {
   SampleNames,
 } from "@perfood/capacitor-healthkit";
 import { endOfDay, startOfDay } from "date-fns";
+import { PreferencesEntity } from "../data/entities";
 
 type HealthKitData = {
   activeCalories: number;
@@ -25,7 +26,10 @@ export const hasPermission = async (): Promise<boolean> => {
   return localStorage.getItem("hasPermission") === "hasPermission";
 };
 
-export const getHealthKitData = async (today: Date): Promise<HealthKitData> => {
+export const getHealthKitData = async (
+  today: Date,
+  preferences?: PreferencesEntity,
+): Promise<HealthKitData> => {
   const defaultHealthKitData = {
     activeCalories: 250,
     baseCalories: 1500,
@@ -78,10 +82,12 @@ export const getHealthKitData = async (today: Date): Promise<HealthKitData> => {
     0,
   );
 
-  const stepsData = await CapacitorHealthkit.queryHKitSampleType<OtherData>({
-    ...queryOptions,
-    sampleName: SampleNames.STEP_COUNT,
-  });
+  const stepsData = preferences?.hideSteps
+    ? { resultData: [] }
+    : await CapacitorHealthkit.queryHKitSampleType<OtherData>({
+        ...queryOptions,
+        sampleName: SampleNames.STEP_COUNT,
+      });
   const hasAppleWatch = stepsData.resultData.find(
     (result) => result.device?.name === "Apple Watch",
   );

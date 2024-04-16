@@ -9,7 +9,8 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "prod-config": "amplify generate config --app-id d14lkx3uodtpjt --branch main --profile personal",
-    "ios": "npm run prod-config && npm run build && cap sync && cap copy ios && cap build ios && cap open ios",
+    "ios": "npm run prod-config && npm run dev-ios",
+    "dev-ios": "npm run build && cap sync && cap copy ios && cap build ios && cap open ios",
     "prepare": "husky install"
   },
   "dependencies": {

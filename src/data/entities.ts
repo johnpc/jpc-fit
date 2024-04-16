@@ -18,7 +18,8 @@ export type FoodEntity = {
 
 export type PreferencesEntity = {
   id?: string;
-  hideProtein: boolean;
+  hideProtein?: boolean | null;
+  hideSteps?: boolean | null;
 };
 
 export type GoalEntity = {
@@ -102,6 +103,7 @@ export const getPreferences = async (): Promise<PreferencesEntity> => {
     return {
       id: undefined,
       hideProtein: false,
+      hideSteps: false,
     };
   }
   return preferences;
@@ -112,13 +114,15 @@ export const updatePreferences = async (
 ): Promise<PreferencesEntity> => {
   if (!preferences.id) {
     const preference = await client.models.Preferences.create({
-      hideProtein: preferences.hideProtein,
+      hideProtein: preferences.hideProtein ?? false,
+      hideSteps: preferences.hideSteps ?? false,
     });
     return preference.data;
   } else {
     const preference = await client.models.Preferences.update({
       id: preferences.id,
       hideProtein: preferences.hideProtein,
+      hideSteps: preferences.hideSteps,
     });
     return preference.data;
   }

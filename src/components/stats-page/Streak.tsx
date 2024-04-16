@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react";
-import { StreakInfo, getStreakInfo } from "../../helpers/getStreakInfo";
+import { StreakInfo } from "../../helpers/getStreakInfo";
 import { FoodEntity } from "../../data/entities";
 import {
   Loader,
@@ -10,19 +9,12 @@ import {
   Text,
 } from "@aws-amplify/ui-react";
 
-export default function Streak(props: { allFoods: FoodEntity[] }) {
+export default function Streak(props: {
+  allFoods: FoodEntity[];
+  streakInfo: StreakInfo;
+}) {
   const { tokens } = useTheme();
-
-  const [streakInfo, setStreakInfo] = useState<StreakInfo>();
-  const setup = async () => {
-    const s = await getStreakInfo(props.allFoods, new Date());
-    setStreakInfo(s);
-  };
-  useEffect(() => {
-    setup();
-  }, [props.allFoods]);
-
-  if (!streakInfo) return <Loader />;
+  if (!props.streakInfo) return <Loader />;
   return (
     <Grid
       margin={tokens.space.small}
@@ -30,23 +22,25 @@ export default function Streak(props: { allFoods: FoodEntity[] }) {
       gap={tokens.space.small}
     >
       <View columnSpan={4} textAlign={"center"}>
-        Your streak is {streakInfo.currentStreakDays} days
+        Your streak is {props.streakInfo.currentStreakDays} days
       </View>
       <View borderRadius={tokens.radii.xxxl} textAlign={"center"}>
-        <Heading>{streakInfo.threeDaysAgo.tracked ? "🔥" : "❌"} </Heading>
-        <Text as="p">{streakInfo.threeDaysAgo.day}</Text>
+        <Heading>
+          {props.streakInfo.threeDaysAgo.tracked ? "🔥" : "❌"}{" "}
+        </Heading>
+        <Text as="p">{props.streakInfo.threeDaysAgo.day}</Text>
       </View>
       <View borderRadius={tokens.radii.xxxl} textAlign={"center"}>
-        <Heading>{streakInfo.twoDaysAgo.tracked ? "🔥" : "❌"} </Heading>
-        <Text as="p">{streakInfo.twoDaysAgo.day}</Text>
+        <Heading>{props.streakInfo.twoDaysAgo.tracked ? "🔥" : "❌"} </Heading>
+        <Text as="p">{props.streakInfo.twoDaysAgo.day}</Text>
       </View>
       <View borderRadius={tokens.radii.xxxl} textAlign={"center"}>
-        <Heading>{streakInfo.yesterday.tracked ? "🔥" : "❌"} </Heading>
-        <Text as="p">{streakInfo.yesterday.day}</Text>
+        <Heading>{props.streakInfo.yesterday.tracked ? "🔥" : "❌"} </Heading>
+        <Text as="p">{props.streakInfo.yesterday.day}</Text>
       </View>
       <View borderRadius={tokens.radii.xxxl} textAlign={"center"}>
-        <Heading>{streakInfo.today.tracked ? "🔥" : "❌"} </Heading>
-        <Text as="p">{streakInfo.today.day}</Text>
+        <Heading>{props.streakInfo.today.tracked ? "🔥" : "❌"} </Heading>
+        <Text as="p">{props.streakInfo.today.day}</Text>
       </View>
     </Grid>
   );
