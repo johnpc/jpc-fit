@@ -42,29 +42,42 @@ export const CalorieData = (props: {
   const foods = props.allFoods.filter(
     (food) => food.day === date.toLocaleDateString(),
   );
-  const setup = async () => {
-    if (date.toLocaleDateString() === props.streakInfo.today.day) {
-      setDayInfo(props.streakInfo.today);
-    } else if (date.toLocaleDateString() === props.streakInfo.yesterday.day) {
-      setDayInfo(props.streakInfo.yesterday);
-    } else if (date.toLocaleDateString() === props.streakInfo.twoDaysAgo.day) {
-      setDayInfo(props.streakInfo.twoDaysAgo);
-    } else if (
-      date.toLocaleDateString() === props.streakInfo.threeDaysAgo.day
-    ) {
-      setDayInfo(props.streakInfo.threeDaysAgo);
-    } else if (date.toLocaleDateString() === props.streakInfo.fourDaysAgo.day) {
-      setDayInfo(props.streakInfo.fourDaysAgo);
-    } else if (date.toLocaleDateString() === props.streakInfo.fiveDaysAgo.day) {
-      setDayInfo(props.streakInfo.fiveDaysAgo);
-    } else if (date.toLocaleDateString() === props.streakInfo.sixDaysAgo.day) {
-      setDayInfo(props.streakInfo.sixDaysAgo);
-    } else {
-      const dayInfo = await getDayInfo(props.allFoods, date, props.preferences);
-      setDayInfo(dayInfo);
-    }
-  };
+
   useEffect(() => {
+    const setup = async () => {
+      if (date.toLocaleDateString() === props.streakInfo.today.day) {
+        setDayInfo(props.streakInfo.today);
+      } else if (date.toLocaleDateString() === props.streakInfo.yesterday.day) {
+        setDayInfo(props.streakInfo.yesterday);
+      } else if (
+        date.toLocaleDateString() === props.streakInfo.twoDaysAgo.day
+      ) {
+        setDayInfo(props.streakInfo.twoDaysAgo);
+      } else if (
+        date.toLocaleDateString() === props.streakInfo.threeDaysAgo.day
+      ) {
+        setDayInfo(props.streakInfo.threeDaysAgo);
+      } else if (
+        date.toLocaleDateString() === props.streakInfo.fourDaysAgo.day
+      ) {
+        setDayInfo(props.streakInfo.fourDaysAgo);
+      } else if (
+        date.toLocaleDateString() === props.streakInfo.fiveDaysAgo.day
+      ) {
+        setDayInfo(props.streakInfo.fiveDaysAgo);
+      } else if (
+        date.toLocaleDateString() === props.streakInfo.sixDaysAgo.day
+      ) {
+        setDayInfo(props.streakInfo.sixDaysAgo);
+      } else {
+        const dayInfo = await getDayInfo(
+          props.allFoods,
+          date,
+          props.preferences,
+        );
+        setDayInfo(dayInfo);
+      }
+    };
     setup();
   }, [date, props.streakInfo, props.allFoods, props.preferences]);
 

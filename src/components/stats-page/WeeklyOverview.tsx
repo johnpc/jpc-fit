@@ -22,15 +22,16 @@ export default function WeeklyOverview(props: {
 }) {
   const [streakInfo, setStreakInfo] = useState<StreakInfo>(props.streakInfo);
   const [date, setDate] = useState<Date>(new Date());
-  const setup = async () => {
-    if (props.streakInfo.today.day !== date.toLocaleDateString()) {
-      const s = await getStreakInfo(props.allFoods, date, props.preferences);
-      setStreakInfo(s);
-    }
-  };
+
   useEffect(() => {
+    const setup = async () => {
+      if (props.streakInfo.today.day !== date.toLocaleDateString()) {
+        const s = await getStreakInfo(props.allFoods, date, props.preferences);
+        setStreakInfo(s);
+      }
+    };
     setup();
-  }, [props.allFoods, date]);
+  }, [props.allFoods, date, props.preferences, props.streakInfo.today]);
 
   if (!streakInfo) return <Loader />;
   const { burnedCalories, consumedCalories } = (

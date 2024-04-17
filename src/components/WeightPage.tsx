@@ -27,13 +27,12 @@ export default function WeightPage(props: { preferences: PreferencesEntity }) {
   const [weight, setWeight] = useState<WeightEntity>();
   const [height, setHeight] = useState<HeightEntity>();
 
-  const setup = async () => {
-    const { weight } = await getHealthKitData(new Date(), props.preferences);
-    setWeight((await getWeight()) ?? { currentWeight: weight });
-    setHeight((await getHeight()) ?? { currentHeight: 0 });
-  };
-
   useEffect(() => {
+    const setup = async () => {
+      const { weight } = await getHealthKitData(new Date(), props.preferences);
+      setWeight((await getWeight()) ?? { currentWeight: weight });
+      setHeight((await getHeight()) ?? { currentHeight: 0 });
+    };
     setup();
     const createWeightSubscription = createWeightListener(setup);
     const createHeightSubscription = createHeightListener(setup);
@@ -41,7 +40,7 @@ export default function WeightPage(props: { preferences: PreferencesEntity }) {
       unsubscribeListener(createWeightSubscription);
       unsubscribeListener(createHeightSubscription);
     };
-  }, []);
+  }, [props.preferences]);
   const handleEditWeight = async () => {
     const newWeight = parseInt(prompt("Enter your weight in lbs")!);
     if (Number.isNaN(newWeight) || newWeight < 1) {

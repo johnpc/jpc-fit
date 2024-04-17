@@ -62,7 +62,8 @@ export default function TabsView() {
       setGoal(await getGoal());
       const gotGoalTime = Date.now();
       const gotGoal = gotGoalTime - start - gotAllFoods;
-      setPreferences(await getPreferences());
+      const preferences = await getPreferences();
+      setPreferences(preferences);
       const gotPreferencesTime = Date.now();
       const gotPreferences = gotPreferencesTime - start - gotGoal;
       const existingQuickAdds = await listQuickAdds();
