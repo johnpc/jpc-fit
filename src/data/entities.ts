@@ -182,9 +182,9 @@ export const listQuickAdds = async (): Promise<QuickAddEntity[]> => {
         (a, b) =>
           new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
       )
-      .map((food) => ({
-        ...food,
-        createdAt: new Date(food.createdAt),
+      .map((quickAdd) => ({
+        ...quickAdd,
+        createdAt: new Date(quickAdd.createdAt),
       })) ?? []
   );
 };
@@ -261,10 +261,12 @@ export const createFoodListener = (fn: (food: FoodEntity) => void) => {
   return listener;
 };
 
-export const createQuickAddListener = (fn: () => void) => {
+export const createQuickAddListener = (
+  fn: (quickAdd: QuickAddEntity) => void,
+) => {
   const listener = client.models.QuickAdd.onCreate().subscribe({
-    next: async () => {
-      fn();
+    next: async (quickAdd: Schema["QuickAdd"]) => {
+      fn({ ...quickAdd, createdAt: new Date(quickAdd.createdAt) });
     },
     error: (error: Error) => {
       console.error("Subscription error", error);
@@ -273,10 +275,12 @@ export const createQuickAddListener = (fn: () => void) => {
   return listener;
 };
 
-export const deleteQuickAddListener = (fn: () => void) => {
+export const deleteQuickAddListener = (
+  fn: (quickAdd: QuickAddEntity) => void,
+) => {
   const listener = client.models.QuickAdd.onDelete().subscribe({
-    next: async () => {
-      fn();
+    next: async (quickAdd: Schema["QuickAdd"]) => {
+      fn({ ...quickAdd, createdAt: new Date(quickAdd.createdAt) });
     },
     error: (error: Error) => {
       console.error("Subscription error", error);
@@ -285,10 +289,10 @@ export const deleteQuickAddListener = (fn: () => void) => {
   return listener;
 };
 
-export const deleteFoodListener = (fn: () => void) => {
+export const deleteFoodListener = (fn: (food: FoodEntity) => void) => {
   const listener = client.models.Food.onDelete().subscribe({
-    next: async () => {
-      fn();
+    next: async (food: Schema["Food"]) => {
+      fn({ ...food, createdAt: new Date(food.updatedAt) });
     },
     error: (error: Error) => {
       console.error("Subscription error", error);
@@ -297,10 +301,10 @@ export const deleteFoodListener = (fn: () => void) => {
   return listener;
 };
 
-export const createGoalListener = (fn: () => void) => {
+export const createGoalListener = (fn: (createdGoal: GoalEntity) => void) => {
   const listener = client.models.Goal.onCreate().subscribe({
-    next: async () => {
-      fn();
+    next: async (goal: Schema["Goal"]) => {
+      fn(goal);
     },
     error: (error: Error) => {
       console.error("Subscription error", error);
@@ -309,10 +313,12 @@ export const createGoalListener = (fn: () => void) => {
   return listener;
 };
 
-export const createPreferencesListener = (fn: () => void) => {
+export const createPreferencesListener = (
+  fn: (preferences: PreferencesEntity) => void,
+) => {
   const listener = client.models.Preferences.onCreate().subscribe({
-    next: async () => {
-      fn();
+    next: async (preferences: Schema["Preferences"]) => {
+      fn(preferences);
     },
     error: (error: Error) => {
       console.error("Subscription error", error);
@@ -321,10 +327,12 @@ export const createPreferencesListener = (fn: () => void) => {
   return listener;
 };
 
-export const updatePreferencesListener = (fn: () => void) => {
+export const updatePreferencesListener = (
+  fn: (preferences: PreferencesEntity) => void,
+) => {
   const listener = client.models.Preferences.onUpdate().subscribe({
-    next: async () => {
-      fn();
+    next: async (preferences: Schema["Preferences"]) => {
+      fn(preferences);
     },
     error: (error: Error) => {
       console.error("Subscription error", error);

@@ -2,6 +2,7 @@ import { Capacitor } from "@capacitor/core";
 import {
   CapacitorHealthkit,
   OtherData,
+  QueryOutput,
   SampleNames,
 } from "@perfood/capacitor-healthkit";
 import { endOfDay, startOfDay } from "date-fns";
@@ -24,6 +25,22 @@ export const hasPermission = async (): Promise<boolean> => {
   }
 
   return localStorage.getItem("hasPermission") === "hasPermission";
+};
+
+const aggregateHealthData = (data: QueryOutput<OtherData>) => {
+  const hasAppleWatch = data.resultData.find(
+    (result) => result.device?.name === "Apple Watch",
+  );
+
+  const sum = data.resultData
+    .filter((result) =>
+      hasAppleWatch
+        ? result.device?.name === "Apple Watch"
+        : result.device?.name === "iPhone",
+    )
+    .filter((result) => result.sourceBundleId.includes("com.apple.health"))
+    .reduce((value, item) => (value += item.value), 0);
+  return sum;
 };
 
 export const getHealthKitData = async (
@@ -59,28 +76,23 @@ export const getHealthKitData = async (
       ...queryOptions,
       sampleName: SampleNames.ACTIVE_ENERGY_BURNED,
     });
-  const activeCalorieValue = activeCalorieData.resultData.reduce(
-    (value, item) => (value += item.value),
-    0,
-  );
+
+  const activeCalorieValue = aggregateHealthData(activeCalorieData);
+
   const baseCalorieData =
     await CapacitorHealthkit.queryHKitSampleType<OtherData>({
       ...queryOptions,
       sampleName: SampleNames.BASAL_ENERGY_BURNED,
     });
 
-  const baseCalorieValue = baseCalorieData.resultData.reduce(
-    (value, item) => (value += item.value),
-    0,
-  );
+  const baseCalorieValue = aggregateHealthData(baseCalorieData);
+
   const weightData = await CapacitorHealthkit.queryHKitSampleType<OtherData>({
     ...queryOptions,
     sampleName: SampleNames.WEIGHT,
   });
-  const weightValue = weightData.resultData.reduce(
-    (value, item) => (value += item.value),
-    0,
-  );
+
+  const weightValue = aggregateHealthData(weightData);
 
   const stepsData = preferences?.hideSteps
     ? { resultData: [] }
@@ -88,17 +100,8 @@ export const getHealthKitData = async (
         ...queryOptions,
         sampleName: SampleNames.STEP_COUNT,
       });
-  const hasAppleWatch = stepsData.resultData.find(
-    (result) => result.device?.name === "Apple Watch",
-  );
 
-  const stepsValue = stepsData.resultData
-    .filter((result) =>
-      hasAppleWatch
-        ? result.device?.name === "Apple Watch"
-        : result.device?.name === "iPhone",
-    )
-    .reduce((value, item) => (value += item.value), 0);
+  const stepsValue = aggregateHealthData(stepsData as QueryOutput<OtherData>);
 
   const calculatedHealthKitData = {
     activeCalories: +activeCalorieValue.toFixed(),

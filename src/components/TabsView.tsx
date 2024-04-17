@@ -41,10 +41,12 @@ export default function TabsView() {
     useState<QuickAddEntity[]>(defaultQuickAdds);
   const [streak, setStreak] = useState<StreakInfo>();
 
-  const setupQuickAdds = async () => {
-    const quickAdds = await listQuickAdds();
-    if (quickAdds.length) {
-      setQuickAdds([...quickAdds, customQuickAdd]);
+  const setupQuickAdds = async (existingQuickAdds: QuickAddEntity[]) => {
+    const withCustomRemoved = existingQuickAdds.filter(
+      (quickAdd) => quickAdd.id !== "dqa-Custom",
+    );
+    if (withCustomRemoved.length) {
+      setQuickAdds([...withCustomRemoved, customQuickAdd]);
     } else {
       setQuickAdds(defaultQuickAdds);
     }
@@ -63,7 +65,8 @@ export default function TabsView() {
       setPreferences(await getPreferences());
       const gotPreferencesTime = Date.now();
       const gotPreferences = gotPreferencesTime - start - gotGoal;
-      await setupQuickAdds();
+      const existingQuickAdds = await listQuickAdds();
+      await setupQuickAdds(existingQuickAdds);
       const gotQuickAddsTime = Date.now();
       const gotQuickAdds = gotQuickAddsTime - start - gotPreferences;
       const streak = await getStreakInfo(allFoods, new Date(), preferences);
@@ -79,45 +82,71 @@ export default function TabsView() {
       });
     };
     setup();
-    const createFoodSubscription = createFoodListener(async () => {
-      const allFoods = await listAllFood();
-      setAllFoods(allFoods);
-      const preferences = await getPreferences();
-      setPreferences(preferences);
-      const streak = await getStreakInfo(allFoods, new Date(), preferences);
-      setStreak(streak);
-    });
-    const deleteFoodSubscription = deleteFoodListener(async () => {
-      const allFoods = await listAllFood();
-      setAllFoods(allFoods);
-      const preferences = await getPreferences();
-      setPreferences(preferences);
-      const streak = await getStreakInfo(allFoods, new Date(), preferences);
-      setStreak(streak);
-    });
-    const createGoalSubscription = createGoalListener(async () =>
-      setGoal(await getGoal()),
+  }, []);
+
+  useEffect(() => {
+    const createFoodSubscription = createFoodListener(
+      async (food: FoodEntity) => {
+        const newAllFoods = [...allFoods, food];
+        setAllFoods(newAllFoods);
+        const streak = await getStreakInfo(
+          newAllFoods,
+          new Date(),
+          preferences,
+        );
+        setStreak(streak);
+      },
+    );
+    const deleteFoodSubscription = deleteFoodListener(
+      async (deletedFood: FoodEntity) => {
+        const newAllFoods = allFoods.filter(
+          (food) => food.id !== deletedFood.id,
+        );
+        setAllFoods(newAllFoods);
+        const streak = await getStreakInfo(
+          newAllFoods,
+          new Date(),
+          preferences,
+        );
+        setStreak(streak);
+      },
+    );
+    const createGoalSubscription = createGoalListener(
+      async (goal: GoalEntity) => setGoal(goal),
     );
     const deleteGoalSubscription = deleteGoalListener(async () =>
-      setGoal(await getGoal()),
+      setGoal(undefined),
     );
-    const createQuickAddSubscription = createQuickAddListener(setupQuickAdds);
-    const deleteQuickAddSubscription = deleteQuickAddListener(setupQuickAdds);
+    const createQuickAddSubscription = createQuickAddListener(
+      (createdQuickAdd: QuickAddEntity) => {
+        const isDefault = !!quickAdds.find((quickAdd) =>
+          quickAdd.id.startsWith("dqa-100"),
+        );
+        if (isDefault) {
+          setupQuickAdds([createdQuickAdd]);
+        } else {
+          const updatedQuickAdds = [...quickAdds, createdQuickAdd];
+          setupQuickAdds(updatedQuickAdds);
+        }
+      },
+    );
+    const deleteQuickAddSubscription = deleteQuickAddListener(
+      (deletedQuickAdd: QuickAddEntity) => {
+        const updatedQuickAdds = quickAdds.filter(
+          (quickAdd) => quickAdd.id !== deletedQuickAdd.id,
+        );
+        setupQuickAdds(updatedQuickAdds);
+      },
+    );
     const createPreferencesSubscription = createPreferencesListener(
-      async () => {
-        const allFoods = await listAllFood();
-        setAllFoods(allFoods);
-        const preferences = await getPreferences();
+      async (preferences: PreferencesEntity) => {
         setPreferences(preferences);
         const streak = await getStreakInfo(allFoods, new Date(), preferences);
         setStreak(streak);
       },
     );
     const updatePreferencesSubscription = updatePreferencesListener(
-      async () => {
-        const allFoods = await listAllFood();
-        setAllFoods(allFoods);
-        const preferences = await getPreferences();
+      async (preferences: PreferencesEntity) => {
         setPreferences(preferences);
         const streak = await getStreakInfo(allFoods, new Date(), preferences);
         setStreak(streak);
@@ -125,8 +154,6 @@ export default function TabsView() {
     );
     App.addListener("appStateChange", async ({ isActive }) => {
       if (isActive) {
-        const allFoods = await listAllFood();
-        setAllFoods(allFoods);
         const streak = await getStreakInfo(allFoods, new Date(), preferences);
         setStreak(streak);
       }
@@ -142,7 +169,7 @@ export default function TabsView() {
       unsubscribeListener(updatePreferencesSubscription);
       App.removeAllListeners();
     };
-  }, []);
+  }, [allFoods, preferences, quickAdds]);
 
   if (!streak) return <Loader variation="linear" />;
   return (
