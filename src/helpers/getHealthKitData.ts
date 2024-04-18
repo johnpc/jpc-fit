@@ -5,7 +5,7 @@ import {
   QueryOutput,
   SampleNames,
 } from "@perfood/capacitor-healthkit";
-import { endOfDay, startOfDay } from "date-fns";
+import { endOfDay, startOfDay, subDays } from "date-fns";
 import { PreferencesEntity } from "../data/entities";
 
 type HealthKitData = {
@@ -116,7 +116,7 @@ export const getHealthKitData = async (
     calculatedHealthKitData.weight === 0 &&
     calculatedHealthKitData.steps === 0
   ) {
-    if (today.toLocaleDateString() !== new Date().toLocaleDateString()) {
+    if (today.getTime() < endOfDay(subDays(new Date(), 1)).getTime()) {
       localStorage.setItem(
         localStorageCacheKey,
         JSON.stringify(defaultHealthKitData),
@@ -125,7 +125,7 @@ export const getHealthKitData = async (
     return defaultHealthKitData;
   }
 
-  if (today.toLocaleDateString() !== new Date().toLocaleDateString()) {
+  if (today.getTime() < endOfDay(subDays(new Date(), 1)).getTime()) {
     console.log(`updated cache for ${today.toLocaleDateString()}`);
     localStorage.setItem(
       localStorageCacheKey,
