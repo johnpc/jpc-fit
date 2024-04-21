@@ -31,6 +31,7 @@ import { StreakInfo, getStreakInfo } from "../helpers/getStreakInfo";
 import { App } from "@capacitor/app";
 
 export default function TabsView() {
+  const [toggleListeners, setToggleListeners] = useState<boolean>(false);
   const [allFoods, setAllFoods] = useState<FoodEntity[]>([]);
   const [goal, setGoal] = useState<GoalEntity>();
   const [preferences, setPreferences] = useState<PreferencesEntity>({
@@ -157,6 +158,7 @@ export default function TabsView() {
       if (isActive) {
         const streak = await getStreakInfo(allFoods, new Date(), preferences);
         setStreak(streak);
+        setToggleListeners(!toggleListeners);
       }
     });
     return () => {
@@ -170,7 +172,7 @@ export default function TabsView() {
       unsubscribeListener(updatePreferencesSubscription);
       App.removeAllListeners();
     };
-  }, [allFoods, preferences, quickAdds]);
+  }, [allFoods, preferences, quickAdds, toggleListeners]);
 
   if (!streak) return <Loader variation="linear" />;
   return (
