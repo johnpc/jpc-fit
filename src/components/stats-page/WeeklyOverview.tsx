@@ -46,9 +46,9 @@ export default function WeeklyOverview(props: {
       }
       return {
         burnedCalories:
-          acc.burnedCalories + streakInfo[key].burnedCalories ?? 0,
+          acc.burnedCalories + streakInfo[key]?.burnedCalories || 0,
         consumedCalories:
-          acc.consumedCalories + streakInfo[key].consumedCalories ?? 0,
+          acc.consumedCalories + streakInfo[key]?.consumedCalories || 0,
       };
     },
     { burnedCalories: 0, consumedCalories: 0 },
