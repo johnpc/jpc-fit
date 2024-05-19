@@ -4,6 +4,7 @@ import WeightPage from "./WeightPage";
 import SettingsPage from "./SettingsPage";
 import StatsPage from "./StatsPage";
 import { useEffect, useState } from "react";
+import { App as CapacitorApp } from "@capacitor/app";
 import {
   FoodEntity,
   GoalEntity,
@@ -41,6 +42,7 @@ export default function TabsView() {
   const [quickAdds, setQuickAdds] =
     useState<QuickAddEntity[]>(defaultQuickAdds);
   const [streak, setStreak] = useState<StreakInfo>();
+  const [lastOpenTime, setLastOpenTime] = useState<Date>();
 
   const setupQuickAdds = async (existingQuickAdds: QuickAddEntity[]) => {
     const withCustomRemoved = existingQuickAdds.filter(
@@ -52,6 +54,14 @@ export default function TabsView() {
       setQuickAdds(defaultQuickAdds);
     }
   };
+  useEffect(() => {
+    CapacitorApp.addListener("resume", () => {
+      setLastOpenTime(new Date());
+    });
+    return () => {
+      CapacitorApp.removeAllListeners();
+    };
+  }, []);
 
   useEffect(() => {
     const setup = async () => {
@@ -172,7 +182,7 @@ export default function TabsView() {
       unsubscribeListener(updatePreferencesSubscription);
       App.removeAllListeners();
     };
-  }, [allFoods, preferences, quickAdds, toggleListeners]);
+  }, [allFoods, preferences, quickAdds, toggleListeners, lastOpenTime]);
 
   if (!streak) return <Loader variation="linear" />;
   return (
