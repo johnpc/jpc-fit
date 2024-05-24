@@ -1,7 +1,7 @@
 import { Amplify } from "aws-amplify";
 import { generateClient } from "aws-amplify/api";
 import { Subscription } from "rxjs";
-import config from "../../amplifyconfiguration.json";
+import config from "../../amplify_outputs.json";
 import { Schema } from "../../amplify/data/resource";
 Amplify.configure(config);
 const client = generateClient<Schema>({
@@ -13,6 +13,8 @@ export type FoodEntity = {
   protein?: number | undefined | null;
   day: string;
   name?: string | undefined | null;
+  notes?: string | undefined | null;
+  photos?: (string | null | undefined)[] | undefined | null;
   createdAt: Date;
 };
 
@@ -58,7 +60,7 @@ export const createGoal = async (dietCalories: number): Promise<GoalEntity> => {
     dietCalories,
   });
   return {
-    ...createdGoal.data,
+    ...createdGoal.data!,
   };
 };
 
@@ -117,14 +119,14 @@ export const updatePreferences = async (
       hideProtein: preferences.hideProtein ?? false,
       hideSteps: preferences.hideSteps ?? false,
     });
-    return preference.data;
+    return preference.data!;
   } else {
     const preference = await client.models.Preferences.update({
       id: preferences.id,
       hideProtein: preferences.hideProtein,
       hideSteps: preferences.hideSteps,
     });
-    return preference.data;
+    return preference.data!;
   }
 };
 
@@ -135,7 +137,7 @@ export const createWeight = async (
     currentWeight,
   });
   return {
-    ...createdWeight.data,
+    ...createdWeight.data!,
   };
 };
 
@@ -146,7 +148,7 @@ export const createHeight = async (
     currentHeight,
   });
   return {
-    ...createdHeight.data,
+    ...createdHeight.data!,
   };
 };
 
@@ -163,8 +165,8 @@ export const createQuickAdd = async (
     protein,
   });
   return {
-    ...createdQuickAdd.data,
-    createdAt: new Date(createdQuickAdd.data.createdAt),
+    ...createdQuickAdd.data!,
+    createdAt: new Date(createdQuickAdd.data!.createdAt),
   };
 };
 
@@ -192,7 +194,16 @@ export const listQuickAdds = async (): Promise<QuickAddEntity[]> => {
 export const listAllFood = async (): Promise<FoodEntity[]> => {
   const foods = await client.models.Food.list({
     limit: 10000,
-    selectionSet: ["id", "day", "calories", "protein", "createdAt", "name"],
+    selectionSet: [
+      "id",
+      "day",
+      "calories",
+      "notes",
+      "photos",
+      "protein",
+      "createdAt",
+      "name",
+    ],
   });
   return (
     foods.data
@@ -208,19 +219,27 @@ export const listAllFood = async (): Promise<FoodEntity[]> => {
 };
 
 export const listFood = async (date: Date): Promise<FoodEntity[]> => {
-  const foods = await client.models.Food.listByDay(
+  const foods = await client.models.Food.listFoodByDay(
     { day: date.toLocaleDateString() },
     {
-      selectionSet: ["id", "day", "calories", "protein", "createdAt", "name"],
+      selectionSet: [
+        "id",
+        "day",
+        "calories",
+        "protein",
+        "createdAt",
+        "updatedAt",
+        "name",
+      ],
     },
   );
   return (
     foods.data
       ?.sort(
-        (a, b) =>
+        (a: Schema["Food"]["type"], b: Schema["Food"]["type"]) =>
           new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
       )
-      .map((food) => ({
+      .map((food: Schema["Food"]["type"]) => ({
         ...food,
         createdAt: new Date(food.createdAt),
       })) ?? []
@@ -240,8 +259,26 @@ export const createFood = async (
     day: date.toLocaleDateString(),
   });
   return {
-    ...createdFood.data,
-    createdAt: new Date(createdFood.data.updatedAt),
+    ...createdFood.data!,
+    createdAt: new Date(createdFood.data!.updatedAt),
+  };
+};
+
+export const updateFood = async (food: FoodEntity): Promise<FoodEntity> => {
+  const updatedFood = await client.models.Food.update({
+    id: food.id,
+    calories: food.calories,
+    protein: food.protein,
+    day: food.day,
+    name: food.name,
+    notes: food.notes,
+    photos: (food.photos as string[]) ?? [],
+  });
+  return {
+    ...updatedFood.data!,
+    id: updatedFood.data!.id!,
+    calories: updatedFood.data!.calories!,
+    createdAt: new Date(updatedFood.data!.updatedAt),
   };
 };
 
@@ -251,7 +288,19 @@ export const deleteFood = async (food: FoodEntity) => {
 
 export const createFoodListener = (fn: (food: FoodEntity) => void) => {
   const listener = client.models.Food.onCreate().subscribe({
-    next: async (food: Schema["Food"]) => {
+    next: async (food: Schema["Food"]["type"]) => {
+      fn({ ...food, createdAt: new Date(food.updatedAt) });
+    },
+    error: (error: Error) => {
+      console.error("Subscription error", error);
+    },
+  });
+  return listener;
+};
+
+export const updateFoodListener = (fn: (food: FoodEntity) => void) => {
+  const listener = client.models.Food.onUpdate().subscribe({
+    next: async (food: Schema["Food"]["type"]) => {
       fn({ ...food, createdAt: new Date(food.updatedAt) });
     },
     error: (error: Error) => {
@@ -265,7 +314,7 @@ export const createQuickAddListener = (
   fn: (quickAdd: QuickAddEntity) => void,
 ) => {
   const listener = client.models.QuickAdd.onCreate().subscribe({
-    next: async (quickAdd: Schema["QuickAdd"]) => {
+    next: async (quickAdd: Schema["QuickAdd"]["type"]) => {
       fn({ ...quickAdd, createdAt: new Date(quickAdd.createdAt) });
     },
     error: (error: Error) => {
@@ -279,7 +328,7 @@ export const deleteQuickAddListener = (
   fn: (quickAdd: QuickAddEntity) => void,
 ) => {
   const listener = client.models.QuickAdd.onDelete().subscribe({
-    next: async (quickAdd: Schema["QuickAdd"]) => {
+    next: async (quickAdd: Schema["QuickAdd"]["type"]) => {
       fn({ ...quickAdd, createdAt: new Date(quickAdd.createdAt) });
     },
     error: (error: Error) => {
@@ -291,7 +340,7 @@ export const deleteQuickAddListener = (
 
 export const deleteFoodListener = (fn: (food: FoodEntity) => void) => {
   const listener = client.models.Food.onDelete().subscribe({
-    next: async (food: Schema["Food"]) => {
+    next: async (food: Schema["Food"]["type"]) => {
       fn({ ...food, createdAt: new Date(food.updatedAt) });
     },
     error: (error: Error) => {
@@ -303,7 +352,7 @@ export const deleteFoodListener = (fn: (food: FoodEntity) => void) => {
 
 export const createGoalListener = (fn: (createdGoal: GoalEntity) => void) => {
   const listener = client.models.Goal.onCreate().subscribe({
-    next: async (goal: Schema["Goal"]) => {
+    next: async (goal: Schema["Goal"]["type"]) => {
       fn(goal);
     },
     error: (error: Error) => {
@@ -317,7 +366,7 @@ export const createPreferencesListener = (
   fn: (preferences: PreferencesEntity) => void,
 ) => {
   const listener = client.models.Preferences.onCreate().subscribe({
-    next: async (preferences: Schema["Preferences"]) => {
+    next: async (preferences: Schema["Preferences"]["type"]) => {
       fn(preferences);
     },
     error: (error: Error) => {
@@ -331,7 +380,7 @@ export const updatePreferencesListener = (
   fn: (preferences: PreferencesEntity) => void,
 ) => {
   const listener = client.models.Preferences.onUpdate().subscribe({
-    next: async (preferences: Schema["Preferences"]) => {
+    next: async (preferences: Schema["Preferences"]["type"]) => {
       fn(preferences);
     },
     error: (error: Error) => {

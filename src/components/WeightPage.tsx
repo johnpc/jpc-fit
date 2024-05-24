@@ -22,6 +22,7 @@ import {
 } from "../data/entities";
 import { useEffect, useState } from "react";
 import { getHealthKitData } from "../helpers/getHealthKitData";
+import { BodyFatEyeTest } from "./weight-page/BodyFatEyeTest";
 
 export default function WeightPage(props: { preferences: PreferencesEntity }) {
   const [weight, setWeight] = useState<WeightEntity>();
@@ -154,6 +155,7 @@ export default function WeightPage(props: { preferences: PreferencesEntity }) {
           </TableBody>
         </Table>
       </Card>
+      <BodyFatEyeTest />
     </>
   );
 }

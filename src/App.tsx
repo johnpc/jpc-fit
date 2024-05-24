@@ -4,7 +4,14 @@ import { Footer } from "./components/Footer";
 import { Profiler, useEffect, useState } from "react";
 import { hasPermission } from "./helpers/getHealthKitData";
 import { RequestPermission } from "./components/settings-page/RequestPermission";
-import { Heading, Image, Link, View, useTheme, withAuthenticator } from "@aws-amplify/ui-react";
+import {
+  Heading,
+  Image,
+  Link,
+  View,
+  useTheme,
+  withAuthenticator,
+} from "@aws-amplify/ui-react";
 import { App as CapacitorApp } from "@capacitor/app";
 import { Capacitor } from "@capacitor/core";
 import TabsView from "./components/TabsView";
@@ -65,15 +72,24 @@ export default withAuthenticator(App, {
     Header() {
       const { tokens } = useTheme();
       return (
-        <View textAlign="center" backgroundColor={'palevioletred'} padding={'15px'}>
-        <Image
-          alt="logo"
-          borderRadius={tokens.radii.xl}
-          width={"100px"}
-          src="/maskable.png"
-        />
-        <Heading fontSize={tokens.fontSizes.xl} color={tokens.colors.primary[90]}>jpc.fit</Heading>
-      </View>
+        <View
+          textAlign="center"
+          backgroundColor={"palevioletred"}
+          padding={"15px"}
+        >
+          <Image
+            alt="logo"
+            borderRadius={tokens.radii.xl}
+            width={"100px"}
+            src="/maskable.png"
+          />
+          <Heading
+            fontSize={tokens.fontSizes.xl}
+            color={tokens.colors.primary[90]}
+          >
+            jpc.fit
+          </Heading>
+        </View>
       );
     },
     Footer: () => (

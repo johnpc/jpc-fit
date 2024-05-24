@@ -9,6 +9,7 @@ import {
   Loader,
   Text,
   Button,
+  useTheme,
 } from "@aws-amplify/ui-react";
 import { useEffect, useState } from "react";
 import {
@@ -29,6 +30,7 @@ import {
 } from "@mui/icons-material";
 import { addDays, subDays } from "date-fns";
 import { DayInfo, StreakInfo, getDayInfo } from "../../helpers/getStreakInfo";
+import { FoodDetailPage } from "../FoodDetailPage";
 
 export const CalorieData = (props: {
   goal?: GoalEntity;
@@ -37,11 +39,17 @@ export const CalorieData = (props: {
   quickAdds: QuickAddEntity[];
   streakInfo: StreakInfo;
 }) => {
+  const { tokens } = useTheme();
+  const [foodDetail, setFoodDetail] = useState<string>();
   const [date, setDate] = useState<Date>(new Date());
   const [dayInfo, setDayInfo] = useState<DayInfo>();
   const foods = props.allFoods.filter(
     (food) => food.day === date.toLocaleDateString(),
   );
+
+  const onLeaveFoodDetail = () => {
+    setFoodDetail(undefined);
+  };
 
   useEffect(() => {
     const setup = async () => {
@@ -112,6 +120,15 @@ export const CalorieData = (props: {
   if (dayInfo?.burnedCalories === undefined) return <Loader />;
   const targetCalories = props.goal?.dietCalories ?? dayInfo.burnedCalories;
   const remainingCalories = targetCalories - consumedCalories;
+
+  if (foodDetail) {
+    return (
+      <FoodDetailPage
+        food={props.allFoods.find((f) => f.id === foodDetail)!}
+        onLeaveFoodDetail={onLeaveFoodDetail}
+      />
+    );
+  }
   return (
     <>
       <>
@@ -228,7 +245,12 @@ export const CalorieData = (props: {
                       .slice(0, 2)
                       .join(":")}
                   </TableCell>
-                  <TableCell>{food.name ?? "No name"}</TableCell>
+                  <TableCell
+                    color={tokens.colors.primary[60]}
+                    onClick={() => setFoodDetail(food.id)}
+                  >
+                    {food.name ?? "No name"}
+                  </TableCell>
                   <TableCell>{food.calories}</TableCell>
                   {props.preferences?.hideProtein ? null : (
                     <TableCell>{food.protein ?? 0}g</TableCell>

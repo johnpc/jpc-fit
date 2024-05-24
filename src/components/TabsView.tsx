@@ -22,6 +22,7 @@ import {
   listAllFood,
   listQuickAdds,
   unsubscribeListener,
+  updateFoodListener,
   updatePreferencesListener,
 } from "../data/entities";
 import {
@@ -109,6 +110,12 @@ export default function TabsView() {
         setStreak(streak);
       },
     );
+    const updateFoodSubscription = updateFoodListener(
+      async (food: FoodEntity) => {
+        const newAllFoods = allFoods.map((f) => (f.id === food.id ? food : f));
+        setAllFoods(newAllFoods);
+      },
+    );
     const deleteFoodSubscription = deleteFoodListener(
       async (deletedFood: FoodEntity) => {
         const newAllFoods = allFoods.filter(
@@ -173,6 +180,7 @@ export default function TabsView() {
     });
     return () => {
       unsubscribeListener(createFoodSubscription);
+      unsubscribeListener(updateFoodSubscription);
       unsubscribeListener(deleteFoodSubscription);
       unsubscribeListener(createGoalSubscription);
       unsubscribeListener(deleteGoalSubscription);

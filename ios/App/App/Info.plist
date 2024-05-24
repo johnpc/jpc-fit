@@ -49,5 +49,7 @@
 	<string>Read Health Data</string>
 	<key>NSHealthUpdateUsageDescription</key>
 	<string>Read Health Data</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Add photos of food or nutrition facts</string>
 </dict>
 </plist>

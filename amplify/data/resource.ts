@@ -7,14 +7,16 @@ const schema = a.schema({
       calories: a.integer().required(),
       protein: a.integer(),
       day: a.string().required(),
+      notes: a.string(),
+      photos: a.string().array(),
     })
     .secondaryIndexes((index) => [index("day")])
-    .authorization([a.allow.owner()]),
+    .authorization((allow) => [allow.owner()]),
   Goal: a
     .model({
       dietCalories: a.integer().required(),
     })
-    .authorization([a.allow.owner()]),
+    .authorization((allow) => [allow.owner()]),
   QuickAdd: a
     .model({
       name: a.string().required(),
@@ -22,23 +24,23 @@ const schema = a.schema({
       protein: a.integer(),
       icon: a.string().required(),
     })
-    .authorization([a.allow.owner()]),
+    .authorization((allow) => [allow.owner()]),
   Weight: a
     .model({
       currentWeight: a.integer().required(),
     })
-    .authorization([a.allow.owner()]),
+    .authorization((allow) => [allow.owner()]),
   Height: a
     .model({
       currentHeight: a.integer().required(),
     })
-    .authorization([a.allow.owner()]),
+    .authorization((allow) => [allow.owner()]),
   Preferences: a
     .model({
       hideProtein: a.boolean(),
       hideSteps: a.boolean(),
     })
-    .authorization([a.allow.owner()]),
+    .authorization((allow) => [allow.owner()]),
 });
 
 export type Schema = ClientSchema<typeof schema>;
