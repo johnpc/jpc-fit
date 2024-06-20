@@ -1,7 +1,6 @@
 import { Loader, Tabs } from "@aws-amplify/ui-react";
 import { Preferences } from "@capacitor/preferences";
 import { WidgetsBridgePlugin } from "capacitor-widgetsbridge-plugin";
-
 import CaloriePage from "./CaloriePage";
 import WeightPage from "./WeightPage";
 import SettingsPage from "./SettingsPage";
@@ -35,6 +34,7 @@ import {
 import { StreakInfo, getStreakInfo } from "../helpers/getStreakInfo";
 import { App } from "@capacitor/app";
 import AphorismsPage from "./AphorismsPage";
+import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 
 const setTodaysCaloriesPreferences = async (calories: number) => {
   await Preferences.configure({
@@ -281,7 +281,7 @@ export default function TabsView() {
             content: <AphorismsPage />,
           },
           {
-            label: "Settings",
+            label: <ManageAccountsIcon />,
             value: "Settings",
             content: (
               <SettingsPage preferences={preferences} quickAdds={quickAdds} />
