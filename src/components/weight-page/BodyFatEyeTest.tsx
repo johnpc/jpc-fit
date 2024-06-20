@@ -1,8 +1,4 @@
-import {
-  Card,
-  Image,
-  Accordion,
-} from "@aws-amplify/ui-react";
+import { Card, Image, Accordion } from "@aws-amplify/ui-react";
 import femaleBfEyeTest from "../../images/female-bf-eye-test.webp";
 import maleBfEyeTest from "../../images/male-bf-eye-test.jpg";
 import bfChart from "../../images/bf-chart.jpeg";

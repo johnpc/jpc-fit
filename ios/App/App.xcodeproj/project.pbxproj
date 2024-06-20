@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1D0CD94F2C12B00C006A2593 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D5168F72C07DF1A00475CD8 /* WidgetKit.framework */; };
+		1D0CD9502C12B00C006A2593 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D5168F92C07DF1A00475CD8 /* SwiftUI.framework */; };
+		1D0CD9532C12B00C006A2593 /* JpcFitWatchWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D0CD9522C12B00C006A2593 /* JpcFitWatchWidget.swift */; };
+		1D0CD9552C12B00E006A2593 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1D0CD9542C12B00E006A2593 /* Assets.xcassets */; };
 		1D5168F82C07DF1A00475CD8 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D5168F72C07DF1A00475CD8 /* WidgetKit.framework */; };
 		1D5168FA2C07DF1A00475CD8 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D5168F92C07DF1A00475CD8 /* SwiftUI.framework */; };
 		1D5168FD2C07DF1A00475CD8 /* JpcFitWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D5168FC2C07DF1A00475CD8 /* JpcFitWidgetBundle.swift */; };
@@ -49,6 +53,10 @@
 
 /* Begin PBXFileReference section */
 		1D089B712BBF99AC001A2F54 /* App.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = App.entitlements; sourceTree = "<group>"; };
+		1D0CD94E2C12B00C006A2593 /* JpcFitWatchWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = JpcFitWatchWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		1D0CD9522C12B00C006A2593 /* JpcFitWatchWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JpcFitWatchWidget.swift; sourceTree = "<group>"; };
+		1D0CD9542C12B00E006A2593 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		1D0CD9562C12B00E006A2593 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		1D3923972C0C981200A7BE46 /* JpcFitWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = JpcFitWidgetExtension.entitlements; sourceTree = "<group>"; };
 		1D5168F62C07DF1A00475CD8 /* JpcFitWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = JpcFitWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		1D5168F72C07DF1A00475CD8 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
@@ -72,6 +80,15 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		1D0CD94B2C12B00C006A2593 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1D0CD9502C12B00C006A2593 /* SwiftUI.framework in Frameworks */,
+				1D0CD94F2C12B00C006A2593 /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		1D5168F32C07DF1A00475CD8 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -92,6 +109,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		1D0CD9512C12B00C006A2593 /* JpcFitWatchWidget */ = {
+			isa = PBXGroup;
+			children = (
+				1D0CD9522C12B00C006A2593 /* JpcFitWatchWidget.swift */,
+				1D0CD9542C12B00E006A2593 /* Assets.xcassets */,
+				1D0CD9562C12B00E006A2593 /* Info.plist */,
+			);
+			path = JpcFitWatchWidget;
+			sourceTree = "<group>";
+		};
 		1D5168FB2C07DF1A00475CD8 /* JpcFitWidget */ = {
 			isa = PBXGroup;
 			children = (
@@ -119,6 +146,7 @@
 				1D3923972C0C981200A7BE46 /* JpcFitWidgetExtension.entitlements */,
 				504EC3061FED79650016851F /* App */,
 				1D5168FB2C07DF1A00475CD8 /* JpcFitWidget */,
+				1D0CD9512C12B00C006A2593 /* JpcFitWatchWidget */,
 				504EC3051FED79650016851F /* Products */,
 				7F8756D8B27F46E3366F6CEA /* Pods */,
 				27E2DDA53C4D2A4D1A88CE4A /* Frameworks */,
@@ -130,6 +158,7 @@
 			children = (
 				504EC3041FED79650016851F /* App.app */,
 				1D5168F62C07DF1A00475CD8 /* JpcFitWidgetExtension.appex */,
+				1D0CD94E2C12B00C006A2593 /* JpcFitWatchWidgetExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -162,6 +191,23 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		1D0CD94D2C12B00C006A2593 /* JpcFitWatchWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1D0CD9592C12B00E006A2593 /* Build configuration list for PBXNativeTarget "JpcFitWatchWidgetExtension" */;
+			buildPhases = (
+				1D0CD94A2C12B00C006A2593 /* Sources */,
+				1D0CD94B2C12B00C006A2593 /* Frameworks */,
+				1D0CD94C2C12B00C006A2593 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = JpcFitWatchWidgetExtension;
+			productName = JpcFitWatchWidgetExtension;
+			productReference = 1D0CD94E2C12B00C006A2593 /* JpcFitWatchWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		1D5168F52C07DF1A00475CD8 /* JpcFitWidgetExtension */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 1D5169092C07DF1C00475CD8 /* Build configuration list for PBXNativeTarget "JpcFitWidgetExtension" */;
@@ -206,9 +252,13 @@
 		504EC2FC1FED79650016851F /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 1530;
+				LastSwiftUpdateCheck = 1540;
 				LastUpgradeCheck = 0920;
 				TargetAttributes = {
+					1D0CD94D2C12B00C006A2593 = {
+						CreatedOnToolsVersion = 15.4;
+						ProvisioningStyle = Automatic;
+					};
 					1D5168F52C07DF1A00475CD8 = {
 						CreatedOnToolsVersion = 15.3;
 						ProvisioningStyle = Automatic;
@@ -235,11 +285,20 @@
 			targets = (
 				504EC3031FED79650016851F /* App */,
 				1D5168F52C07DF1A00475CD8 /* JpcFitWidgetExtension */,
+				1D0CD94D2C12B00C006A2593 /* JpcFitWatchWidgetExtension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		1D0CD94C2C12B00C006A2593 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1D0CD9552C12B00E006A2593 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		1D5168F42C07DF1A00475CD8 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -300,6 +359,14 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		1D0CD94A2C12B00C006A2593 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1D0CD9532C12B00C006A2593 /* JpcFitWatchWidget.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		1D5168F22C07DF1A00475CD8 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -347,6 +414,78 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		1D0CD9572C12B00E006A2593 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = JW5SC3NYUV;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = JpcFitWatchWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = JpcFitWatchWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks @executable_path/../../../../Frameworks";
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = io.jpc.JpcFitWatchWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.5;
+			};
+			name = Debug;
+		};
+		1D0CD9582C12B00E006A2593 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = JW5SC3NYUV;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = JpcFitWatchWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = JpcFitWatchWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks @executable_path/../../../../Frameworks";
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = io.jpc.JpcFitWatchWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.5;
+			};
+			name = Release;
+		};
 		1D5169072C07DF1C00475CD8 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -576,6 +715,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		1D0CD9592C12B00E006A2593 /* Build configuration list for PBXNativeTarget "JpcFitWatchWidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1D0CD9572C12B00E006A2593 /* Debug */,
+				1D0CD9582C12B00E006A2593 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		1D5169092C07DF1C00475CD8 /* Build configuration list for PBXNativeTarget "JpcFitWidgetExtension" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

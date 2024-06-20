@@ -1,8 +1,8 @@
 //
-//  JpcFitWidget.swift
-//  JpcFitWidget
+//  JpcFitWatchWidget.swift
+//  JpcFitWatchWidget
 //
-//  Created by Corser, John on 5/29/24.
+//  Created by Corser, John on 6/6/24.
 //
 
 import WidgetKit
@@ -113,7 +113,6 @@ func getHealthKitDataAggregate(completion: @escaping ((Double, Int) -> Void)) ->
         healthStore.execute(query)
     }
 
-
 struct Provider: TimelineProvider {
     func placeholder(in context: Context) -> SimpleEntry {
         SimpleEntry(date: Date(), burnedCalories: 1736, consumedCalories: 1000 )
@@ -142,7 +141,7 @@ struct SimpleEntry: TimelineEntry {
     let consumedCalories: Int
 }
 
-struct JpcFitWidgetEntryView : View {
+struct JpcFitWatchWidgetEntryView : View {
     var entry: Provider.Entry
     
 
@@ -159,28 +158,28 @@ struct JpcFitWidgetEntryView : View {
     }
 }
 
-struct JpcFitWidget: Widget {
-    let kind: String = "JpcFitWidget"
+@main
+struct JpcFitWatchWidget: Widget {
+    let kind: String = "JpcFitWatchWidget"
 
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: Provider()) { entry in
-            if #available(iOS 17.0, *) {
-                JpcFitWidgetEntryView(entry: entry)
+            if #available(watchOS 10.0, *) {
+                JpcFitWatchWidgetEntryView(entry: entry)
                     .containerBackground(.fill.tertiary, for: .widget)
             } else {
-                JpcFitWidgetEntryView(entry: entry)
+                JpcFitWatchWidgetEntryView(entry: entry)
                     .padding()
                     .background()
             }
         }
         .configurationDisplayName("jpc.fit")
         .description("See a snapshot of your calories in/out.")
-        .supportedFamilies([.systemSmall])
     }
 }
 
-#Preview(as: .systemSmall) {
-    JpcFitWidget()
+#Preview(as: .accessoryRectangular) {
+    JpcFitWatchWidget()
 } timeline: {
     SimpleEntry(date: .now, burnedCalories: 1756, consumedCalories: 1000 )
 }

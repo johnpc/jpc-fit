@@ -1,5 +1,5 @@
 import { Loader, Tabs } from "@aws-amplify/ui-react";
-import { Preferences } from '@capacitor/preferences';
+import { Preferences } from "@capacitor/preferences";
 import { WidgetsBridgePlugin } from "capacitor-widgetsbridge-plugin";
 
 import CaloriePage from "./CaloriePage";
@@ -34,31 +34,32 @@ import {
 } from "./settings-page/QuickAddConfiguration";
 import { StreakInfo, getStreakInfo } from "../helpers/getStreakInfo";
 import { App } from "@capacitor/app";
+import AphorismsPage from "./AphorismsPage";
 
 const setTodaysCaloriesPreferences = async (calories: number) => {
   await Preferences.configure({
     group: "group.com.johncorser.fit.prefs",
   });
-  const keys = await Preferences.keys()
-  console.log({keys});
-  console.log('TabsView 39');
+  const keys = await Preferences.keys();
+  console.log({ keys });
+  console.log("TabsView 39");
   await getTodaysCaloriesPreferences();
-  console.log('TabsView 41', { calories });
+  console.log("TabsView 41", { calories });
   await Preferences.set({
-    key: 'consumedCalories',
+    key: "consumedCalories",
 
     value: calories.toString(),
   });
-  console.log('TabsView 46');
+  console.log("TabsView 46");
   await WidgetsBridgePlugin.reloadAllTimelines();
-  console.log('TabsView 48');
+  console.log("TabsView 48");
 };
 
 const getTodaysCaloriesPreferences = async () => {
   await Preferences.configure({
     group: "group.com.johncorser.fit.prefs",
   });
-  const { value } = await Preferences.get({ key: 'consumedCalories' });
+  const { value } = await Preferences.get({ key: "consumedCalories" });
 
   console.log(`Hello ${value}!`);
   return value;
@@ -133,7 +134,9 @@ export default function TabsView() {
     const createFoodSubscription = createFoodListener(
       async (food: FoodEntity) => {
         const newAllFoods = [...allFoods, food];
-        const todaysCalories = newAllFoods.filter((food) => food.day === new Date().toLocaleDateString()).reduce((acc, food) => acc + food.calories, 0);
+        const todaysCalories = newAllFoods
+          .filter((food) => food.day === new Date().toLocaleDateString())
+          .reduce((acc, food) => acc + food.calories, 0);
         setTodaysCaloriesPreferences(todaysCalories);
         setAllFoods(newAllFoods);
         const streak = await getStreakInfo(
@@ -148,7 +151,9 @@ export default function TabsView() {
       async (food: FoodEntity) => {
         const newAllFoods = allFoods.map((f) => (f.id === food.id ? food : f));
         setAllFoods(newAllFoods);
-        const todaysCalories = newAllFoods.filter((food) => food.day === new Date().toLocaleDateString()).reduce((acc, food) => acc + food.calories, 0);
+        const todaysCalories = newAllFoods
+          .filter((food) => food.day === new Date().toLocaleDateString())
+          .reduce((acc, food) => acc + food.calories, 0);
         setTodaysCaloriesPreferences(todaysCalories);
       },
     );
@@ -229,7 +234,9 @@ export default function TabsView() {
   }, [allFoods, preferences, quickAdds, toggleListeners, lastOpenTime]);
 
   if (!streak) return <Loader variation="linear" />;
-  const todaysCalories = allFoods.filter((food) => food.day === new Date().toLocaleDateString()).reduce((acc, food) => acc + food.calories, 0);
+  const todaysCalories = allFoods
+    .filter((food) => food.day === new Date().toLocaleDateString())
+    .reduce((acc, food) => acc + food.calories, 0);
   setTodaysCaloriesPreferences(todaysCalories);
 
   return (
@@ -240,7 +247,7 @@ export default function TabsView() {
         defaultValue="Calories"
         items={[
           {
-            label: "Calories",
+            label: "Today",
             value: "Calories",
             content: (
               <CaloriePage
@@ -267,6 +274,11 @@ export default function TabsView() {
                 preferences={preferences}
               />
             ),
+          },
+          {
+            label: "Quotes",
+            value: "Aphorisms",
+            content: <AphorismsPage />,
           },
           {
             label: "Settings",
