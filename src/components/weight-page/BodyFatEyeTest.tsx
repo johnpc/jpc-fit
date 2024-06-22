@@ -3,12 +3,18 @@ import femaleBfEyeTest from "../../images/female-bf-eye-test.webp";
 import maleBfEyeTest from "../../images/male-bf-eye-test.jpg";
 import bfChart from "../../images/bf-chart.jpeg";
 import bmiChart from "../../images/bmi-chart.png";
+import WhyBMI from "./WhyBMI";
 
 export const BodyFatEyeTest = () => {
   return (
     <Card>
       <Accordion
         items={[
+          {
+            trigger: "Why BMI?",
+            value: "whyBmi",
+            content: <WhyBMI />,
+          },
           {
             trigger: "BMI Chart",
             value: "bmiChart",

@@ -38,11 +38,12 @@ export const CalorieData = (props: {
   allFoods: FoodEntity[];
   quickAdds: QuickAddEntity[];
   streakInfo: StreakInfo;
+  dayInfo: DayInfo;
 }) => {
   const { tokens } = useTheme();
   const [foodDetail, setFoodDetail] = useState<string>();
   const [date, setDate] = useState<Date>(new Date());
-  const [dayInfo, setDayInfo] = useState<DayInfo>();
+  const [dayInfo, setDayInfo] = useState<DayInfo>(props.dayInfo);
   const foods = props.allFoods.filter(
     (food) => food.day === date.toLocaleDateString(),
   );

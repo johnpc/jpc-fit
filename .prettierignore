@@ -6,6 +6,7 @@ dist
 *.png
 *.webp
 *.jpeg
+*.jpg
 .husky
 .gitignore
 .prettierignore

@@ -4,7 +4,7 @@ import {
   PreferencesEntity,
   QuickAddEntity,
 } from "../data/entities";
-import { StreakInfo } from "../helpers/getStreakInfo";
+import { DayInfo, StreakInfo } from "../helpers/getStreakInfo";
 import { CalorieData } from "./calorie-page/CalorieData";
 
 export default function CaloriePage(props: {
@@ -13,6 +13,7 @@ export default function CaloriePage(props: {
   preferences?: PreferencesEntity;
   quickAdds: QuickAddEntity[];
   streakInfo: StreakInfo;
+  dayInfo: DayInfo;
 }) {
   return (
     <>

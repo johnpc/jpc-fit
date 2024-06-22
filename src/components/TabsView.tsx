@@ -10,8 +10,10 @@ import { App as CapacitorApp } from "@capacitor/app";
 import {
   FoodEntity,
   GoalEntity,
+  HeightEntity,
   PreferencesEntity,
   QuickAddEntity,
+  WeightEntity,
   createFoodListener,
   createGoalListener,
   createPreferencesListener,
@@ -20,7 +22,9 @@ import {
   deleteGoalListener,
   deleteQuickAddListener,
   getGoal,
+  getHeight,
   getPreferences,
+  getWeight,
   listAllFood,
   listQuickAdds,
   unsubscribeListener,
@@ -34,7 +38,7 @@ import {
 import { StreakInfo, getStreakInfo } from "../helpers/getStreakInfo";
 import { App } from "@capacitor/app";
 import AphorismsPage from "./AphorismsPage";
-import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
+import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
 
 const setTodaysCaloriesPreferences = async (calories: number) => {
   await Preferences.configure({
@@ -69,6 +73,8 @@ export default function TabsView() {
   const [toggleListeners, setToggleListeners] = useState<boolean>(false);
   const [allFoods, setAllFoods] = useState<FoodEntity[]>([]);
   const [goal, setGoal] = useState<GoalEntity>();
+  const [height, setHeight] = useState<HeightEntity>();
+  const [weight, setWeight] = useState<WeightEntity>();
   const [preferences, setPreferences] = useState<PreferencesEntity>({
     hideProtein: true,
     hideSteps: true,
@@ -98,37 +104,50 @@ export default function TabsView() {
   }, []);
 
   useEffect(() => {
-    const setup = async () => {
-      const start = Date.now();
+    const fetchFood = async () => {
       const allFoods = await listAllFood();
       setAllFoods(allFoods);
-      const gotFoodsTime = Date.now();
-      const gotAllFoods = gotFoodsTime - start;
+    };
+    const fetchGoal = async () => {
       setGoal(await getGoal());
-      const gotGoalTime = Date.now();
-      const gotGoal = gotGoalTime - start - gotAllFoods;
+    };
+    const fetchPreferences = async () => {
       const preferences = await getPreferences();
       setPreferences(preferences);
-      const gotPreferencesTime = Date.now();
-      const gotPreferences = gotPreferencesTime - start - gotGoal;
+    };
+    const fetchQuickAdds = async () => {
       const existingQuickAdds = await listQuickAdds();
       await setupQuickAdds(existingQuickAdds);
-      const gotQuickAddsTime = Date.now();
-      const gotQuickAdds = gotQuickAddsTime - start - gotPreferences;
-      const streak = await getStreakInfo(allFoods, new Date(), preferences);
-      setStreak(streak);
-      const gotStreakTime = Date.now();
-      const gotStreak = gotStreakTime - start - gotQuickAdds;
-      console.log({
-        gotAllFoods,
-        gotGoal,
-        gotPreferences,
-        gotQuickAdds,
-        gotStreak,
-      });
+    };
+    const fetchHeight = async () => {
+      const height = await getHeight();
+      setHeight(height);
+    };
+    const fetchWeight = async () => {
+      const weight = await getWeight();
+      setWeight(weight);
+    };
+
+    const setup = async () => {
+      await Promise.all([
+        fetchFood(),
+        fetchGoal(),
+        fetchPreferences(),
+        fetchQuickAdds(),
+        fetchHeight(),
+        fetchWeight(),
+      ]);
     };
     setup();
   }, []);
+
+  useEffect(() => {
+    const fetchStreak = async () => {
+      const streak = await getStreakInfo(allFoods, new Date(), preferences);
+      setStreak(streak);
+    };
+    fetchStreak();
+  }, [preferences, allFoods]);
 
   useEffect(() => {
     const createFoodSubscription = createFoodListener(
@@ -256,13 +275,20 @@ export default function TabsView() {
                 goal={goal}
                 preferences={preferences}
                 streakInfo={streak}
+                dayInfo={streak.today}
               />
             ),
           },
           {
             label: "Weight",
             value: "Weight",
-            content: <WeightPage preferences={preferences} />,
+            content: (
+              <WeightPage
+                preferences={preferences}
+                height={height}
+                weight={weight}
+              />
+            ),
           },
           {
             label: "Stats",

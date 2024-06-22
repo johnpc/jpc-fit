@@ -24,9 +24,13 @@ import { useEffect, useState } from "react";
 import { getHealthKitData } from "../helpers/getHealthKitData";
 import { BodyFatEyeTest } from "./weight-page/BodyFatEyeTest";
 
-export default function WeightPage(props: { preferences: PreferencesEntity }) {
-  const [weight, setWeight] = useState<WeightEntity>();
-  const [height, setHeight] = useState<HeightEntity>();
+export default function WeightPage(props: {
+  preferences: PreferencesEntity;
+  height?: HeightEntity;
+  weight?: WeightEntity;
+}) {
+  const [weight, setWeight] = useState<WeightEntity | undefined>(props.weight);
+  const [height, setHeight] = useState<HeightEntity | undefined>(props.height);
 
   useEffect(() => {
     const setup = async () => {
