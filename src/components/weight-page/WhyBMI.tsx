@@ -37,7 +37,11 @@ export default function WhyBMI() {
         textDecoration="none"
         margin={tokens.space.small}
       >
-        However, BMI should not be dismissed so readily. The Arnies of the world
+        <Text
+          as="span"
+          fontWeight={tokens.fontWeights.semibold}
+          fontStyle={"oblique"}
+        >However, BMI's limits are not a "get out of dieting free" card.</Text> The Arnies of the world
         are extreme outliers.{" "}
         <Text
           as="span"
