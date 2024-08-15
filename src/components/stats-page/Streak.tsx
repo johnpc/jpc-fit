@@ -15,6 +15,7 @@ export default function Streak(props: {
 }) {
   const { tokens } = useTheme();
   if (!props.streakInfo) return <Loader />;
+  const netLbs = props.streakInfo.currentStreakNetCalories / 3500;
   return (
     <Grid
       margin={tokens.space.small}
@@ -22,7 +23,7 @@ export default function Streak(props: {
       gap={tokens.space.small}
     >
       <View columnSpan={4} textAlign={"center"}>
-        Your streak is {props.streakInfo.currentStreakDays} days
+        Your streak is {props.streakInfo.currentStreakDays} days (~<Text as="span" color={netLbs > 0 ? "red" : "green"}>{(Math.abs(netLbs)).toFixed(1)} lbs</Text>)
       </View>
       <View borderRadius={tokens.radii.xxxl} textAlign={"center"}>
         <Heading>

@@ -37,22 +37,18 @@ export default function WhyBMI() {
         textDecoration="none"
         margin={tokens.space.small}
       >
-        <Text
-          as="span"
-          fontWeight={tokens.fontWeights.semibold}
-          fontStyle={"oblique"}
-        >However, BMI's limits are not a "get out of dieting free" card.</Text> The Arnies of the world
-        are extreme outliers.{" "}
+        However, The Arnies of the world are extreme outliers.{" "}
         <Text
           as="span"
           fontWeight={tokens.fontWeights.semibold}
           fontStyle={"oblique"}
         >
-          Athletes in the vast majority of sports fall within a healthy BMI
-          range
+          BMI's bluntness is not a "get out of dieting free" card.{" "}
         </Text>
-        , including sports like swimming, UFC, and soccer where the athletes are
-        quite muscular.
+        Athletes in the vast majority of sports fall within a healthy BMI range,
+        including sports like swimming, UFC, and soccer where the athletes are
+        quite muscular. In Olympic athletes, the average male BMI is 24 and the
+        average female BMI is 21.6, both within the healthy BMI range.
       </Text>
       <Text
         variation="primary"
@@ -64,10 +60,8 @@ export default function WhyBMI() {
         textDecoration="none"
         margin={tokens.space.small}
       >
-        In Olympic athletes, the average male BMI is 24 and the average female
-        BMI is 21.6, both within the healthy BMI range. For the average person,
-        whose lifestyle does not involve the extreme training regimens of elite
-        athletes,{" "}
+        For the typical person, whose lifestyle does not involve the extreme
+        training regimens of elite athletes,{" "}
         <Text
           as="span"
           fontWeight={tokens.fontWeights.semibold}
@@ -75,7 +69,9 @@ export default function WhyBMI() {
         >
           BMI remains a relevant and practical tool to set healthy goals
         </Text>
-        .
+        . In the USA, BMI is more likely to err in the other direction - for
+        example "skinny fat" has similar health profile to obesity despite being
+        a healthy BMI.
       </Text>
     </>
   );
