@@ -51,8 +51,18 @@ const setTodaysCaloriesPreferences = async (calories: number) => {
   console.log("TabsView 41", { calories });
   await Preferences.set({
     key: "consumedCalories",
-
     value: calories.toString(),
+  });
+  // Widget in date format like Sep 8, 2024
+  await Preferences.set({
+    key: "consumedCaloriesDay",
+    value: new Date().toLocaleDateString(undefined, {
+      month: "short",
+    }) + " " + new Date().toLocaleDateString(undefined, {
+      day: "numeric",
+    }) + ", " + new Date().toLocaleDateString(undefined, {
+      year: "numeric",
+    }),
   });
   console.log("TabsView 46");
   await WidgetsBridgePlugin.reloadAllTimelines();

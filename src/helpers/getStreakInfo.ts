@@ -55,8 +55,11 @@ export const getStreakInfo = async (
   let currentStreak = 0;
   let currentStreakNetCalories = 0;
   let trackedFoodsOnDay: FoodEntity[] = [];
+  let lastCheckedDay = today;
+  let itr = 0;
   do {
-    const dayToCheck = subDays(today, currentStreak);
+    const dayToCheck = subDays(today, itr);
+    lastCheckedDay = dayToCheck;
     const dayString = dayToCheck.toLocaleDateString();
     trackedFoodsOnDay = allFoods.filter((food) => food.day === dayString);
     currentStreakNetCalories +=
@@ -69,7 +72,11 @@ export const getStreakInfo = async (
     if (trackedFoodsOnDay.length) {
       currentStreak++;
     }
-  } while (trackedFoodsOnDay.length);
+    itr++;
+  } while (
+    trackedFoodsOnDay.length ||
+    lastCheckedDay.toDateString() === today.toDateString()
+  );
 
   return {
     currentStreakDays: currentStreak,

@@ -6,6 +6,7 @@ import {
   TableCell,
   TableHead,
   TableRow,
+  Text,
 } from "@aws-amplify/ui-react";
 import { Height, MonitorWeight } from "@mui/icons-material";
 import {
@@ -71,12 +72,12 @@ export default function WeightPage(props: {
     (weight.currentWeight / (height.currentHeight * height.currentHeight)) *
     703;
   const getBmiLabel = (bmi: number) => {
-    if (bmi < 18.5) return "underweight";
-    if (bmi < 25) return "healthy";
-    if (bmi < 30) return "overweight";
-    if (bmi < 35) return "obese";
-    if (bmi < 40) return "obese - class 3";
-    return "obese - class 3";
+    if (bmi < 18.5) return <>underweight</>;
+    if (bmi < 25) return <>healthy</>;
+    if (bmi < 30) return <>overweight</>;
+    if (bmi < 35) return <>obese</>;
+    if (bmi < 40) return <>obese - class 3</>;
+    return <>obese - class 3</>;
   };
   const maxUnderweightLbs = (
     (18.5 / 703) *
@@ -137,22 +138,22 @@ export default function WeightPage(props: {
           </TableHead>
           <TableBody>
             <TableRow>
-              <TableCell>Underweight</TableCell>
+              <TableCell>Underweight <br /><Text as="div" fontSize="xs">{"(bmi < 18.5)"}</Text></TableCell>
               <TableCell>0 lbs</TableCell>
               <TableCell>{maxUnderweightLbs} lbs</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell>Healthy</TableCell>
+              <TableCell>Healthy <br /><Text as="div" fontSize="xs">{"(bmi 18.5 - 25)"}</Text></TableCell>
               <TableCell>{maxUnderweightLbs} lbs</TableCell>
               <TableCell>{maxHealthyLbs} lbs</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell>Overweight</TableCell>
+              <TableCell>Overweight <br /><Text as="div" fontSize="xs">{"(bmi 25 - 30)"}</Text></TableCell>
               <TableCell>{maxHealthyLbs} lbs</TableCell>
               <TableCell>{maxOverweightLbs} lbs</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell>Obese</TableCell>
+              <TableCell>Obese <br /><Text as="div" fontSize="xs">{"(bmi 35+)"}</Text></TableCell>
               <TableCell>{maxOverweightLbs} lbs</TableCell>
               <TableCell>&#8734; lbs</TableCell>
             </TableRow>

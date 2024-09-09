@@ -103,7 +103,24 @@ func getHealthKitDataAggregate(completion: @escaping ((Double, Int) -> Void)) ->
                     print(userDefaults.dictionaryRepresentation().keys)
                     let consumedCalories = Int(userDefaults.string(forKey: "group.com.johncorser.fit.prefs.consumedCalories") ?? "0")
                     print(consumedCalories!)
-                    completion(totalCalories, consumedCalories ?? 0) }
+                    let dateFormatter = DateFormatter()
+                    dateFormatter.dateStyle = .medium
+                    dateFormatter.timeStyle = .none
+                    let formattedDate = dateFormatter.string(from: Date())
+                    
+                    
+                    let consumedCaloriesDay = userDefaults.string(forKey: "group.com.johncorser.fit.prefs.consumedCaloriesDay") ?? ""
+                    
+                    print("formattedDate: " + formattedDate)
+                    print("consumedCaloriesDay (cache): " + consumedCaloriesDay)
+                    if (formattedDate != consumedCaloriesDay) {
+                        completion(totalCalories, 0)
+                    }
+                    
+                    else {
+                        print(consumedCalories!)
+                        completion(totalCalories, consumedCalories ?? 0)
+                    }}
                 else {
                     completion(totalCalories, 0)
                 }
