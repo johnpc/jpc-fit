@@ -5,12 +5,26 @@ import { useState } from "react";
 export default function AphorismsPage() {
   const { tokens } = useTheme();
   const quotes = aphorisms.aphorisms;
-  const [index, setIndex] = useState(Math.floor(Math.random() * quotes.length));
-  const quote = quotes[index];
+  const [usedIndexes, setUsedIndexes] = useState([] as number[]);
+    const pushRandomIndex = () => {
+      console.log({usedIndexes, quotes});
+      if (usedIndexes.length === quotes.length){
+         return setUsedIndexes([]);
+        }
 
-  const randomizeIndex = () => {
-    setIndex(Math.floor(Math.random() * quotes.length));
-  };
+      let randomIndex;
+      do {
+        randomIndex = Math.floor(Math.random() * quotes.length);
+      }
+      while (usedIndexes.includes(randomIndex));
+      setUsedIndexes([...usedIndexes, randomIndex]);
+    };
+  if (!usedIndexes.length) {
+    pushRandomIndex();
+  }
+
+  const quote = quotes[usedIndexes[usedIndexes.length - 1]];
+
 
   return (
     <Card>
@@ -49,7 +63,7 @@ export default function AphorismsPage() {
         marginBottom={tokens.space.medium}
         marginTop={tokens.space.medium}
       />
-      <Button isFullWidth onClick={() => randomizeIndex()}>
+      <Button isFullWidth onClick={() => pushRandomIndex()}>
         Randomize Quote
       </Button>
     </Card>
