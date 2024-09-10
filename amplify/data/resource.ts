@@ -41,6 +41,21 @@ const schema = a.schema({
       hideSteps: a.boolean(),
     })
     .authorization((allow) => [allow.owner()]),
+  chat: a.conversation({
+    aiModel: a.ai.model("Claude 3.5 Sonnet"),
+    systemPrompt: `You are motivating users to lose weight. You answer in three sentences or less, using simple english words.`,
+    tools: [
+      {
+        query: a.ref("listFoods"),
+        description: "The food the user has eaten.",
+      },
+    ],
+    inferenceConfiguration: {
+      maxTokens: 500,
+      temperature: 1,
+      topP: 0.5,
+    },
+  }),
 });
 
 export type Schema = ClientSchema<typeof schema>;
