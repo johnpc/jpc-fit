@@ -6,25 +6,23 @@ export default function AphorismsPage() {
   const { tokens } = useTheme();
   const quotes = aphorisms.aphorisms;
   const [usedIndexes, setUsedIndexes] = useState([] as number[]);
-    const pushRandomIndex = () => {
-      console.log({usedIndexes, quotes});
-      if (usedIndexes.length === quotes.length){
-         return setUsedIndexes([]);
-        }
+  const pushRandomIndex = () => {
+    console.log({ usedIndexes, quotes });
+    if (usedIndexes.length === quotes.length) {
+      return setUsedIndexes([]);
+    }
 
-      let randomIndex;
-      do {
-        randomIndex = Math.floor(Math.random() * quotes.length);
-      }
-      while (usedIndexes.includes(randomIndex));
-      setUsedIndexes([...usedIndexes, randomIndex]);
-    };
+    let randomIndex;
+    do {
+      randomIndex = Math.floor(Math.random() * quotes.length);
+    } while (usedIndexes.includes(randomIndex));
+    setUsedIndexes([...usedIndexes, randomIndex]);
+  };
   if (!usedIndexes.length) {
     pushRandomIndex();
   }
 
   const quote = quotes[usedIndexes[usedIndexes.length - 1]];
-
 
   return (
     <Card>
