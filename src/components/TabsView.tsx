@@ -4,6 +4,7 @@ import { WidgetsBridgePlugin } from "capacitor-widgetsbridge-plugin";
 import CaloriePage from "./CaloriePage";
 import WeightPage from "./WeightPage";
 import SettingsPage from "./SettingsPage";
+import ChatPage from "./ChatPage";
 import StatsPage from "./StatsPage";
 import { useEffect, useState } from "react";
 import { App as CapacitorApp } from "@capacitor/app";
@@ -39,6 +40,12 @@ import { StreakInfo, getStreakInfo } from "../helpers/getStreakInfo";
 import { App } from "@capacitor/app";
 import AphorismsPage from "./AphorismsPage";
 import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
+import FormatQuoteIcon from "@mui/icons-material/FormatQuote";
+import ChatIcon from "@mui/icons-material/Chat";
+import QueryStatsIcon from "@mui/icons-material/QueryStats";
+import MonitorWeightIcon from "@mui/icons-material/MonitorWeight";
+import RestaurantIcon from "@mui/icons-material/Restaurant";
+import { AuthUser, getCurrentUser } from "aws-amplify/auth";
 
 const setTodaysCaloriesPreferences = async (calories: number) => {
   await Preferences.configure({
@@ -56,13 +63,18 @@ const setTodaysCaloriesPreferences = async (calories: number) => {
   // Widget in date format like Sep 8, 2024
   await Preferences.set({
     key: "consumedCaloriesDay",
-    value: new Date().toLocaleDateString(undefined, {
-      month: "short",
-    }) + " " + new Date().toLocaleDateString(undefined, {
-      day: "numeric",
-    }) + ", " + new Date().toLocaleDateString(undefined, {
-      year: "numeric",
-    }),
+    value:
+      new Date().toLocaleDateString(undefined, {
+        month: "short",
+      }) +
+      " " +
+      new Date().toLocaleDateString(undefined, {
+        day: "numeric",
+      }) +
+      ", " +
+      new Date().toLocaleDateString(undefined, {
+        year: "numeric",
+      }),
   });
   console.log("TabsView 46");
   await WidgetsBridgePlugin.reloadAllTimelines();
@@ -83,6 +95,7 @@ export default function TabsView() {
   const [toggleListeners, setToggleListeners] = useState<boolean>(false);
   const [allFoods, setAllFoods] = useState<FoodEntity[]>([]);
   const [goal, setGoal] = useState<GoalEntity>();
+  const [user, setUser] = useState<AuthUser>();
   const [height, setHeight] = useState<HeightEntity>();
   const [weight, setWeight] = useState<WeightEntity>();
   const [preferences, setPreferences] = useState<PreferencesEntity>({
@@ -137,6 +150,10 @@ export default function TabsView() {
       const weight = await getWeight();
       setWeight(weight);
     };
+    const fetchCurrentUser = async () => {
+      const user = await getCurrentUser();
+      setUser(user);
+    };
 
     const setup = async () => {
       await Promise.all([
@@ -146,6 +163,7 @@ export default function TabsView() {
         fetchQuickAdds(),
         fetchHeight(),
         fetchWeight(),
+        fetchCurrentUser(),
       ]);
     };
     setup();
@@ -276,7 +294,7 @@ export default function TabsView() {
         defaultValue="Calories"
         items={[
           {
-            label: "Today",
+            label: <RestaurantIcon />,
             value: "Calories",
             content: (
               <CaloriePage
@@ -290,7 +308,7 @@ export default function TabsView() {
             ),
           },
           {
-            label: "Weight",
+            label: <MonitorWeightIcon />,
             value: "Weight",
             content: (
               <WeightPage
@@ -301,7 +319,7 @@ export default function TabsView() {
             ),
           },
           {
-            label: "Stats",
+            label: <QueryStatsIcon />,
             value: "Stats",
             content: (
               <StatsPage
@@ -312,9 +330,14 @@ export default function TabsView() {
             ),
           },
           {
-            label: "Quotes",
+            label: <FormatQuoteIcon />,
             value: "Aphorisms",
             content: <AphorismsPage />,
+          },
+          {
+            label: <ChatIcon />,
+            value: "Chat",
+            content: <ChatPage user={user} />,
           },
           {
             label: <ManageAccountsIcon />,

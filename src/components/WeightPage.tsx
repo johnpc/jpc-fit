@@ -138,22 +138,42 @@ export default function WeightPage(props: {
           </TableHead>
           <TableBody>
             <TableRow>
-              <TableCell>Underweight <br /><Text as="div" fontSize="xs">{"(bmi < 18.5)"}</Text></TableCell>
+              <TableCell>
+                Underweight <br />
+                <Text as="div" fontSize="xs">
+                  {"(bmi < 18.5)"}
+                </Text>
+              </TableCell>
               <TableCell>0 lbs</TableCell>
               <TableCell>{maxUnderweightLbs} lbs</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell>Healthy <br /><Text as="div" fontSize="xs">{"(bmi 18.5 - 25)"}</Text></TableCell>
+              <TableCell>
+                Healthy <br />
+                <Text as="div" fontSize="xs">
+                  {"(bmi 18.5 - 25)"}
+                </Text>
+              </TableCell>
               <TableCell>{maxUnderweightLbs} lbs</TableCell>
               <TableCell>{maxHealthyLbs} lbs</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell>Overweight <br /><Text as="div" fontSize="xs">{"(bmi 25 - 30)"}</Text></TableCell>
+              <TableCell>
+                Overweight <br />
+                <Text as="div" fontSize="xs">
+                  {"(bmi 25 - 30)"}
+                </Text>
+              </TableCell>
               <TableCell>{maxHealthyLbs} lbs</TableCell>
               <TableCell>{maxOverweightLbs} lbs</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell>Obese <br /><Text as="div" fontSize="xs">{"(bmi 35+)"}</Text></TableCell>
+              <TableCell>
+                Obese <br />
+                <Text as="div" fontSize="xs">
+                  {"(bmi 35+)"}
+                </Text>
+              </TableCell>
               <TableCell>{maxOverweightLbs} lbs</TableCell>
               <TableCell>&#8734; lbs</TableCell>
             </TableRow>
