@@ -8,7 +8,8 @@ type GeneratedSubscription<InputType, OutputType> = string & {
   __generatedSubscriptionOutput: OutputType;
 };
 
-export const onCreateAssistantResponseChat = /* GraphQL */ `subscription OnCreateAssistantResponseChat($conversationId: ID) {
+export const onCreateAssistantResponseChat =
+  /* GraphQL */ `subscription OnCreateAssistantResponseChat($conversationId: ID) {
   onCreateAssistantResponseChat(conversationId: $conversationId) {
     aiContext
     assistantContent {
@@ -41,10 +42,11 @@ export const onCreateAssistantResponseChat = /* GraphQL */ `subscription OnCreat
   }
 }
 ` as GeneratedSubscription<
-  APITypes.OnCreateAssistantResponseChatSubscriptionVariables,
-  APITypes.OnCreateAssistantResponseChatSubscription
->;
-export const onCreateConversationMessageChat = /* GraphQL */ `subscription OnCreateConversationMessageChat(
+    APITypes.OnCreateAssistantResponseChatSubscriptionVariables,
+    APITypes.OnCreateAssistantResponseChatSubscription
+  >;
+export const onCreateConversationMessageChat =
+  /* GraphQL */ `subscription OnCreateConversationMessageChat(
   $filter: ModelSubscriptionConversationMessageChatFilterInput
   $owner: String
 ) {
@@ -80,9 +82,9 @@ export const onCreateConversationMessageChat = /* GraphQL */ `subscription OnCre
   }
 }
 ` as GeneratedSubscription<
-  APITypes.OnCreateConversationMessageChatSubscriptionVariables,
-  APITypes.OnCreateConversationMessageChatSubscription
->;
+    APITypes.OnCreateConversationMessageChatSubscriptionVariables,
+    APITypes.OnCreateConversationMessageChatSubscription
+  >;
 export const onCreateFood = /* GraphQL */ `subscription OnCreateFood(
   $filter: ModelSubscriptionFoodFilterInput
   $owner: String
@@ -139,7 +141,8 @@ export const onCreateHeight = /* GraphQL */ `subscription OnCreateHeight(
   APITypes.OnCreateHeightSubscriptionVariables,
   APITypes.OnCreateHeightSubscription
 >;
-export const onCreatePreferences = /* GraphQL */ `subscription OnCreatePreferences(
+export const onCreatePreferences =
+  /* GraphQL */ `subscription OnCreatePreferences(
   $filter: ModelSubscriptionPreferencesFilterInput
   $owner: String
 ) {
@@ -154,9 +157,9 @@ export const onCreatePreferences = /* GraphQL */ `subscription OnCreatePreferenc
   }
 }
 ` as GeneratedSubscription<
-  APITypes.OnCreatePreferencesSubscriptionVariables,
-  APITypes.OnCreatePreferencesSubscription
->;
+    APITypes.OnCreatePreferencesSubscriptionVariables,
+    APITypes.OnCreatePreferencesSubscription
+  >;
 export const onCreateQuickAdd = /* GraphQL */ `subscription OnCreateQuickAdd(
   $filter: ModelSubscriptionQuickAddFilterInput
   $owner: String
@@ -250,7 +253,8 @@ export const onDeleteHeight = /* GraphQL */ `subscription OnDeleteHeight(
   APITypes.OnDeleteHeightSubscriptionVariables,
   APITypes.OnDeleteHeightSubscription
 >;
-export const onDeletePreferences = /* GraphQL */ `subscription OnDeletePreferences(
+export const onDeletePreferences =
+  /* GraphQL */ `subscription OnDeletePreferences(
   $filter: ModelSubscriptionPreferencesFilterInput
   $owner: String
 ) {
@@ -265,9 +269,9 @@ export const onDeletePreferences = /* GraphQL */ `subscription OnDeletePreferenc
   }
 }
 ` as GeneratedSubscription<
-  APITypes.OnDeletePreferencesSubscriptionVariables,
-  APITypes.OnDeletePreferencesSubscription
->;
+    APITypes.OnDeletePreferencesSubscriptionVariables,
+    APITypes.OnDeletePreferencesSubscription
+  >;
 export const onDeleteQuickAdd = /* GraphQL */ `subscription OnDeleteQuickAdd(
   $filter: ModelSubscriptionQuickAddFilterInput
   $owner: String
@@ -361,7 +365,8 @@ export const onUpdateHeight = /* GraphQL */ `subscription OnUpdateHeight(
   APITypes.OnUpdateHeightSubscriptionVariables,
   APITypes.OnUpdateHeightSubscription
 >;
-export const onUpdatePreferences = /* GraphQL */ `subscription OnUpdatePreferences(
+export const onUpdatePreferences =
+  /* GraphQL */ `subscription OnUpdatePreferences(
   $filter: ModelSubscriptionPreferencesFilterInput
   $owner: String
 ) {
@@ -376,9 +381,9 @@ export const onUpdatePreferences = /* GraphQL */ `subscription OnUpdatePreferenc
   }
 }
 ` as GeneratedSubscription<
-  APITypes.OnUpdatePreferencesSubscriptionVariables,
-  APITypes.OnUpdatePreferencesSubscription
->;
+    APITypes.OnUpdatePreferencesSubscriptionVariables,
+    APITypes.OnUpdatePreferencesSubscription
+  >;
 export const onUpdateQuickAdd = /* GraphQL */ `subscription OnUpdateQuickAdd(
   $filter: ModelSubscriptionQuickAddFilterInput
   $owner: String

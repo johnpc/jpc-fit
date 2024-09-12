@@ -37,6 +37,9 @@ export const handler: Schema["getHeights"]["functionHandler"] = async () => {
   const heights = await client.graphql({
     query: listHeights,
   });
-  console.log({ heights: heights.data.listHeights.items, errors: heights.errors });
+  console.log({
+    heights: heights.data.listHeights.items,
+    errors: heights.errors,
+  });
   return { value: JSON.stringify(heights.data.listHeights.items) };
 };

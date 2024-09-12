@@ -53,7 +53,8 @@ export const chat = /* GraphQL */ `mutation Chat(
   }
 }
 ` as GeneratedMutation<APITypes.ChatMutationVariables, APITypes.ChatMutation>;
-export const createAssistantResponseChat = /* GraphQL */ `mutation CreateAssistantResponseChat(
+export const createAssistantResponseChat =
+  /* GraphQL */ `mutation CreateAssistantResponseChat(
   $input: CreateConversationMessageChatAssistantInput!
 ) {
   createAssistantResponseChat(input: $input) {
@@ -88,10 +89,11 @@ export const createAssistantResponseChat = /* GraphQL */ `mutation CreateAssista
   }
 }
 ` as GeneratedMutation<
-  APITypes.CreateAssistantResponseChatMutationVariables,
-  APITypes.CreateAssistantResponseChatMutation
->;
-export const createConversationChat = /* GraphQL */ `mutation CreateConversationChat(
+    APITypes.CreateAssistantResponseChatMutationVariables,
+    APITypes.CreateAssistantResponseChatMutation
+  >;
+export const createConversationChat =
+  /* GraphQL */ `mutation CreateConversationChat(
   $condition: ModelConversationChatConditionInput
   $input: CreateConversationChatInput!
 ) {
@@ -110,10 +112,11 @@ export const createConversationChat = /* GraphQL */ `mutation CreateConversation
   }
 }
 ` as GeneratedMutation<
-  APITypes.CreateConversationChatMutationVariables,
-  APITypes.CreateConversationChatMutation
->;
-export const createConversationMessageChat = /* GraphQL */ `mutation CreateConversationMessageChat(
+    APITypes.CreateConversationChatMutationVariables,
+    APITypes.CreateConversationChatMutation
+  >;
+export const createConversationMessageChat =
+  /* GraphQL */ `mutation CreateConversationMessageChat(
   $condition: ModelConversationMessageChatConditionInput
   $input: CreateConversationMessageChatInput!
 ) {
@@ -149,9 +152,9 @@ export const createConversationMessageChat = /* GraphQL */ `mutation CreateConve
   }
 }
 ` as GeneratedMutation<
-  APITypes.CreateConversationMessageChatMutationVariables,
-  APITypes.CreateConversationMessageChatMutation
->;
+    APITypes.CreateConversationMessageChatMutationVariables,
+    APITypes.CreateConversationMessageChatMutation
+  >;
 export const createFood = /* GraphQL */ `mutation CreateFood(
   $condition: ModelFoodConditionInput
   $input: CreateFoodInput!
@@ -263,7 +266,8 @@ export const createWeight = /* GraphQL */ `mutation CreateWeight(
   APITypes.CreateWeightMutationVariables,
   APITypes.CreateWeightMutation
 >;
-export const deleteConversationChat = /* GraphQL */ `mutation DeleteConversationChat(
+export const deleteConversationChat =
+  /* GraphQL */ `mutation DeleteConversationChat(
   $condition: ModelConversationChatConditionInput
   $input: DeleteConversationChatInput!
 ) {
@@ -282,10 +286,11 @@ export const deleteConversationChat = /* GraphQL */ `mutation DeleteConversation
   }
 }
 ` as GeneratedMutation<
-  APITypes.DeleteConversationChatMutationVariables,
-  APITypes.DeleteConversationChatMutation
->;
-export const deleteConversationMessageChat = /* GraphQL */ `mutation DeleteConversationMessageChat(
+    APITypes.DeleteConversationChatMutationVariables,
+    APITypes.DeleteConversationChatMutation
+  >;
+export const deleteConversationMessageChat =
+  /* GraphQL */ `mutation DeleteConversationMessageChat(
   $condition: ModelConversationMessageChatConditionInput
   $input: DeleteConversationMessageChatInput!
 ) {
@@ -321,9 +326,9 @@ export const deleteConversationMessageChat = /* GraphQL */ `mutation DeleteConve
   }
 }
 ` as GeneratedMutation<
-  APITypes.DeleteConversationMessageChatMutationVariables,
-  APITypes.DeleteConversationMessageChatMutation
->;
+    APITypes.DeleteConversationMessageChatMutationVariables,
+    APITypes.DeleteConversationMessageChatMutation
+  >;
 export const deleteFood = /* GraphQL */ `mutation DeleteFood(
   $condition: ModelFoodConditionInput
   $input: DeleteFoodInput!

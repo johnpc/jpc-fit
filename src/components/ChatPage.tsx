@@ -2,36 +2,130 @@ import { AuthUser } from "aws-amplify/auth";
 import { generateClient } from "aws-amplify/data";
 import { createAIHooks, AIConversation } from "@aws-amplify/ui-react-ai";
 import type { Schema } from "../../amplify/data/resource";
+import { Loader, ScrollView, Text, View } from "@aws-amplify/ui-react";
+import { useEffect, useState } from "react";
 const client = generateClient<Schema>({ authMode: "userPool" });
 const { useAIConversation } = createAIHooks(client);
 
-export default function ChatPage(props: { user: AuthUser | undefined }) {
+function ChatComponent(props: { conversationId: string; user?: AuthUser }) {
   const [
     {
       data: { messages },
+      hasError,
+      isLoading,
     },
     sendMessage,
-  ] = useAIConversation("chat");
-  // 'chat' here should be the key in your schema
+  ] = useAIConversation("chat", {
+    id: props.conversationId,
+    onResponse: (response) => {
+      console.log({ method: "onResponse", response });
+    },
+  });
+  console.log({ hasError });
 
+  messages.sort((a, b) => (a.createdAt < b.createdAt ? -1 : 1));
   return (
-    <AIConversation
-      messages={messages}
-      handleSendMessage={(content) => sendMessage({
-        ...content,
-        aiContext: {ignoreThisArgument: "true"}
-      })}
-      variant="bubble"
-      avatars={{
-        user: {
-          username: props.user?.signInDetails?.loginId?.split("@")[0] || "User",
-          avatar: "🥷",
-        },
-        ai: {
-          username: "MotivationBot",
-          avatar: "🤖",
-        },
-      }}
-    />
+    <>
+      <ScrollView
+        width="100%"
+        minHeight="300px"
+        maxHeight={"70vh"}
+        autoScroll="smooth"
+      >
+        <View
+          paddingLeft={"large"}
+          paddingRight={"large"}
+          paddingBottom={messages.length ? "small" : "xxxl"}
+          textAlign={"center"}
+        >
+          <Text fontSize={"xl"} fontWeight={"bold"}>
+            🤖 MotivationBot 🤖
+          </Text>
+          <Text fontSize={"xs"}>
+            AI chat about your eating and excercise goals.
+          </Text>
+          <Text fontSize={"xxs"}>(experimental)</Text>
+        </View>
+        <AIConversation
+          messages={messages}
+          handleSendMessage={(content) =>
+            sendMessage({
+              ...content,
+              aiContext: { ignoreThisArgument: "true" },
+              // toolConfiguration: {
+              //   tools: {
+              //     generateRecipe: {
+              //       description: "List ingredients needed for a recipe",
+              //       inputSchema: {
+              //         json: {
+              //           type: "object",
+              //           properties: {
+              //             ingredients: {
+              //               type: "array",
+              //               items: {
+              //                 type: "object",
+              //                 properties: {
+              //                   ingredientName: {type: "string"},
+              //                   quantity: {type: "number"},
+              //                   unit: {type: "string"},
+              //               } },
+              //             },
+              //           },
+              //         },
+              //       },
+              //     },
+              //   }
+              // }
+            })
+          }
+          variant="bubble"
+          avatars={{
+            user: {
+              username:
+                props.user?.signInDetails?.loginId?.split("@")[0] || "User",
+              avatar: "🥷",
+            },
+            ai: {
+              username: "MotivationBot",
+              avatar: "🤖",
+            },
+          }}
+        />
+        {isLoading ? <Loader variation="linear" /> : <></>}
+      </ScrollView>
+    </>
   );
+}
+
+export default function ChatPage(props: { user: AuthUser | undefined }) {
+  const [conversationId, setConversationId] = useState<string | undefined>();
+  console.log({ rendering: conversationId });
+  useEffect(() => {
+    const fetchConversation = async () => {
+      const { data, errors } = await client.conversations.chat.list();
+      data.sort((a, b) => (a.id < b.id ? 1 : -1));
+      const c = data.find((t) => t);
+      if (!c) {
+        const { data: newConversation, errors } =
+          await client.conversations.chat.create();
+        if (errors) {
+          console.log({ method: "createConversation", errors });
+        }
+        setConversationId(newConversation!.id);
+        return;
+      }
+      if (errors) {
+        console.log({ method: "fetchConversation", errors });
+      }
+      console.log({ method: "fetchConversation", c });
+      setConversationId(c!.id);
+    };
+    fetchConversation();
+  }, []);
+
+  if (!conversationId) {
+    return <Loader />;
+  }
+
+  return <ChatComponent conversationId={conversationId} user={props.user} />;
 }

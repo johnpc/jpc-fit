@@ -5,13 +5,13 @@ export const getWeights = defineFunction({
   entry: "./getWeights.ts",
 });
 export const getHeights = defineFunction({
-	name: "getHeights",
-	entry: "./getHeights.ts",
-  });
-  export const getFoods = defineFunction({
-	name: "getFoods",
-	entry: "./getFoods.ts",
-  });
+  name: "getHeights",
+  entry: "./getHeights.ts",
+});
+export const getFoods = defineFunction({
+  name: "getFoods",
+  entry: "./getFoods.ts",
+});
 export const getCurrentDate = defineFunction({
   name: "getCurrentDate",
   entry: "./getCurrentDate.ts",

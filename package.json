@@ -13,6 +13,10 @@
     "dev-ios": "npm run build && cap sync && cap copy ios && cap open ios",
     "prepare": "husky install"
   },
+  "overrides": {
+    "@aws-amplify/data-construct": "ai",
+    "@aws-amplify/graphql-api-construct": "ai"
+  },
   "dependencies": {
     "@aws-amplify/ui-react": "^6.3.0",
     "@aws-amplify/ui-react-ai": "^0.1.0",

@@ -8,7 +8,8 @@ type GeneratedQuery<InputType, OutputType> = string & {
   __generatedQueryOutput: OutputType;
 };
 
-export const getConversationChat = /* GraphQL */ `query GetConversationChat($id: ID!) {
+export const getConversationChat =
+  /* GraphQL */ `query GetConversationChat($id: ID!) {
   getConversationChat(id: $id) {
     createdAt
     id
@@ -24,10 +25,11 @@ export const getConversationChat = /* GraphQL */ `query GetConversationChat($id:
   }
 }
 ` as GeneratedQuery<
-  APITypes.GetConversationChatQueryVariables,
-  APITypes.GetConversationChatQuery
->;
-export const getConversationMessageChat = /* GraphQL */ `query GetConversationMessageChat($id: ID!) {
+    APITypes.GetConversationChatQueryVariables,
+    APITypes.GetConversationChatQuery
+  >;
+export const getConversationMessageChat =
+  /* GraphQL */ `query GetConversationMessageChat($id: ID!) {
   getConversationMessageChat(id: $id) {
     aiContext
     assistantContent {
@@ -60,9 +62,9 @@ export const getConversationMessageChat = /* GraphQL */ `query GetConversationMe
   }
 }
 ` as GeneratedQuery<
-  APITypes.GetConversationMessageChatQueryVariables,
-  APITypes.GetConversationMessageChatQuery
->;
+    APITypes.GetConversationMessageChatQueryVariables,
+    APITypes.GetConversationMessageChatQuery
+  >;
 export const getFood = /* GraphQL */ `query GetFood($id: ID!) {
   getFood(id: $id) {
     calories
@@ -167,7 +169,8 @@ export const listConversationChats = /* GraphQL */ `query ListConversationChats(
   APITypes.ListConversationChatsQueryVariables,
   APITypes.ListConversationChatsQuery
 >;
-export const listConversationMessageChats = /* GraphQL */ `query ListConversationMessageChats(
+export const listConversationMessageChats =
+  /* GraphQL */ `query ListConversationMessageChats(
   $filter: ModelConversationMessageChatFilterInput
   $limit: Int
   $nextToken: String
@@ -192,9 +195,9 @@ export const listConversationMessageChats = /* GraphQL */ `query ListConversatio
   }
 }
 ` as GeneratedQuery<
-  APITypes.ListConversationMessageChatsQueryVariables,
-  APITypes.ListConversationMessageChatsQuery
->;
+    APITypes.ListConversationMessageChatsQueryVariables,
+    APITypes.ListConversationMessageChatsQuery
+  >;
 export const listFoods = /* GraphQL */ `query ListFoods(
   $filter: ModelFoodFilterInput
   $limit: Int

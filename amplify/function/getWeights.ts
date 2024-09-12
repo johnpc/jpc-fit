@@ -37,6 +37,9 @@ export const handler: Schema["getWeights"]["functionHandler"] = async () => {
   const weights = await client.graphql({
     query: listWeights,
   });
-  console.log({ weights: weights.data.listWeights.items, errors: weights.errors });
+  console.log({
+    weights: weights.data.listWeights.items,
+    errors: weights.errors,
+  });
   return { value: JSON.stringify(weights.data.listWeights.items) };
 };
