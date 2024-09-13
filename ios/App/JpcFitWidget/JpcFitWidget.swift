@@ -18,7 +18,7 @@ func getDeviceInformation(device: HKDevice?) -> [String: String?]? {
         if (device == nil) {
             return nil;
         }
-        
+
         let deviceInformation: [String: String?] = [
             "name": device?.name,
             "model": device?.model,
@@ -26,7 +26,7 @@ func getDeviceInformation(device: HKDevice?) -> [String: String?]? {
             "hardwareVersion": device?.hardwareVersion,
             "softwareVersion": device?.softwareVersion,
         ];
-                
+
         return deviceInformation;
     }
 
@@ -56,25 +56,25 @@ func generateOutput(results: [HKSample]?) -> [[String: Any]]? {
             "device": getDeviceInformation(device: sample.device) as Any,
         ])
     }
-    
+
     return output
 }
 
 func getHealthKitDataAggregate(completion: @escaping ((Double, Int) -> Void)) -> Void {
-    
+
         let oneDayAgo = Calendar.current.startOfDay(for: Date())
         let activeEnergySampleType = HKQuantityType.quantityType(forIdentifier: HKQuantityTypeIdentifier.activeEnergyBurned)!
         let basalEnergySampleType = HKQuantityType.quantityType(forIdentifier: HKQuantityTypeIdentifier.basalEnergyBurned)!
-        
+
         let predicate = HKQuery.predicateForSamples(withStart: oneDayAgo, end: .now, options: HKQueryOptions.strictStartDate)
         let query = HKSampleQuery(sampleType: activeEnergySampleType, predicate: predicate, limit: 0, sortDescriptors: nil) {
             _, results, _ in
             let outputs: [[String: Any]] = generateOutput(results: results)!
             //            print(outputs)
             var filtered = outputs.filter({ ($0["sourceBundleId"] as! String).contains("com.apple.health") })
-            
+
             filtered = filtered.filter({ (($0["device"] as! [String: Any])["name"] as! String).contains("Apple Watch") })
-            
+
             let numbers = filtered.map({ $0["value"] as! Double })
             let activeSum = numbers.reduce(0, { x, y in
                 x + y
@@ -83,9 +83,9 @@ func getHealthKitDataAggregate(completion: @escaping ((Double, Int) -> Void)) ->
                 _, results, _ in
                 let outputs: [[String: Any]] = generateOutput(results: results)!
                 var filtered = outputs.filter({ ($0["sourceBundleId"] as! String).contains("com.apple.health") })
-                
+
                 filtered = filtered.filter({ (($0["device"] as! [String: Any])["name"] as! String).contains("Apple Watch") })
-                
+
                 let numbers = filtered.map({ $0["value"] as! Double })
                 let basalSum = numbers.reduce(0, { x, y in
                     x + y
@@ -99,28 +99,29 @@ func getHealthKitDataAggregate(completion: @escaping ((Double, Int) -> Void)) ->
                     nonSharedDefaults.setValue(totalCalories, forKey: "cachedTotalCalories")
                 }
                 if let userDefaults = UserDefaults(suiteName: "group.com.johncorser.fit.prefs") {
-                    //                let userDefaults = UserDefaults.standard
                     print(userDefaults.dictionaryRepresentation().keys)
-                    let consumedCalories = Int(userDefaults.string(forKey: "group.com.johncorser.fit.prefs.consumedCalories") ?? "0")
+                    let consumedCalories = Int(userDefaults.string(forKey: "consumedCalories") ?? "0")
                     print(consumedCalories!)
                     let dateFormatter = DateFormatter()
                     dateFormatter.dateStyle = .medium
                     dateFormatter.timeStyle = .none
                     let formattedDate = dateFormatter.string(from: Date())
-                    
-                    
-                    let consumedCaloriesDay = userDefaults.string(forKey: "group.com.johncorser.fit.prefs.consumedCaloriesDay") ?? ""
-                    
+
+
+                    let consumedCaloriesDay = userDefaults.string(forKey: "consumedCaloriesDay") ?? ""
+
+                    print("consumedCalories: " + String(consumedCalories!))
                     print("formattedDate: " + formattedDate)
                     print("consumedCaloriesDay (cache): " + consumedCaloriesDay)
                     if (formattedDate != consumedCaloriesDay) {
                         completion(totalCalories, 0)
                     }
-                    
+
                     else {
                         print(consumedCalories!)
                         completion(totalCalories, consumedCalories ?? 0)
-                    }}
+                    }
+                }
                 else {
                     completion(totalCalories, 0)
                 }
@@ -161,14 +162,12 @@ struct SimpleEntry: TimelineEntry {
 
 struct JpcFitWidgetEntryView : View {
     var entry: Provider.Entry
-    
-
     var body: some View {
         let emoji = entry.burnedCalories - entry.consumedCalories > 0 ? "✅" : "❌"
         VStack {
             Spacer()
             Text((entry.burnedCalories).formatted() + " 🔥").dynamicTypeSize(.medium)
-            
+
             Text("-" + (entry.consumedCalories).formatted() + " 🍕").dynamicTypeSize(.medium).padding(.bottom, .pi)
             Text("= " + (entry.burnedCalories - entry.consumedCalories).formatted() + " " + emoji).dynamicTypeSize(.xLarge)
             Spacer()

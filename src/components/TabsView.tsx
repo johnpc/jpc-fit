@@ -1,5 +1,5 @@
 import { Loader, Tabs } from "@aws-amplify/ui-react";
-import { Preferences } from "@capacitor/preferences";
+// import { Preferences } from "@capacitor/preferences";
 import { WidgetsBridgePlugin } from "capacitor-widgetsbridge-plugin";
 import CaloriePage from "./CaloriePage";
 import WeightPage from "./WeightPage";
@@ -47,22 +47,20 @@ import MonitorWeightIcon from "@mui/icons-material/MonitorWeight";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
 import { AuthUser, getCurrentUser } from "aws-amplify/auth";
 
+const WIDGET_PREFERENCES_GROUP = "group.com.johncorser.fit.prefs";
+const CONSUMED_CALORIES_PREFERENCES_KEY = "consumedCalories";
+const CONSUMED_CALORIES_DAY_PREFERENCES_KEY = "consumedCaloriesDay";
+
 const setTodaysCaloriesPreferences = async (calories: number) => {
-  await Preferences.configure({
-    group: "group.com.johncorser.fit.prefs",
-  });
-  const keys = await Preferences.keys();
-  console.log({ keys });
-  console.log("TabsView 39");
-  await getTodaysCaloriesPreferences();
-  console.log("TabsView 41", { calories });
-  await Preferences.set({
-    key: "consumedCalories",
+  await WidgetsBridgePlugin.setItem({
+    group: WIDGET_PREFERENCES_GROUP,
+    key: CONSUMED_CALORIES_PREFERENCES_KEY,
     value: calories.toString(),
   });
   // Widget in date format like Sep 8, 2024
-  await Preferences.set({
-    key: "consumedCaloriesDay",
+  await WidgetsBridgePlugin.setItem({
+    group: WIDGET_PREFERENCES_GROUP,
+    key: CONSUMED_CALORIES_DAY_PREFERENCES_KEY,
     value:
       new Date().toLocaleDateString(undefined, {
         month: "short",
@@ -76,19 +74,22 @@ const setTodaysCaloriesPreferences = async (calories: number) => {
         year: "numeric",
       }),
   });
-  console.log("TabsView 46");
   await WidgetsBridgePlugin.reloadAllTimelines();
-  console.log("TabsView 48");
+  await getTodaysCaloriesPreferences();
 };
 
 const getTodaysCaloriesPreferences = async () => {
-  await Preferences.configure({
-    group: "group.com.johncorser.fit.prefs",
+  const consumedCaloriesResult = await WidgetsBridgePlugin.getItem({
+    group: WIDGET_PREFERENCES_GROUP,
+    key: CONSUMED_CALORIES_PREFERENCES_KEY,
   });
-  const { value } = await Preferences.get({ key: "consumedCalories" });
+  const consumedCaloriesDayResult = await WidgetsBridgePlugin.getItem({
+    group: WIDGET_PREFERENCES_GROUP,
+    key: CONSUMED_CALORIES_DAY_PREFERENCES_KEY,
+  });
 
-  console.log(`Hello ${value}!`);
-  return value;
+  console.log(`ConsumedCalories`, { consumedCaloriesResult });
+  console.log(`ConsumedCaloriesDay`, { consumedCaloriesDayResult });
 };
 
 export default function TabsView() {
