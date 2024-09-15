@@ -1,6 +1,7 @@
 import {
   FoodEntity,
   GoalEntity,
+  HealthKitCacheEntity,
   PreferencesEntity,
   QuickAddEntity,
 } from "../data/entities";
@@ -14,6 +15,7 @@ export default function CaloriePage(props: {
   quickAdds: QuickAddEntity[];
   streakInfo: StreakInfo;
   dayInfo: DayInfo;
+  healthKitCaches: HealthKitCacheEntity[];
 }) {
   return (
     <>

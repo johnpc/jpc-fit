@@ -1,5 +1,4 @@
 import { Loader, Tabs } from "@aws-amplify/ui-react";
-// import { Preferences } from "@capacitor/preferences";
 import { WidgetsBridgePlugin } from "capacitor-widgetsbridge-plugin";
 import CaloriePage from "./CaloriePage";
 import WeightPage from "./WeightPage";
@@ -11,6 +10,7 @@ import { App as CapacitorApp } from "@capacitor/app";
 import {
   FoodEntity,
   GoalEntity,
+  HealthKitCacheEntity,
   HeightEntity,
   PreferencesEntity,
   QuickAddEntity,
@@ -27,6 +27,7 @@ import {
   getPreferences,
   getWeight,
   listAllFood,
+  listHealthKitCaches,
   listQuickAdds,
   unsubscribeListener,
   updateFoodListener,
@@ -96,13 +97,18 @@ export default function TabsView() {
   const [randomNumber, setRandomNumber] = useState(Math.random());
   const [toggleListeners, setToggleListeners] = useState<boolean>(false);
   const [allFoods, setAllFoods] = useState<FoodEntity[]>([]);
+  const [healthKitCaches, setHealthKitCaches] = useState<
+    HealthKitCacheEntity[]
+  >([]);
+  const [loadedHealthKitCaches, setLoadedHealthKitCaches] =
+    useState<boolean>(false);
   const [goal, setGoal] = useState<GoalEntity>();
   const [user, setUser] = useState<AuthUser>();
   const [height, setHeight] = useState<HeightEntity>();
   const [weight, setWeight] = useState<WeightEntity>();
   const [preferences, setPreferences] = useState<PreferencesEntity>({
     hideProtein: true,
-    hideSteps: true,
+    hideSteps: false,
   });
   const [quickAdds, setQuickAdds] =
     useState<QuickAddEntity[]>(defaultQuickAdds);
@@ -132,6 +138,11 @@ export default function TabsView() {
     const fetchFood = async () => {
       const allFoods = await listAllFood();
       setAllFoods(allFoods);
+    };
+    const fetchHealthKitCaches = async () => {
+      const hkCaches = await listHealthKitCaches();
+      setHealthKitCaches(hkCaches);
+      setLoadedHealthKitCaches(true);
     };
     const fetchGoal = async () => {
       setGoal(await getGoal());
@@ -166,6 +177,7 @@ export default function TabsView() {
         fetchHeight(),
         fetchWeight(),
         fetchCurrentUser(),
+        fetchHealthKitCaches(),
       ]);
     };
     setup();
@@ -173,11 +185,17 @@ export default function TabsView() {
 
   useEffect(() => {
     const fetchStreak = async () => {
-      const streak = await getStreakInfo(allFoods, new Date(), preferences);
+      if (!loadedHealthKitCaches) return;
+      const streak = await getStreakInfo(
+        allFoods,
+        new Date(),
+        healthKitCaches,
+        preferences,
+      );
       setStreak(streak);
     };
     fetchStreak();
-  }, [preferences, allFoods]);
+  }, [preferences, allFoods, healthKitCaches, loadedHealthKitCaches]);
 
   useEffect(() => {
     const createFoodSubscription = createFoodListener(
@@ -191,6 +209,7 @@ export default function TabsView() {
         const streak = await getStreakInfo(
           newAllFoods,
           new Date(),
+          healthKitCaches,
           preferences,
         );
         setStreak(streak);
@@ -215,6 +234,7 @@ export default function TabsView() {
         const streak = await getStreakInfo(
           newAllFoods,
           new Date(),
+          healthKitCaches,
           preferences,
         );
         setStreak(streak);
@@ -250,20 +270,35 @@ export default function TabsView() {
     const createPreferencesSubscription = createPreferencesListener(
       async (preferences: PreferencesEntity) => {
         setPreferences(preferences);
-        const streak = await getStreakInfo(allFoods, new Date(), preferences);
+        const streak = await getStreakInfo(
+          allFoods,
+          new Date(),
+          healthKitCaches,
+          preferences,
+        );
         setStreak(streak);
       },
     );
     const updatePreferencesSubscription = updatePreferencesListener(
       async (preferences: PreferencesEntity) => {
         setPreferences(preferences);
-        const streak = await getStreakInfo(allFoods, new Date(), preferences);
+        const streak = await getStreakInfo(
+          allFoods,
+          new Date(),
+          healthKitCaches,
+          preferences,
+        );
         setStreak(streak);
       },
     );
     App.addListener("appStateChange", async ({ isActive }) => {
       if (isActive) {
-        const streak = await getStreakInfo(allFoods, new Date(), preferences);
+        const streak = await getStreakInfo(
+          allFoods,
+          new Date(),
+          healthKitCaches,
+          preferences,
+        );
         setStreak(streak);
         setToggleListeners(!toggleListeners);
       }
@@ -280,9 +315,16 @@ export default function TabsView() {
       unsubscribeListener(updatePreferencesSubscription);
       App.removeAllListeners();
     };
-  }, [allFoods, preferences, quickAdds, toggleListeners, lastOpenTime]);
+  }, [
+    allFoods,
+    preferences,
+    quickAdds,
+    toggleListeners,
+    lastOpenTime,
+    healthKitCaches,
+  ]);
 
-  if (!streak) return <Loader variation="linear" />;
+  if (!streak || !loadedHealthKitCaches) return <Loader variation="linear" />;
   const todaysCalories = allFoods
     .filter((food) => food.day === new Date().toLocaleDateString())
     .reduce((acc, food) => acc + food.calories, 0);
@@ -307,6 +349,7 @@ export default function TabsView() {
                 preferences={preferences}
                 streakInfo={streak}
                 dayInfo={streak.today}
+                healthKitCaches={healthKitCaches}
               />
             ),
           },
@@ -318,6 +361,7 @@ export default function TabsView() {
                 preferences={preferences}
                 height={height}
                 weight={weight}
+                healthKitCaches={healthKitCaches}
               />
             ),
           },
@@ -329,6 +373,7 @@ export default function TabsView() {
                 allFoods={allFoods}
                 streakInfo={streak}
                 preferences={preferences}
+                healthKitCaches={healthKitCaches}
               />
             ),
           },

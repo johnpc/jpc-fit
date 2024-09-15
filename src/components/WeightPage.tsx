@@ -10,6 +10,7 @@ import {
 } from "@aws-amplify/ui-react";
 import { Height, MonitorWeight } from "@mui/icons-material";
 import {
+  HealthKitCacheEntity,
   HeightEntity,
   PreferencesEntity,
   WeightEntity,
@@ -27,6 +28,7 @@ import { BodyFatEyeTest } from "./weight-page/BodyFatEyeTest";
 
 export default function WeightPage(props: {
   preferences: PreferencesEntity;
+  healthKitCaches: HealthKitCacheEntity[];
   height?: HeightEntity;
   weight?: WeightEntity;
 }) {
@@ -35,7 +37,11 @@ export default function WeightPage(props: {
 
   useEffect(() => {
     const setup = async () => {
-      const { weight } = await getHealthKitData(new Date(), props.preferences);
+      const { weight } = await getHealthKitData(
+        new Date(),
+        props.healthKitCaches,
+        props.preferences,
+      );
       setWeight((await getWeight()) ?? { currentWeight: weight });
       setHeight((await getHeight()) ?? { currentHeight: 0 });
     };

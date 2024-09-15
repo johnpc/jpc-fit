@@ -42,6 +42,15 @@ const schema = a
         currentHeight: a.integer().required(),
       })
       .authorization((allow) => [allow.owner()]),
+    HealthKitCache: a
+      .model({
+        activeCalories: a.float().required(),
+        baseCalories: a.float().required(),
+        weight: a.float(),
+        steps: a.float(),
+        day: a.string().required(),
+      })
+      .authorization((allow) => [allow.owner()]),
     Preferences: a
       .model({
         hideProtein: a.boolean(),

@@ -15,6 +15,7 @@ import { useEffect, useState } from "react";
 import {
   FoodEntity,
   GoalEntity,
+  HealthKitCacheEntity,
   PreferencesEntity,
   QuickAddEntity,
   createGoal,
@@ -39,6 +40,7 @@ export const CalorieData = (props: {
   quickAdds: QuickAddEntity[];
   streakInfo: StreakInfo;
   dayInfo: DayInfo;
+  healthKitCaches: HealthKitCacheEntity[];
 }) => {
   const { tokens } = useTheme();
   const [foodDetail, setFoodDetail] = useState<string>();
@@ -82,13 +84,20 @@ export const CalorieData = (props: {
         const dayInfo = await getDayInfo(
           props.allFoods,
           date,
+          props.healthKitCaches,
           props.preferences,
         );
         setDayInfo(dayInfo);
       }
     };
     setup();
-  }, [date, props.streakInfo, props.allFoods, props.preferences]);
+  }, [
+    date,
+    props.streakInfo,
+    props.allFoods,
+    props.preferences,
+    props.healthKitCaches,
+  ]);
 
   const handleEditGoal = async () => {
     const newGoal = parseInt(prompt("Enter new goal")!);

@@ -1,4 +1,8 @@
-import { FoodEntity, PreferencesEntity } from "../data/entities";
+import {
+  FoodEntity,
+  HealthKitCacheEntity,
+  PreferencesEntity,
+} from "../data/entities";
 import { subDays } from "date-fns";
 import { getHealthKitData } from "./getHealthKitData";
 
@@ -26,9 +30,14 @@ export type StreakInfo = {
 export const getDayInfo = async (
   allFoods: FoodEntity[],
   day: Date,
+  healthKitCaches: HealthKitCacheEntity[],
   preferences?: PreferencesEntity,
 ): Promise<DayInfo> => {
-  const healthKitData = await getHealthKitData(day, preferences);
+  const healthKitData = await getHealthKitData(
+    day,
+    healthKitCaches,
+    preferences,
+  );
   const dayString = day.toLocaleDateString();
   const tracked = !!allFoods.find((food) => food.day === dayString);
   const consumedCalories = allFoods
@@ -50,6 +59,7 @@ export const getDayInfo = async (
 export const getStreakInfo = async (
   allFoods: FoodEntity[],
   today: Date,
+  healthKitCaches: HealthKitCacheEntity[],
   preferences?: PreferencesEntity,
 ): Promise<StreakInfo> => {
   let currentStreak = 0;
@@ -67,8 +77,14 @@ export const getStreakInfo = async (
         (sum: number, food: FoodEntity) => sum + food.calories,
         0,
       ) -
-      (await getDayInfo(trackedFoodsOnDay, dayToCheck, preferences))
-        .burnedCalories;
+      (
+        await getDayInfo(
+          trackedFoodsOnDay,
+          dayToCheck,
+          healthKitCaches,
+          preferences,
+        )
+      ).burnedCalories;
     if (trackedFoodsOnDay.length) {
       currentStreak++;
     }
@@ -81,12 +97,42 @@ export const getStreakInfo = async (
   return {
     currentStreakDays: currentStreak,
     currentStreakNetCalories,
-    today: await getDayInfo(allFoods, today, preferences),
-    yesterday: await getDayInfo(allFoods, subDays(today, 1), preferences),
-    twoDaysAgo: await getDayInfo(allFoods, subDays(today, 2), preferences),
-    threeDaysAgo: await getDayInfo(allFoods, subDays(today, 3), preferences),
-    fourDaysAgo: await getDayInfo(allFoods, subDays(today, 4), preferences),
-    fiveDaysAgo: await getDayInfo(allFoods, subDays(today, 5), preferences),
-    sixDaysAgo: await getDayInfo(allFoods, subDays(today, 6), preferences),
+    today: await getDayInfo(allFoods, today, healthKitCaches, preferences),
+    yesterday: await getDayInfo(
+      allFoods,
+      subDays(today, 1),
+      healthKitCaches,
+      preferences,
+    ),
+    twoDaysAgo: await getDayInfo(
+      allFoods,
+      subDays(today, 2),
+      healthKitCaches,
+      preferences,
+    ),
+    threeDaysAgo: await getDayInfo(
+      allFoods,
+      subDays(today, 3),
+      healthKitCaches,
+      preferences,
+    ),
+    fourDaysAgo: await getDayInfo(
+      allFoods,
+      subDays(today, 4),
+      healthKitCaches,
+      preferences,
+    ),
+    fiveDaysAgo: await getDayInfo(
+      allFoods,
+      subDays(today, 5),
+      healthKitCaches,
+      preferences,
+    ),
+    sixDaysAgo: await getDayInfo(
+      allFoods,
+      subDays(today, 6),
+      healthKitCaches,
+      preferences,
+    ),
   };
 };

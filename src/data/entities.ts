@@ -3,6 +3,7 @@ import { generateClient } from "aws-amplify/api";
 import { Subscription } from "rxjs";
 import config from "../../amplify_outputs.json";
 import { Schema } from "../../amplify/data/resource";
+import { getCurrentUser } from "aws-amplify/auth";
 Amplify.configure(config);
 const client = generateClient<Schema>({
   authMode: "userPool",
@@ -45,6 +46,14 @@ export type QuickAddEntity = {
   createdAt: Date;
 };
 
+export type HealthKitCacheEntity = {
+  activeCalories: number;
+  baseCalories: number;
+  weight?: number;
+  steps?: number;
+  day: Date;
+};
+
 export const getGoal = async (): Promise<GoalEntity | undefined> => {
   const allGoals = (await client.models.Goal.list()).data;
   return allGoals
@@ -53,6 +62,89 @@ export const getGoal = async (): Promise<GoalEntity | undefined> => {
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
     )
     .find((g) => g);
+};
+
+export const getHealthKitCacheForDate = async (
+  date: Date,
+): Promise<HealthKitCacheEntity | undefined> => {
+  const currentUser = await getCurrentUser();
+  const dayString =
+    date.toLocaleDateString(undefined, {
+      month: "numeric",
+    }) +
+    "-" +
+    date.toLocaleDateString(undefined, {
+      day: "numeric",
+    }) +
+    "-" +
+    date.toLocaleDateString(undefined, {
+      year: "numeric",
+    });
+  const healthKitCache = await client.models.HealthKitCache.get({
+    id: currentUser.userId + dayString,
+  });
+  if (healthKitCache.errors) {
+    console.log({ healthKitCache, errors: healthKitCache.errors });
+  }
+
+  if (!healthKitCache.data) {
+    return undefined;
+  }
+
+  return {
+    activeCalories: healthKitCache.data.activeCalories,
+    baseCalories: healthKitCache.data.baseCalories,
+    weight: healthKitCache.data.weight ?? undefined,
+    steps: healthKitCache.data.steps ?? undefined,
+    day: new Date(healthKitCache.data.day),
+  };
+};
+
+export const createHealthKitCache = async (
+  cacheEntity: HealthKitCacheEntity,
+): Promise<void> => {
+  const currentUser = await getCurrentUser();
+  const dayString =
+    cacheEntity.day.toLocaleDateString(undefined, {
+      month: "numeric",
+    }) +
+    "-" +
+    cacheEntity.day.toLocaleDateString(undefined, {
+      day: "numeric",
+    }) +
+    "-" +
+    cacheEntity.day.toLocaleDateString(undefined, {
+      year: "numeric",
+    });
+
+  const createdHealthKitCacheEntity = await client.models.HealthKitCache.create(
+    {
+      ...cacheEntity,
+      id: currentUser.userId + dayString,
+      day: cacheEntity.day.toLocaleDateString(),
+    },
+  );
+  console.log({
+    createdHealthKitCacheEntity: createdHealthKitCacheEntity?.data,
+    errors: createdHealthKitCacheEntity?.errors,
+  });
+};
+
+export const listHealthKitCaches = async (): Promise<
+  HealthKitCacheEntity[]
+> => {
+  const healthKitCaches = (
+    await client.models.HealthKitCache.list({
+      limit: 100000,
+    })
+  ).data;
+  return healthKitCaches.map((h) => ({
+    activeCalories: h.activeCalories,
+    baseCalories: h.baseCalories,
+    weight: h.weight ?? undefined,
+    steps: h.steps ?? undefined,
+    day: new Date(h.day),
+  }));
 };
 
 export const createGoal = async (dietCalories: number): Promise<GoalEntity> => {

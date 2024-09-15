@@ -6,7 +6,11 @@ import {
   SampleNames,
 } from "@perfood/capacitor-healthkit";
 import { endOfDay, startOfDay, subDays } from "date-fns";
-import { PreferencesEntity } from "../data/entities";
+import {
+  createHealthKitCache,
+  HealthKitCacheEntity,
+  PreferencesEntity,
+} from "../data/entities";
 
 type HealthKitData = {
   activeCalories: number;
@@ -45,6 +49,7 @@ const aggregateHealthData = (data: QueryOutput<OtherData>) => {
 
 export const getHealthKitData = async (
   today: Date,
+  healthKitCaches: HealthKitCacheEntity[],
   preferences?: PreferencesEntity,
 ): Promise<HealthKitData> => {
   const defaultHealthKitData = {
@@ -53,17 +58,26 @@ export const getHealthKitData = async (
     weight: 150,
     steps: 0,
   };
+
+  const cache = healthKitCaches.find(
+    (hkCache) =>
+      hkCache.day.toLocaleDateString() === today.toLocaleDateString(),
+  );
+
+  if (cache) {
+    return {
+      activeCalories: cache.activeCalories,
+      baseCalories: cache.baseCalories,
+      weight: cache.weight ?? 0,
+      steps: cache.steps ?? 0,
+    };
+  }
+
   if (!isIos()) {
     return defaultHealthKitData;
   }
 
-  const localStorageCacheKey = `hkData-${today.toLocaleDateString()}`;
-  const storedHKData = localStorage.getItem(localStorageCacheKey);
-  if (storedHKData) {
-    console.log(`Cache hit for ${today.toLocaleDateString()}`);
-    return JSON.parse(storedHKData);
-  }
-
+  console.log(`Cache miss for ${today.toLocaleDateString()}`);
   const startDate = startOfDay(today).toISOString();
   const endDate = endOfDay(today).toISOString();
   const queryOptions = {
@@ -116,21 +130,22 @@ export const getHealthKitData = async (
     calculatedHealthKitData.weight === 0 &&
     calculatedHealthKitData.steps === 0
   ) {
-    if (today.getTime() < endOfDay(subDays(new Date(), 1)).getTime()) {
-      localStorage.setItem(
-        localStorageCacheKey,
-        JSON.stringify(defaultHealthKitData),
-      );
-    }
     return defaultHealthKitData;
   }
 
   if (today.getTime() < endOfDay(subDays(new Date(), 1)).getTime()) {
     console.log(`updated cache for ${today.toLocaleDateString()}`);
-    localStorage.setItem(
-      localStorageCacheKey,
-      JSON.stringify(calculatedHealthKitData),
-    );
+    try {
+      await createHealthKitCache({
+        day: today,
+        activeCalories: calculatedHealthKitData.activeCalories,
+        baseCalories: calculatedHealthKitData.baseCalories,
+        weight: calculatedHealthKitData.weight,
+        steps: calculatedHealthKitData.steps,
+      });
+    } catch (e) {
+      console.error(e);
+    }
   }
   return calculatedHealthKitData;
 };

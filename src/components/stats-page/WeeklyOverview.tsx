@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import { StreakInfo, getStreakInfo } from "../../helpers/getStreakInfo";
-import { FoodEntity, PreferencesEntity } from "../../data/entities";
+import {
+  FoodEntity,
+  HealthKitCacheEntity,
+  PreferencesEntity,
+} from "../../data/entities";
 import {
   Loader,
   View,
@@ -19,6 +23,7 @@ export default function WeeklyOverview(props: {
   allFoods: FoodEntity[];
   streakInfo: StreakInfo;
   preferences: PreferencesEntity;
+  healthKitCaches: HealthKitCacheEntity[];
 }) {
   const [streakInfo, setStreakInfo] = useState<StreakInfo>(props.streakInfo);
   const [date, setDate] = useState<Date>(new Date());
@@ -26,12 +31,23 @@ export default function WeeklyOverview(props: {
   useEffect(() => {
     const setup = async () => {
       if (props.streakInfo.today.day !== date.toLocaleDateString()) {
-        const s = await getStreakInfo(props.allFoods, date, props.preferences);
+        const s = await getStreakInfo(
+          props.allFoods,
+          date,
+          props.healthKitCaches,
+          props.preferences,
+        );
         setStreakInfo(s);
       }
     };
     setup();
-  }, [props.allFoods, date, props.preferences, props.streakInfo.today]);
+  }, [
+    props.allFoods,
+    date,
+    props.preferences,
+    props.streakInfo.today,
+    props.healthKitCaches,
+  ]);
 
   if (!streakInfo) return <Loader />;
   const { burnedCalories, consumedCalories } = (
