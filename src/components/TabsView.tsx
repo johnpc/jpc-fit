@@ -93,6 +93,7 @@ const getTodaysCaloriesPreferences = async () => {
 };
 
 export default function TabsView() {
+  const [randomNumber, setRandomNumber] = useState(Math.random());
   const [toggleListeners, setToggleListeners] = useState<boolean>(false);
   const [allFoods, setAllFoods] = useState<FoodEntity[]>([]);
   const [goal, setGoal] = useState<GoalEntity>();
@@ -292,6 +293,7 @@ export default function TabsView() {
       <Tabs
         justifyContent="flex-start"
         spacing="equal"
+        onValueChange={() => setRandomNumber(Math.random())}
         defaultValue="Calories"
         items={[
           {
@@ -338,7 +340,7 @@ export default function TabsView() {
           {
             label: <ChatIcon />,
             value: "Chat",
-            content: <ChatPage user={user} />,
+            content: <ChatPage user={user} randomNumber={randomNumber} />,
           },
           {
             label: <ManageAccountsIcon />,

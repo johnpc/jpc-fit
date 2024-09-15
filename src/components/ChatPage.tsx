@@ -7,7 +7,11 @@ import { useEffect, useState } from "react";
 const client = generateClient<Schema>({ authMode: "userPool" });
 const { useAIConversation } = createAIHooks(client);
 
-function ChatComponent(props: { conversationId: string; user?: AuthUser }) {
+function ChatComponent(props: {
+  conversationId: string | null;
+  user?: AuthUser;
+  randomNumber: number;
+}) {
   const [
     {
       data: { messages },
@@ -16,7 +20,7 @@ function ChatComponent(props: { conversationId: string; user?: AuthUser }) {
     },
     sendMessage,
   ] = useAIConversation("chat", {
-    id: props.conversationId,
+    id: props.conversationId ?? undefined,
     onResponse: (response) => {
       console.log({ method: "onResponse", response });
     },
@@ -26,26 +30,26 @@ function ChatComponent(props: { conversationId: string; user?: AuthUser }) {
   messages.sort((a, b) => (a.createdAt < b.createdAt ? -1 : 1));
   return (
     <>
+      <View
+        paddingLeft={"large"}
+        paddingRight={"large"}
+        paddingBottom={messages.length ? "small" : "xxxl"}
+        textAlign={"center"}
+      >
+        <Text fontSize={"xl"} fontWeight={"bold"}>
+          🤖 MotivationBot 🤖
+        </Text>
+        <Text fontSize={"xs"}>
+          AI chat about your eating and excercise goals.
+        </Text>
+        <Text fontSize={"xxs"}>(experimental)</Text>
+      </View>
       <ScrollView
         width="100%"
         minHeight="300px"
-        maxHeight={"70vh"}
+        maxHeight={"50vh"}
         autoScroll="smooth"
       >
-        <View
-          paddingLeft={"large"}
-          paddingRight={"large"}
-          paddingBottom={messages.length ? "small" : "xxxl"}
-          textAlign={"center"}
-        >
-          <Text fontSize={"xl"} fontWeight={"bold"}>
-            🤖 MotivationBot 🤖
-          </Text>
-          <Text fontSize={"xs"}>
-            AI chat about your eating and excercise goals.
-          </Text>
-          <Text fontSize={"xxs"}>(experimental)</Text>
-        </View>
         <AIConversation
           messages={messages}
           handleSendMessage={(content) =>
@@ -92,12 +96,18 @@ function ChatComponent(props: { conversationId: string; user?: AuthUser }) {
           }}
         />
         {isLoading ? <Loader variation="linear" /> : <></>}
+        <Text as="span" style={{ visibility: "hidden" }}>
+          {props.randomNumber}
+        </Text>
       </ScrollView>
     </>
   );
 }
 
-export default function ChatPage(props: { user: AuthUser | undefined }) {
+export default function ChatPage(props: {
+  user: AuthUser | undefined;
+  randomNumber: number;
+}) {
   const [conversationId, setConversationId] = useState<string | undefined>();
   console.log({ rendering: conversationId });
   useEffect(() => {
@@ -118,14 +128,20 @@ export default function ChatPage(props: { user: AuthUser | undefined }) {
         console.log({ method: "fetchConversation", errors });
       }
       console.log({ method: "fetchConversation", c });
-      setConversationId(c!.id);
+      setConversationId(c?.id ?? null);
     };
     fetchConversation();
   }, []);
 
-  if (!conversationId) {
+  if (conversationId === undefined) {
     return <Loader />;
   }
 
-  return <ChatComponent conversationId={conversationId} user={props.user} />;
+  return (
+    <ChatComponent
+      conversationId={conversationId}
+      user={props.user}
+      randomNumber={props.randomNumber}
+    />
+  );
 }
