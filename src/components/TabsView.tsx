@@ -27,7 +27,6 @@ import {
   getPreferences,
   getWeight,
   listAllFood,
-  listHealthKitCaches,
   listQuickAdds,
   unsubscribeListener,
   updateFoodListener,
@@ -47,12 +46,17 @@ import QueryStatsIcon from "@mui/icons-material/QueryStats";
 import MonitorWeightIcon from "@mui/icons-material/MonitorWeight";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
 import { AuthUser, getCurrentUser } from "aws-amplify/auth";
+import { isIos } from "../helpers/getHealthKitData";
 
 const WIDGET_PREFERENCES_GROUP = "group.com.johncorser.fit.prefs";
 const CONSUMED_CALORIES_PREFERENCES_KEY = "consumedCalories";
 const CONSUMED_CALORIES_DAY_PREFERENCES_KEY = "consumedCaloriesDay";
 
 const setTodaysCaloriesPreferences = async (calories: number) => {
+  if (!isIos()) {
+    return;
+  }
+
   await WidgetsBridgePlugin.setItem({
     group: WIDGET_PREFERENCES_GROUP,
     key: CONSUMED_CALORIES_PREFERENCES_KEY,
@@ -75,11 +79,16 @@ const setTodaysCaloriesPreferences = async (calories: number) => {
         year: "numeric",
       }),
   });
+
   await WidgetsBridgePlugin.reloadAllTimelines();
   await getTodaysCaloriesPreferences();
 };
 
 const getTodaysCaloriesPreferences = async () => {
+  if (!isIos()) {
+    return;
+  }
+
   const consumedCaloriesResult = await WidgetsBridgePlugin.getItem({
     group: WIDGET_PREFERENCES_GROUP,
     key: CONSUMED_CALORIES_PREFERENCES_KEY,
@@ -93,15 +102,13 @@ const getTodaysCaloriesPreferences = async () => {
   console.log(`ConsumedCaloriesDay`, { consumedCaloriesDayResult });
 };
 
-export default function TabsView() {
+export default function TabsView(props: {
+  healthKitCaches: HealthKitCacheEntity[];
+  ready: boolean;
+}) {
   const [randomNumber, setRandomNumber] = useState(Math.random());
   const [toggleListeners, setToggleListeners] = useState<boolean>(false);
   const [allFoods, setAllFoods] = useState<FoodEntity[]>([]);
-  const [healthKitCaches, setHealthKitCaches] = useState<
-    HealthKitCacheEntity[]
-  >([]);
-  const [loadedHealthKitCaches, setLoadedHealthKitCaches] =
-    useState<boolean>(false);
   const [goal, setGoal] = useState<GoalEntity>();
   const [user, setUser] = useState<AuthUser>();
   const [height, setHeight] = useState<HeightEntity>();
@@ -139,11 +146,7 @@ export default function TabsView() {
       const allFoods = await listAllFood();
       setAllFoods(allFoods);
     };
-    const fetchHealthKitCaches = async () => {
-      const hkCaches = await listHealthKitCaches();
-      setHealthKitCaches(hkCaches);
-      setLoadedHealthKitCaches(true);
-    };
+
     const fetchGoal = async () => {
       setGoal(await getGoal());
     };
@@ -177,7 +180,6 @@ export default function TabsView() {
         fetchHeight(),
         fetchWeight(),
         fetchCurrentUser(),
-        fetchHealthKitCaches(),
       ]);
     };
     setup();
@@ -185,17 +187,17 @@ export default function TabsView() {
 
   useEffect(() => {
     const fetchStreak = async () => {
-      if (!loadedHealthKitCaches) return;
+      if (!props.ready) return;
       const streak = await getStreakInfo(
         allFoods,
         new Date(),
-        healthKitCaches,
+        props.healthKitCaches,
         preferences,
       );
       setStreak(streak);
     };
     fetchStreak();
-  }, [preferences, allFoods, healthKitCaches, loadedHealthKitCaches]);
+  }, [preferences, allFoods, props]);
 
   useEffect(() => {
     const createFoodSubscription = createFoodListener(
@@ -209,7 +211,7 @@ export default function TabsView() {
         const streak = await getStreakInfo(
           newAllFoods,
           new Date(),
-          healthKitCaches,
+          props.healthKitCaches,
           preferences,
         );
         setStreak(streak);
@@ -234,7 +236,7 @@ export default function TabsView() {
         const streak = await getStreakInfo(
           newAllFoods,
           new Date(),
-          healthKitCaches,
+          props.healthKitCaches,
           preferences,
         );
         setStreak(streak);
@@ -273,7 +275,7 @@ export default function TabsView() {
         const streak = await getStreakInfo(
           allFoods,
           new Date(),
-          healthKitCaches,
+          props.healthKitCaches,
           preferences,
         );
         setStreak(streak);
@@ -285,7 +287,7 @@ export default function TabsView() {
         const streak = await getStreakInfo(
           allFoods,
           new Date(),
-          healthKitCaches,
+          props.healthKitCaches,
           preferences,
         );
         setStreak(streak);
@@ -296,7 +298,7 @@ export default function TabsView() {
         const streak = await getStreakInfo(
           allFoods,
           new Date(),
-          healthKitCaches,
+          props.healthKitCaches,
           preferences,
         );
         setStreak(streak);
@@ -321,10 +323,10 @@ export default function TabsView() {
     quickAdds,
     toggleListeners,
     lastOpenTime,
-    healthKitCaches,
+    props.healthKitCaches,
   ]);
 
-  if (!streak || !loadedHealthKitCaches) return <Loader variation="linear" />;
+  if (!streak || !props.ready) return <Loader variation="linear" />;
   const todaysCalories = allFoods
     .filter((food) => food.day === new Date().toLocaleDateString())
     .reduce((acc, food) => acc + food.calories, 0);
@@ -349,7 +351,7 @@ export default function TabsView() {
                 preferences={preferences}
                 streakInfo={streak}
                 dayInfo={streak.today}
-                healthKitCaches={healthKitCaches}
+                healthKitCaches={props.healthKitCaches}
               />
             ),
           },
@@ -361,7 +363,7 @@ export default function TabsView() {
                 preferences={preferences}
                 height={height}
                 weight={weight}
-                healthKitCaches={healthKitCaches}
+                healthKitCaches={props.healthKitCaches}
               />
             ),
           },
@@ -373,7 +375,7 @@ export default function TabsView() {
                 allFoods={allFoods}
                 streakInfo={streak}
                 preferences={preferences}
-                healthKitCaches={healthKitCaches}
+                healthKitCaches={props.healthKitCaches}
               />
             ),
           },

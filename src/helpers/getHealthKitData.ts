@@ -19,7 +19,7 @@ type HealthKitData = {
   steps: number;
 };
 
-const isIos = () => {
+export const isIos = () => {
   return Capacitor.getPlatform() === "ios";
 };
 
