@@ -65,6 +65,17 @@ export const getConversationMessageChat =
     APITypes.GetConversationMessageChatQueryVariables,
     APITypes.GetConversationMessageChatQuery
   >;
+export const getCurrentDate =
+  /* GraphQL */ `query GetCurrentDate($ignoreThisArgument: String) {
+  getCurrentDate(ignoreThisArgument: $ignoreThisArgument) {
+    value
+    __typename
+  }
+}
+` as GeneratedQuery<
+    APITypes.GetCurrentDateQueryVariables,
+    APITypes.GetCurrentDateQuery
+  >;
 export const getFood = /* GraphQL */ `query GetFood($id: ID!) {
   getFood(id: $id) {
     calories
@@ -81,6 +92,14 @@ export const getFood = /* GraphQL */ `query GetFood($id: ID!) {
   }
 }
 ` as GeneratedQuery<APITypes.GetFoodQueryVariables, APITypes.GetFoodQuery>;
+export const getFoods =
+  /* GraphQL */ `query GetFoods($ignoreThisArgument: String) {
+  getFoods(ignoreThisArgument: $ignoreThisArgument) {
+    value
+    __typename
+  }
+}
+` as GeneratedQuery<APITypes.GetFoodsQueryVariables, APITypes.GetFoodsQuery>;
 export const getGoal = /* GraphQL */ `query GetGoal($id: ID!) {
   getGoal(id: $id) {
     createdAt
@@ -92,6 +111,25 @@ export const getGoal = /* GraphQL */ `query GetGoal($id: ID!) {
   }
 }
 ` as GeneratedQuery<APITypes.GetGoalQueryVariables, APITypes.GetGoalQuery>;
+export const getHealthKitCache =
+  /* GraphQL */ `query GetHealthKitCache($id: ID!) {
+  getHealthKitCache(id: $id) {
+    activeCalories
+    baseCalories
+    createdAt
+    day
+    id
+    owner
+    steps
+    updatedAt
+    weight
+    __typename
+  }
+}
+` as GeneratedQuery<
+    APITypes.GetHealthKitCacheQueryVariables,
+    APITypes.GetHealthKitCacheQuery
+  >;
 export const getHeight = /* GraphQL */ `query GetHeight($id: ID!) {
   getHeight(id: $id) {
     createdAt
@@ -103,6 +141,17 @@ export const getHeight = /* GraphQL */ `query GetHeight($id: ID!) {
   }
 }
 ` as GeneratedQuery<APITypes.GetHeightQueryVariables, APITypes.GetHeightQuery>;
+export const getHeights =
+  /* GraphQL */ `query GetHeights($ignoreThisArgument: String) {
+  getHeights(ignoreThisArgument: $ignoreThisArgument) {
+    value
+    __typename
+  }
+}
+` as GeneratedQuery<
+    APITypes.GetHeightsQueryVariables,
+    APITypes.GetHeightsQuery
+  >;
 export const getPreferences = /* GraphQL */ `query GetPreferences($id: ID!) {
   getPreferences(id: $id) {
     createdAt
@@ -146,6 +195,17 @@ export const getWeight = /* GraphQL */ `query GetWeight($id: ID!) {
   }
 }
 ` as GeneratedQuery<APITypes.GetWeightQueryVariables, APITypes.GetWeightQuery>;
+export const getWeights =
+  /* GraphQL */ `query GetWeights($ignoreThisArgument: String) {
+  getWeights(ignoreThisArgument: $ignoreThisArgument) {
+    value
+    __typename
+  }
+}
+` as GeneratedQuery<
+    APITypes.GetWeightsQueryVariables,
+    APITypes.GetWeightsQuery
+  >;
 export const listConversationChats = /* GraphQL */ `query ListConversationChats(
   $filter: ModelConversationChatFilterInput
   $limit: Int
@@ -198,6 +258,41 @@ export const listConversationMessageChats =
     APITypes.ListConversationMessageChatsQueryVariables,
     APITypes.ListConversationMessageChatsQuery
   >;
+export const listFoodByDay = /* GraphQL */ `query ListFoodByDay(
+  $day: String!
+  $filter: ModelFoodFilterInput
+  $limit: Int
+  $nextToken: String
+  $sortDirection: ModelSortDirection
+) {
+  listFoodByDay(
+    day: $day
+    filter: $filter
+    limit: $limit
+    nextToken: $nextToken
+    sortDirection: $sortDirection
+  ) {
+    items {
+      calories
+      createdAt
+      day
+      id
+      name
+      notes
+      owner
+      photos
+      protein
+      updatedAt
+      __typename
+    }
+    nextToken
+    __typename
+  }
+}
+` as GeneratedQuery<
+  APITypes.ListFoodByDayQueryVariables,
+  APITypes.ListFoodByDayQuery
+>;
 export const listFoods = /* GraphQL */ `query ListFoods(
   $filter: ModelFoodFilterInput
   $limit: Int
@@ -241,6 +336,32 @@ export const listGoals = /* GraphQL */ `query ListGoals(
   }
 }
 ` as GeneratedQuery<APITypes.ListGoalsQueryVariables, APITypes.ListGoalsQuery>;
+export const listHealthKitCaches = /* GraphQL */ `query ListHealthKitCaches(
+  $filter: ModelHealthKitCacheFilterInput
+  $limit: Int
+  $nextToken: String
+) {
+  listHealthKitCaches(filter: $filter, limit: $limit, nextToken: $nextToken) {
+    items {
+      activeCalories
+      baseCalories
+      createdAt
+      day
+      id
+      owner
+      steps
+      updatedAt
+      weight
+      __typename
+    }
+    nextToken
+    __typename
+  }
+}
+` as GeneratedQuery<
+  APITypes.ListHealthKitCachesQueryVariables,
+  APITypes.ListHealthKitCachesQuery
+>;
 export const listHeights = /* GraphQL */ `query ListHeights(
   $filter: ModelHeightFilterInput
   $limit: Int

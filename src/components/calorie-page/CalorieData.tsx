@@ -6,7 +6,6 @@ import {
   TableCell,
   TableBody,
   Heading,
-  Loader,
   Text,
   Button,
   useTheme,
@@ -127,7 +126,6 @@ export const CalorieData = (props: {
     0,
   );
 
-  if (dayInfo?.burnedCalories === undefined) return <Loader />;
   const targetCalories = props.goal?.dietCalories ?? dayInfo.burnedCalories;
   const remainingCalories = targetCalories - consumedCalories;
 

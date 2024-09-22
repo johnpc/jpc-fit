@@ -2,7 +2,7 @@ import type { Schema } from "../data/resource";
 import { Amplify } from "aws-amplify";
 import { generateClient } from "aws-amplify/api";
 import { env } from "$amplify/env/getFoods";
-import { listFoods } from "./queries";
+import { listFoods } from "./graphql/queries";
 
 Amplify.configure(
   {

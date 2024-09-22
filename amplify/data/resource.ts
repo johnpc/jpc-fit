@@ -1,6 +1,7 @@
 import { type ClientSchema, a, defineData } from "@aws-amplify/backend";
 import {
   getCurrentDate,
+  getEverything,
   getFoods,
   getHeights,
   getWeights,
@@ -85,6 +86,12 @@ const schema = a
       .returns(a.ref("StringType"))
       .handler(a.handler.function(getCurrentDate))
       .authorization((allow) => allow.authenticated()),
+    getEverything: a
+      .query()
+      .arguments({ userId: a.string().required() })
+      .returns(a.ref("StringType"))
+      .handler(a.handler.function(getEverything))
+      .authorization((allow) => allow.authenticated()),
     chat: a.conversation({
       aiModel: a.ai.model("Claude 3.5 Sonnet"),
       systemPrompt: `You are motivating users to lose weight. You answer in three sentences or less, using simple english words.`,
@@ -121,6 +128,7 @@ const schema = a
     allow.resource(getHeights),
     allow.resource(getWeights),
     allow.resource(getFoods),
+    allow.resource(getEverything),
   ]);
 
 export type Schema = ClientSchema<typeof schema>;

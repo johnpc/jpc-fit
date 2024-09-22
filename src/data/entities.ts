@@ -4,6 +4,7 @@ import { Subscription } from "rxjs";
 import config from "../../amplify_outputs.json";
 import { Schema } from "../../amplify/data/resource";
 import { getCurrentUser } from "aws-amplify/auth";
+import { getStreakInfo, StreakInfo } from "../helpers/getStreakInfo";
 Amplify.configure(config);
 const client = generateClient<Schema>({
   authMode: "userPool",
@@ -378,6 +379,51 @@ export const deleteFood = async (food: FoodEntity) => {
   await client.models.Food.delete({ id: food.id });
 };
 
+export const getEverything = async (): Promise<{
+  allFoods: FoodEntity[];
+  allQuickAdds: QuickAddEntity[];
+  goal?: GoalEntity;
+  preferences: PreferencesEntity;
+  weight: WeightEntity;
+  height: HeightEntity;
+  healthKitCaches: HealthKitCacheEntity[];
+  streak: StreakInfo;
+}> => {
+  const [
+    allFoods,
+    allQuickAdds,
+    goal,
+    preferences,
+    weight,
+    height,
+    healthKitCaches,
+  ] = await Promise.all([
+    listAllFood(),
+    listQuickAdds(),
+    getGoal(),
+    getPreferences(),
+    getWeight(),
+    getHeight(),
+    listHealthKitCaches(),
+  ]);
+  const streak = await getStreakInfo(
+    allFoods,
+    new Date(),
+    healthKitCaches,
+    preferences,
+  );
+  return {
+    allFoods,
+    allQuickAdds,
+    goal,
+    preferences,
+    weight: weight ?? { currentWeight: 0 },
+    height: height ?? { currentHeight: 0 },
+    healthKitCaches,
+    streak,
+  };
+};
+
 export const createFoodListener = (fn: (food: FoodEntity) => void) => {
   const listener = client.models.Food.onCreate().subscribe({
     next: async (food: Schema["Food"]["type"]) => {
@@ -494,10 +540,10 @@ export const deleteGoalListener = (fn: () => void) => {
   return listener;
 };
 
-export const createWeightListener = (fn: () => void) => {
+export const createWeightListener = (fn: (weight: WeightEntity) => void) => {
   const listener = client.models.Weight.onCreate().subscribe({
-    next: async () => {
-      fn();
+    next: async (weight: Schema["Weight"]["type"]) => {
+      fn(weight);
     },
     error: (error: Error) => {
       console.error("Subscription error", error);
@@ -506,10 +552,10 @@ export const createWeightListener = (fn: () => void) => {
   return listener;
 };
 
-export const createHeightListener = (fn: () => void) => {
+export const createHeightListener = (fn: (height: HeightEntity) => void) => {
   const listener = client.models.Height.onCreate().subscribe({
-    next: async () => {
-      fn();
+    next: async (height: Schema["Height"]["type"]) => {
+      fn(height);
     },
     error: (error: Error) => {
       console.error("Subscription error", error);
@@ -518,6 +564,6 @@ export const createHeightListener = (fn: () => void) => {
   return listener;
 };
 
-export const unsubscribeListener = (subscription: Subscription) => {
-  return subscription.unsubscribe();
+export const unsubscribeListeners = (subscriptions: Subscription[]) => {
+  subscriptions.forEach((subscription) => subscription.unsubscribe());
 };

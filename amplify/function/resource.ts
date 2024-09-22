@@ -16,3 +16,7 @@ export const getCurrentDate = defineFunction({
   name: "getCurrentDate",
   entry: "./getCurrentDate.ts",
 });
+export const getEverything = defineFunction({
+  name: "getEverything",
+  entry: "./getEverything.ts",
+});

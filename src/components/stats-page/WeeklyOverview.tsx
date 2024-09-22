@@ -6,7 +6,6 @@ import {
   PreferencesEntity,
 } from "../../data/entities";
 import {
-  Loader,
   View,
   Text,
   Table,
@@ -49,7 +48,6 @@ export default function WeeklyOverview(props: {
     props.healthKitCaches,
   ]);
 
-  if (!streakInfo) return <Loader />;
   const { burnedCalories, consumedCalories } = (
     Object.keys(streakInfo) as unknown as ("today" | "yesterday")[]
   ).reduce(

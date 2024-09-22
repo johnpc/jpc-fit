@@ -124,6 +124,28 @@ export const onCreateGoal = /* GraphQL */ `subscription OnCreateGoal(
   APITypes.OnCreateGoalSubscriptionVariables,
   APITypes.OnCreateGoalSubscription
 >;
+export const onCreateHealthKitCache =
+  /* GraphQL */ `subscription OnCreateHealthKitCache(
+  $filter: ModelSubscriptionHealthKitCacheFilterInput
+  $owner: String
+) {
+  onCreateHealthKitCache(filter: $filter, owner: $owner) {
+    activeCalories
+    baseCalories
+    createdAt
+    day
+    id
+    owner
+    steps
+    updatedAt
+    weight
+    __typename
+  }
+}
+` as GeneratedSubscription<
+    APITypes.OnCreateHealthKitCacheSubscriptionVariables,
+    APITypes.OnCreateHealthKitCacheSubscription
+  >;
 export const onCreateHeight = /* GraphQL */ `subscription OnCreateHeight(
   $filter: ModelSubscriptionHeightFilterInput
   $owner: String
@@ -236,6 +258,28 @@ export const onDeleteGoal = /* GraphQL */ `subscription OnDeleteGoal(
   APITypes.OnDeleteGoalSubscriptionVariables,
   APITypes.OnDeleteGoalSubscription
 >;
+export const onDeleteHealthKitCache =
+  /* GraphQL */ `subscription OnDeleteHealthKitCache(
+  $filter: ModelSubscriptionHealthKitCacheFilterInput
+  $owner: String
+) {
+  onDeleteHealthKitCache(filter: $filter, owner: $owner) {
+    activeCalories
+    baseCalories
+    createdAt
+    day
+    id
+    owner
+    steps
+    updatedAt
+    weight
+    __typename
+  }
+}
+` as GeneratedSubscription<
+    APITypes.OnDeleteHealthKitCacheSubscriptionVariables,
+    APITypes.OnDeleteHealthKitCacheSubscription
+  >;
 export const onDeleteHeight = /* GraphQL */ `subscription OnDeleteHeight(
   $filter: ModelSubscriptionHeightFilterInput
   $owner: String
@@ -348,6 +392,28 @@ export const onUpdateGoal = /* GraphQL */ `subscription OnUpdateGoal(
   APITypes.OnUpdateGoalSubscriptionVariables,
   APITypes.OnUpdateGoalSubscription
 >;
+export const onUpdateHealthKitCache =
+  /* GraphQL */ `subscription OnUpdateHealthKitCache(
+  $filter: ModelSubscriptionHealthKitCacheFilterInput
+  $owner: String
+) {
+  onUpdateHealthKitCache(filter: $filter, owner: $owner) {
+    activeCalories
+    baseCalories
+    createdAt
+    day
+    id
+    owner
+    steps
+    updatedAt
+    weight
+    __typename
+  }
+}
+` as GeneratedSubscription<
+    APITypes.OnUpdateHealthKitCacheSubscriptionVariables,
+    APITypes.OnUpdateHealthKitCacheSubscription
+  >;
 export const onUpdateHeight = /* GraphQL */ `subscription OnUpdateHeight(
   $filter: ModelSubscriptionHeightFilterInput
   $owner: String

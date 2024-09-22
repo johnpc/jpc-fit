@@ -194,6 +194,28 @@ export const createGoal = /* GraphQL */ `mutation CreateGoal(
   APITypes.CreateGoalMutationVariables,
   APITypes.CreateGoalMutation
 >;
+export const createHealthKitCache =
+  /* GraphQL */ `mutation CreateHealthKitCache(
+  $condition: ModelHealthKitCacheConditionInput
+  $input: CreateHealthKitCacheInput!
+) {
+  createHealthKitCache(condition: $condition, input: $input) {
+    activeCalories
+    baseCalories
+    createdAt
+    day
+    id
+    owner
+    steps
+    updatedAt
+    weight
+    __typename
+  }
+}
+` as GeneratedMutation<
+    APITypes.CreateHealthKitCacheMutationVariables,
+    APITypes.CreateHealthKitCacheMutation
+  >;
 export const createHeight = /* GraphQL */ `mutation CreateHeight(
   $condition: ModelHeightConditionInput
   $input: CreateHeightInput!
@@ -368,6 +390,28 @@ export const deleteGoal = /* GraphQL */ `mutation DeleteGoal(
   APITypes.DeleteGoalMutationVariables,
   APITypes.DeleteGoalMutation
 >;
+export const deleteHealthKitCache =
+  /* GraphQL */ `mutation DeleteHealthKitCache(
+  $condition: ModelHealthKitCacheConditionInput
+  $input: DeleteHealthKitCacheInput!
+) {
+  deleteHealthKitCache(condition: $condition, input: $input) {
+    activeCalories
+    baseCalories
+    createdAt
+    day
+    id
+    owner
+    steps
+    updatedAt
+    weight
+    __typename
+  }
+}
+` as GeneratedMutation<
+    APITypes.DeleteHealthKitCacheMutationVariables,
+    APITypes.DeleteHealthKitCacheMutation
+  >;
 export const deleteHeight = /* GraphQL */ `mutation DeleteHeight(
   $condition: ModelHeightConditionInput
   $input: DeleteHeightInput!
@@ -479,6 +523,28 @@ export const updateGoal = /* GraphQL */ `mutation UpdateGoal(
   APITypes.UpdateGoalMutationVariables,
   APITypes.UpdateGoalMutation
 >;
+export const updateHealthKitCache =
+  /* GraphQL */ `mutation UpdateHealthKitCache(
+  $condition: ModelHealthKitCacheConditionInput
+  $input: UpdateHealthKitCacheInput!
+) {
+  updateHealthKitCache(condition: $condition, input: $input) {
+    activeCalories
+    baseCalories
+    createdAt
+    day
+    id
+    owner
+    steps
+    updatedAt
+    weight
+    __typename
+  }
+}
+` as GeneratedMutation<
+    APITypes.UpdateHealthKitCacheMutationVariables,
+    APITypes.UpdateHealthKitCacheMutation
+  >;
 export const updateHeight = /* GraphQL */ `mutation UpdateHeight(
   $condition: ModelHeightConditionInput
   $input: UpdateHeightInput!

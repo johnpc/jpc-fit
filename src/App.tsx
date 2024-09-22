@@ -15,19 +15,11 @@ import {
 import { App as CapacitorApp } from "@capacitor/app";
 import { Capacitor } from "@capacitor/core";
 import TabsView from "./components/TabsView";
-import { HealthKitCacheEntity, listHealthKitCaches } from "./data/entities";
 function App() {
   const [permission, setPermission] = useState<boolean>(false);
-  const [healthKitCaches, setHealthKitCaches] = useState<
-    HealthKitCacheEntity[]
-  >([]);
-  const [ready, setReady] = useState<boolean>(false);
   const setup = async () => {
     const p = await hasPermission();
     setPermission(p);
-    const hkCaches = await listHealthKitCaches();
-    setHealthKitCaches(hkCaches);
-    setReady(true);
   };
   useEffect(() => {
     setup();
@@ -66,7 +58,7 @@ function App() {
     <Profiler id="App" onRender={onRenderCallback}>
       <Header />
       {permission ? (
-        <TabsView ready={ready} healthKitCaches={healthKitCaches} />
+        <TabsView />
       ) : (
         <RequestPermission onPermissionGranted={setup} />
       )}

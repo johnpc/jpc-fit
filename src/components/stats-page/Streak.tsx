@@ -1,20 +1,12 @@
 import { StreakInfo } from "../../helpers/getStreakInfo";
 import { FoodEntity } from "../../data/entities";
-import {
-  Loader,
-  useTheme,
-  Grid,
-  View,
-  Heading,
-  Text,
-} from "@aws-amplify/ui-react";
+import { useTheme, Grid, View, Heading, Text } from "@aws-amplify/ui-react";
 
 export default function Streak(props: {
   allFoods: FoodEntity[];
   streakInfo: StreakInfo;
 }) {
   const { tokens } = useTheme();
-  if (!props.streakInfo) return <Loader />;
   const netLbs = props.streakInfo.currentStreakNetCalories / 3500;
   return (
     <Grid

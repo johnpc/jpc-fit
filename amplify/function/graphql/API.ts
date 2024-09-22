@@ -128,6 +128,11 @@ export type ToolInputSchema = {
   json?: string | null;
 };
 
+export type StringType = {
+  __typename: "StringType";
+  value?: string | null;
+};
+
 export type Food = {
   __typename: "Food";
   calories: number;
@@ -149,6 +154,19 @@ export type Goal = {
   id: string;
   owner?: string | null;
   updatedAt: string;
+};
+
+export type HealthKitCache = {
+  __typename: "HealthKitCache";
+  activeCalories: number;
+  baseCalories: number;
+  createdAt: string;
+  day: string;
+  id: string;
+  owner?: string | null;
+  steps?: number | null;
+  updatedAt: string;
+  weight?: number | null;
 };
 
 export type Height = {
@@ -310,6 +328,11 @@ export type ModelIntInput = {
   ne?: number | null;
 };
 
+export enum ModelSortDirection {
+  ASC = "ASC",
+  DESC = "DESC",
+}
+
 export type ModelFoodConnection = {
   __typename: "ModelFoodConnection";
   items: Array<Food | null>;
@@ -330,6 +353,39 @@ export type ModelGoalFilterInput = {
 export type ModelGoalConnection = {
   __typename: "ModelGoalConnection";
   items: Array<Goal | null>;
+  nextToken?: string | null;
+};
+
+export type ModelHealthKitCacheFilterInput = {
+  activeCalories?: ModelFloatInput | null;
+  and?: Array<ModelHealthKitCacheFilterInput | null> | null;
+  baseCalories?: ModelFloatInput | null;
+  createdAt?: ModelStringInput | null;
+  day?: ModelStringInput | null;
+  id?: ModelIDInput | null;
+  not?: ModelHealthKitCacheFilterInput | null;
+  or?: Array<ModelHealthKitCacheFilterInput | null> | null;
+  owner?: ModelStringInput | null;
+  steps?: ModelFloatInput | null;
+  updatedAt?: ModelStringInput | null;
+  weight?: ModelFloatInput | null;
+};
+
+export type ModelFloatInput = {
+  attributeExists?: boolean | null;
+  attributeType?: ModelAttributeTypes | null;
+  between?: Array<number | null> | null;
+  eq?: number | null;
+  ge?: number | null;
+  gt?: number | null;
+  le?: number | null;
+  lt?: number | null;
+  ne?: number | null;
+};
+
+export type ModelHealthKitCacheConnection = {
+  __typename: "ModelHealthKitCacheConnection";
+  items: Array<HealthKitCache | null>;
   nextToken?: string | null;
 };
 
@@ -561,6 +617,29 @@ export type CreateGoalInput = {
   id?: string | null;
 };
 
+export type ModelHealthKitCacheConditionInput = {
+  activeCalories?: ModelFloatInput | null;
+  and?: Array<ModelHealthKitCacheConditionInput | null> | null;
+  baseCalories?: ModelFloatInput | null;
+  createdAt?: ModelStringInput | null;
+  day?: ModelStringInput | null;
+  not?: ModelHealthKitCacheConditionInput | null;
+  or?: Array<ModelHealthKitCacheConditionInput | null> | null;
+  owner?: ModelStringInput | null;
+  steps?: ModelFloatInput | null;
+  updatedAt?: ModelStringInput | null;
+  weight?: ModelFloatInput | null;
+};
+
+export type CreateHealthKitCacheInput = {
+  activeCalories: number;
+  baseCalories: number;
+  day: string;
+  id?: string | null;
+  steps?: number | null;
+  weight?: number | null;
+};
+
 export type ModelHeightConditionInput = {
   and?: Array<ModelHeightConditionInput | null> | null;
   createdAt?: ModelStringInput | null;
@@ -645,6 +724,10 @@ export type DeleteGoalInput = {
   id: string;
 };
 
+export type DeleteHealthKitCacheInput = {
+  id: string;
+};
+
 export type DeleteHeightInput = {
   id: string;
 };
@@ -674,6 +757,15 @@ export type UpdateFoodInput = {
 export type UpdateGoalInput = {
   dietCalories?: number | null;
   id: string;
+};
+
+export type UpdateHealthKitCacheInput = {
+  activeCalories?: number | null;
+  baseCalories?: number | null;
+  day?: string | null;
+  id: string;
+  steps?: number | null;
+  weight?: number | null;
 };
 
 export type UpdateHeightInput = {
@@ -777,6 +869,32 @@ export type ModelSubscriptionGoalFilterInput = {
   or?: Array<ModelSubscriptionGoalFilterInput | null> | null;
   owner?: ModelStringInput | null;
   updatedAt?: ModelSubscriptionStringInput | null;
+};
+
+export type ModelSubscriptionHealthKitCacheFilterInput = {
+  activeCalories?: ModelSubscriptionFloatInput | null;
+  and?: Array<ModelSubscriptionHealthKitCacheFilterInput | null> | null;
+  baseCalories?: ModelSubscriptionFloatInput | null;
+  createdAt?: ModelSubscriptionStringInput | null;
+  day?: ModelSubscriptionStringInput | null;
+  id?: ModelSubscriptionIDInput | null;
+  or?: Array<ModelSubscriptionHealthKitCacheFilterInput | null> | null;
+  owner?: ModelStringInput | null;
+  steps?: ModelSubscriptionFloatInput | null;
+  updatedAt?: ModelSubscriptionStringInput | null;
+  weight?: ModelSubscriptionFloatInput | null;
+};
+
+export type ModelSubscriptionFloatInput = {
+  between?: Array<number | null> | null;
+  eq?: number | null;
+  ge?: number | null;
+  gt?: number | null;
+  in?: Array<number | null> | null;
+  le?: number | null;
+  lt?: number | null;
+  ne?: number | null;
+  notIn?: Array<number | null> | null;
 };
 
 export type ModelSubscriptionHeightFilterInput = {
@@ -885,6 +1003,17 @@ export type GetConversationMessageChatQuery = {
   } | null;
 };
 
+export type GetCurrentDateQueryVariables = {
+  ignoreThisArgument?: string | null;
+};
+
+export type GetCurrentDateQuery = {
+  getCurrentDate?: {
+    __typename: "StringType";
+    value?: string | null;
+  } | null;
+};
+
 export type GetFoodQueryVariables = {
   id: string;
 };
@@ -905,6 +1034,17 @@ export type GetFoodQuery = {
   } | null;
 };
 
+export type GetFoodsQueryVariables = {
+  ignoreThisArgument?: string | null;
+};
+
+export type GetFoodsQuery = {
+  getFoods?: {
+    __typename: "StringType";
+    value?: string | null;
+  } | null;
+};
+
 export type GetGoalQueryVariables = {
   id: string;
 };
@@ -920,6 +1060,25 @@ export type GetGoalQuery = {
   } | null;
 };
 
+export type GetHealthKitCacheQueryVariables = {
+  id: string;
+};
+
+export type GetHealthKitCacheQuery = {
+  getHealthKitCache?: {
+    __typename: "HealthKitCache";
+    activeCalories: number;
+    baseCalories: number;
+    createdAt: string;
+    day: string;
+    id: string;
+    owner?: string | null;
+    steps?: number | null;
+    updatedAt: string;
+    weight?: number | null;
+  } | null;
+};
+
 export type GetHeightQueryVariables = {
   id: string;
 };
@@ -932,6 +1091,17 @@ export type GetHeightQuery = {
     id: string;
     owner?: string | null;
     updatedAt: string;
+  } | null;
+};
+
+export type GetHeightsQueryVariables = {
+  ignoreThisArgument?: string | null;
+};
+
+export type GetHeightsQuery = {
+  getHeights?: {
+    __typename: "StringType";
+    value?: string | null;
   } | null;
 };
 
@@ -984,6 +1154,17 @@ export type GetWeightQuery = {
   } | null;
 };
 
+export type GetWeightsQueryVariables = {
+  ignoreThisArgument?: string | null;
+};
+
+export type GetWeightsQuery = {
+  getWeights?: {
+    __typename: "StringType";
+    value?: string | null;
+  } | null;
+};
+
 export type ListConversationChatsQueryVariables = {
   filter?: ModelConversationChatFilterInput | null;
   limit?: number | null;
@@ -1023,6 +1204,34 @@ export type ListConversationMessageChatsQuery = {
       id: string;
       owner?: string | null;
       role?: ConversationParticipantRole | null;
+      updatedAt: string;
+    } | null>;
+    nextToken?: string | null;
+  } | null;
+};
+
+export type ListFoodByDayQueryVariables = {
+  day: string;
+  filter?: ModelFoodFilterInput | null;
+  limit?: number | null;
+  nextToken?: string | null;
+  sortDirection?: ModelSortDirection | null;
+};
+
+export type ListFoodByDayQuery = {
+  listFoodByDay?: {
+    __typename: "ModelFoodConnection";
+    items: Array<{
+      __typename: "Food";
+      calories: number;
+      createdAt: string;
+      day: string;
+      id: string;
+      name?: string | null;
+      notes?: string | null;
+      owner?: string | null;
+      photos?: Array<string | null> | null;
+      protein?: number | null;
       updatedAt: string;
     } | null>;
     nextToken?: string | null;
@@ -1071,6 +1280,31 @@ export type ListGoalsQuery = {
       id: string;
       owner?: string | null;
       updatedAt: string;
+    } | null>;
+    nextToken?: string | null;
+  } | null;
+};
+
+export type ListHealthKitCachesQueryVariables = {
+  filter?: ModelHealthKitCacheFilterInput | null;
+  limit?: number | null;
+  nextToken?: string | null;
+};
+
+export type ListHealthKitCachesQuery = {
+  listHealthKitCaches?: {
+    __typename: "ModelHealthKitCacheConnection";
+    items: Array<{
+      __typename: "HealthKitCache";
+      activeCalories: number;
+      baseCalories: number;
+      createdAt: string;
+      day: string;
+      id: string;
+      owner?: string | null;
+      steps?: number | null;
+      updatedAt: string;
+      weight?: number | null;
     } | null>;
     nextToken?: string | null;
   } | null;
@@ -1337,6 +1571,26 @@ export type CreateGoalMutation = {
   } | null;
 };
 
+export type CreateHealthKitCacheMutationVariables = {
+  condition?: ModelHealthKitCacheConditionInput | null;
+  input: CreateHealthKitCacheInput;
+};
+
+export type CreateHealthKitCacheMutation = {
+  createHealthKitCache?: {
+    __typename: "HealthKitCache";
+    activeCalories: number;
+    baseCalories: number;
+    createdAt: string;
+    day: string;
+    id: string;
+    owner?: string | null;
+    steps?: number | null;
+    updatedAt: string;
+    weight?: number | null;
+  } | null;
+};
+
 export type CreateHeightMutationVariables = {
   condition?: ModelHeightConditionInput | null;
   input: CreateHeightInput;
@@ -1501,6 +1755,26 @@ export type DeleteGoalMutation = {
   } | null;
 };
 
+export type DeleteHealthKitCacheMutationVariables = {
+  condition?: ModelHealthKitCacheConditionInput | null;
+  input: DeleteHealthKitCacheInput;
+};
+
+export type DeleteHealthKitCacheMutation = {
+  deleteHealthKitCache?: {
+    __typename: "HealthKitCache";
+    activeCalories: number;
+    baseCalories: number;
+    createdAt: string;
+    day: string;
+    id: string;
+    owner?: string | null;
+    steps?: number | null;
+    updatedAt: string;
+    weight?: number | null;
+  } | null;
+};
+
 export type DeleteHeightMutationVariables = {
   condition?: ModelHeightConditionInput | null;
   input: DeleteHeightInput;
@@ -1603,6 +1877,26 @@ export type UpdateGoalMutation = {
     id: string;
     owner?: string | null;
     updatedAt: string;
+  } | null;
+};
+
+export type UpdateHealthKitCacheMutationVariables = {
+  condition?: ModelHealthKitCacheConditionInput | null;
+  input: UpdateHealthKitCacheInput;
+};
+
+export type UpdateHealthKitCacheMutation = {
+  updateHealthKitCache?: {
+    __typename: "HealthKitCache";
+    activeCalories: number;
+    baseCalories: number;
+    createdAt: string;
+    day: string;
+    id: string;
+    owner?: string | null;
+    steps?: number | null;
+    updatedAt: string;
+    weight?: number | null;
   } | null;
 };
 
@@ -1786,6 +2080,26 @@ export type OnCreateGoalSubscription = {
   } | null;
 };
 
+export type OnCreateHealthKitCacheSubscriptionVariables = {
+  filter?: ModelSubscriptionHealthKitCacheFilterInput | null;
+  owner?: string | null;
+};
+
+export type OnCreateHealthKitCacheSubscription = {
+  onCreateHealthKitCache?: {
+    __typename: "HealthKitCache";
+    activeCalories: number;
+    baseCalories: number;
+    createdAt: string;
+    day: string;
+    id: string;
+    owner?: string | null;
+    steps?: number | null;
+    updatedAt: string;
+    weight?: number | null;
+  } | null;
+};
+
 export type OnCreateHeightSubscriptionVariables = {
   filter?: ModelSubscriptionHeightFilterInput | null;
   owner?: string | null;
@@ -1891,6 +2205,26 @@ export type OnDeleteGoalSubscription = {
   } | null;
 };
 
+export type OnDeleteHealthKitCacheSubscriptionVariables = {
+  filter?: ModelSubscriptionHealthKitCacheFilterInput | null;
+  owner?: string | null;
+};
+
+export type OnDeleteHealthKitCacheSubscription = {
+  onDeleteHealthKitCache?: {
+    __typename: "HealthKitCache";
+    activeCalories: number;
+    baseCalories: number;
+    createdAt: string;
+    day: string;
+    id: string;
+    owner?: string | null;
+    steps?: number | null;
+    updatedAt: string;
+    weight?: number | null;
+  } | null;
+};
+
 export type OnDeleteHeightSubscriptionVariables = {
   filter?: ModelSubscriptionHeightFilterInput | null;
   owner?: string | null;
@@ -1993,6 +2327,26 @@ export type OnUpdateGoalSubscription = {
     id: string;
     owner?: string | null;
     updatedAt: string;
+  } | null;
+};
+
+export type OnUpdateHealthKitCacheSubscriptionVariables = {
+  filter?: ModelSubscriptionHealthKitCacheFilterInput | null;
+  owner?: string | null;
+};
+
+export type OnUpdateHealthKitCacheSubscription = {
+  onUpdateHealthKitCache?: {
+    __typename: "HealthKitCache";
+    activeCalories: number;
+    baseCalories: number;
+    createdAt: string;
+    day: string;
+    id: string;
+    owner?: string | null;
+    steps?: number | null;
+    updatedAt: string;
+    weight?: number | null;
   } | null;
 };
 

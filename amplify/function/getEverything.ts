@@ -1,8 +1,16 @@
 import type { Schema } from "../data/resource";
 import { Amplify } from "aws-amplify";
 import { generateClient } from "aws-amplify/api";
-import { env } from "$amplify/env/getHeights";
-import { listHeights } from "./graphql/queries";
+import { env } from "$amplify/env/getEverything";
+import {
+  listFoods,
+  listGoals,
+  listHeights,
+  listPreferences,
+  listQuickAdds,
+  listWeights,
+  listHealthKitCaches,
+} from "./graphql/queries";
 
 Amplify.configure(
   {
@@ -33,13 +41,30 @@ Amplify.configure(
 );
 const client = generateClient<Schema>();
 
-export const handler: Schema["getHeights"]["functionHandler"] = async () => {
-  const heights = await client.graphql({
-    query: listHeights,
-  });
-  console.log({
-    heights: heights.data.listHeights.items,
-    errors: heights.errors,
-  });
-  return { value: JSON.stringify(heights.data.listHeights.items) };
+export const handler: Schema["getEverything"]["functionHandler"] = async (
+  args,
+) => {
+  const userId = args.arguments.userId;
+  const promises = [
+    listFoods,
+    listHeights,
+    listWeights,
+    listHealthKitCaches,
+    listQuickAdds,
+    listGoals,
+    listPreferences,
+  ].map((query) =>
+    client.graphql({
+      query,
+      variables: {
+        filter: {
+          owner: {
+            eq: userId,
+          },
+        },
+      },
+    }),
+  );
+  const responses = await Promise.all(promises);
+  return { value: JSON.stringify(responses) };
 };

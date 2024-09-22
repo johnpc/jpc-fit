@@ -1,6 +1,5 @@
 import {
   Card,
-  Loader,
   Table,
   TableBody,
   TableCell,
@@ -15,44 +14,16 @@ import {
   PreferencesEntity,
   WeightEntity,
   createHeight,
-  createHeightListener,
   createWeight,
-  createWeightListener,
-  getHeight,
-  getWeight,
-  unsubscribeListener,
 } from "../data/entities";
-import { useEffect, useState } from "react";
-import { getHealthKitData } from "../helpers/getHealthKitData";
 import { BodyFatEyeTest } from "./weight-page/BodyFatEyeTest";
 
 export default function WeightPage(props: {
   preferences: PreferencesEntity;
   healthKitCaches: HealthKitCacheEntity[];
-  height?: HeightEntity;
-  weight?: WeightEntity;
+  height: HeightEntity;
+  weight: WeightEntity;
 }) {
-  const [weight, setWeight] = useState<WeightEntity | undefined>(props.weight);
-  const [height, setHeight] = useState<HeightEntity | undefined>(props.height);
-
-  useEffect(() => {
-    const setup = async () => {
-      const { weight } = await getHealthKitData(
-        new Date(),
-        props.healthKitCaches,
-        props.preferences,
-      );
-      setWeight((await getWeight()) ?? { currentWeight: weight });
-      setHeight((await getHeight()) ?? { currentHeight: 0 });
-    };
-    setup();
-    const createWeightSubscription = createWeightListener(setup);
-    const createHeightSubscription = createHeightListener(setup);
-    return () => {
-      unsubscribeListener(createWeightSubscription);
-      unsubscribeListener(createHeightSubscription);
-    };
-  }, [props.preferences]);
   const handleEditWeight = async () => {
     const newWeight = parseInt(prompt("Enter your weight in lbs")!);
     if (Number.isNaN(newWeight) || newWeight < 1) {
@@ -73,9 +44,9 @@ export default function WeightPage(props: {
     await createHeight(newHeight);
   };
 
-  if (weight === undefined || height === undefined) return <Loader />;
   const bmi =
-    (weight.currentWeight / (height.currentHeight * height.currentHeight)) *
+    (props.weight.currentWeight /
+      (props.height.currentHeight * props.height.currentHeight)) *
     703;
   const getBmiLabel = (bmi: number) => {
     if (bmi < 18.5) return <>underweight</>;
@@ -87,15 +58,15 @@ export default function WeightPage(props: {
   };
   const maxUnderweightLbs = (
     (18.5 / 703) *
-    (height.currentHeight * height.currentHeight)
+    (props.height.currentHeight * props.height.currentHeight)
   ).toFixed(1);
   const maxHealthyLbs = (
     (25 / 703) *
-    (height.currentHeight * height.currentHeight)
+    (props.height.currentHeight * props.height.currentHeight)
   ).toFixed(1);
   const maxOverweightLbs = (
     (30 / 703) *
-    (height.currentHeight * height.currentHeight)
+    (props.height.currentHeight * props.height.currentHeight)
   ).toFixed(1);
   return (
     <>
@@ -111,14 +82,14 @@ export default function WeightPage(props: {
           <TableBody>
             <TableRow>
               <TableCell>Weight</TableCell>
-              <TableCell>{weight.currentWeight} lbs</TableCell>
+              <TableCell>{props.weight.currentWeight} lbs</TableCell>
               <TableCell onClick={() => handleEditWeight()}>
                 <MonitorWeight />
               </TableCell>
             </TableRow>
             <TableRow>
               <TableCell>Height</TableCell>
-              <TableCell>{height.currentHeight} inches</TableCell>
+              <TableCell>{props.height.currentHeight} inches</TableCell>
               <TableCell onClick={() => handleEditHeight()}>
                 <Height />
               </TableCell>
