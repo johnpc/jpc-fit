@@ -140,7 +140,7 @@ export default function TabsView() {
       } = await getEverything();
       setAllState({
         allFoods,
-        allQuickAdds: await setupQuickAdds(allQuickAdds),
+        allQuickAdds: setupQuickAdds(allQuickAdds),
         goal,
         preferences,
         weight,
