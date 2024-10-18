@@ -59,10 +59,25 @@ export const getHealthKitData = async (
     steps: 0,
   };
 
-  const cache = healthKitCaches.find(
-    (hkCache) =>
-      hkCache.day.toLocaleDateString() === today.toLocaleDateString(),
+  const cache = healthKitCaches.find((hkCache) => {
+    const hkCacheDay =
+      typeof hkCache.day === "string" ? new Date(hkCache.day) : hkCache.day;
+    return hkCacheDay.toLocaleDateString() === today.toLocaleDateString();
+  });
+
+  const isToday = !(
+    today.getTime() < endOfDay(subDays(new Date(), 1)).getTime()
   );
+  // null or "expireTimestamp-{json}"
+  const localCache = localStorage.getItem(today.toLocaleDateString());
+
+  if (localCache && isToday) {
+    const [expireTimestamp, jsonString] = localCache.split("-");
+    if (expireTimestamp && +expireTimestamp > Date.now()) {
+      console.log(`Local cache hit for TODAY ${today.toLocaleDateString()}`);
+      return JSON.parse(jsonString);
+    }
+  }
 
   if (cache) {
     return {
@@ -133,7 +148,16 @@ export const getHealthKitData = async (
     return defaultHealthKitData;
   }
 
-  if (today.getTime() < endOfDay(subDays(new Date(), 1)).getTime()) {
+  if (isToday) {
+    console.log(`updated Local cache for TODAY ${today.toLocaleDateString()}`);
+    localStorage.setItem(
+      today.toLocaleDateString(),
+      // Cache for five minutes
+      `${Date.now() + 1000 * 60 * 5}-${JSON.stringify(calculatedHealthKitData)}`,
+    );
+  }
+
+  if (!isToday) {
     console.log(`updated cache for ${today.toLocaleDateString()}`);
     try {
       await createHealthKitCache({

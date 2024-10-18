@@ -4,7 +4,7 @@ const config: CapacitorConfig = {
   appId: "com.johncorser.fit",
   appName: "fit.jpc",
   webDir: "dist",
-  bundledWebRuntime: false,
+  bundledWebRuntime: true,
   ios: {
     contentInset: "always",
     backgroundColor: "#DB7093",

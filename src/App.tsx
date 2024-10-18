@@ -1,7 +1,7 @@
 import "@aws-amplify/ui-react/styles.css";
 import { Header } from "./components/Header";
 import { Footer } from "./components/Footer";
-import { Profiler, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { hasPermission } from "./helpers/getHealthKitData";
 import { RequestPermission } from "./components/settings-page/RequestPermission";
 import {
@@ -16,46 +16,34 @@ import { App as CapacitorApp } from "@capacitor/app";
 import { Capacitor } from "@capacitor/core";
 import TabsView from "./components/TabsView";
 function App() {
-  const [permission, setPermission] = useState<boolean>(false);
+  const [permission, setPermission] = useState<boolean>(
+    localStorage.getItem("hasPermission") === "hasPermission",
+  );
   const setup = async () => {
     const p = await hasPermission();
     setPermission(p);
   };
   useEffect(() => {
+    console.log("App.tsx Effect Running");
     setup();
     CapacitorApp.addListener("appStateChange", ({ isActive }) => {
-      if (isActive) {
+      if (isActive && !permission) {
         setup();
       }
     });
     CapacitorApp.addListener("resume", () => {
-      setup();
+      if (!permission) {
+        setup();
+      }
     });
 
     return () => {
       CapacitorApp.removeAllListeners();
     };
   }, []);
-  function onRenderCallback(
-    id: string, // the "id" prop of the Profiler tree that has just committed
-    phase: string, // either "mount" (if the tree just mounted) or "update" (if it re-rendered)
-    actualDuration: number, // time spent rendering the committed update
-    baseDuration: number, // estimated time to render the entire subtree without memoization
-    startTime: number, // when React began rendering this update
-    commitTime: number, // when React committed this update
-  ) {
-    console.log({
-      id,
-      phase,
-      actualDuration,
-      baseDuration,
-      startTime,
-      commitTime,
-    });
-  }
 
   return (
-    <Profiler id="App" onRender={onRenderCallback}>
+    <>
       <Header />
       {permission ? (
         <TabsView />
@@ -63,7 +51,7 @@ function App() {
         <RequestPermission onPermissionGranted={setup} />
       )}
       <Footer />
-    </Profiler>
+    </>
   );
 }
 

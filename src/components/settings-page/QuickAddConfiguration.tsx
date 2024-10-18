@@ -131,7 +131,7 @@ export default function QuickAddConfiguration(props: {
     <>
       <Text
         variation="primary"
-        as="p"
+        as="span"
         display={"block"}
         lineHeight={tokens.lineHeights.medium}
         fontWeight={tokens.fontWeights.normal}
@@ -143,7 +143,7 @@ export default function QuickAddConfiguration(props: {
         does jpc.fit default to t-shirt sizes when reporting calories consumed?
         <Text
           variation="primary"
-          as="p"
+          as="span"
           display={"block"}
           lineHeight={tokens.lineHeights.medium}
           fontWeight={tokens.fontWeights.bold}
@@ -156,7 +156,7 @@ export default function QuickAddConfiguration(props: {
         </Text>
         <Text
           variation="primary"
-          as="p"
+          as="span"
           display={"block"}
           lineHeight={tokens.lineHeights.medium}
           fontWeight={tokens.fontWeights.bold}
@@ -171,7 +171,7 @@ export default function QuickAddConfiguration(props: {
         </Text>
         <Text
           variation="primary"
-          as="p"
+          as="span"
           display={"block"}
           lineHeight={tokens.lineHeights.medium}
           fontWeight={tokens.fontWeights.bold}

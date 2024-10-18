@@ -15,7 +15,7 @@ function ChatComponent(props: {
   const [
     {
       data: { messages },
-      hasError,
+      // hasError,
       isLoading,
     },
     sendMessage,
@@ -25,7 +25,6 @@ function ChatComponent(props: {
       console.log({ method: "onResponse", response });
     },
   });
-  console.log({ hasError });
 
   messages.sort((a, b) => (a.createdAt < b.createdAt ? -1 : 1));
   return (
@@ -109,8 +108,8 @@ export default function ChatPage(props: {
   randomNumber: number;
 }) {
   const [conversationId, setConversationId] = useState<string | undefined>();
-  console.log({ rendering: conversationId });
   useEffect(() => {
+    console.log("ChatPage Effect Running");
     const fetchConversation = async () => {
       const { data, errors } = await client.conversations.chat.list();
       data.sort((a, b) => (a.id < b.id ? 1 : -1));
@@ -127,7 +126,6 @@ export default function ChatPage(props: {
       if (errors) {
         console.log({ method: "fetchConversation", errors });
       }
-      console.log({ method: "fetchConversation", c });
       setConversationId(c?.id ?? null);
     };
     fetchConversation();

@@ -27,6 +27,7 @@ import {
   unsubscribeListeners,
   updateFoodListener,
   updatePreferencesListener,
+  getEverythingCache,
 } from "../data/entities";
 import {
   customQuickAdd,
@@ -41,7 +42,7 @@ import ChatIcon from "@mui/icons-material/Chat";
 import QueryStatsIcon from "@mui/icons-material/QueryStats";
 import MonitorWeightIcon from "@mui/icons-material/MonitorWeight";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
-import { AuthUser, getCurrentUser } from "aws-amplify/auth";
+import { AuthUser } from "aws-amplify/auth";
 import { isIos } from "../helpers/getHealthKitData";
 
 const WIDGET_PREFERENCES_GROUP = "group.com.johncorser.fit.prefs";
@@ -99,19 +100,11 @@ const getTodaysCaloriesPreferences = async () => {
 };
 
 export default function TabsView() {
-  const [randomNumber, setRandomNumber] = useState(Math.random());
-  const [toggleListeners, setToggleListeners] = useState<boolean>(false);
-  const [allState, setAllState] = useState<{
-    allFoods: FoodEntity[];
-    allQuickAdds: QuickAddEntity[];
-    goal?: GoalEntity;
-    preferences: PreferencesEntity;
-    weight: WeightEntity;
-    height: HeightEntity;
-    healthKitCaches: HealthKitCacheEntity[];
-    streak: StreakInfo;
-    user: AuthUser;
-  }>();
+  const [randomNumber, setRandomNumber] = useState(0);
+  const everything = getEverythingCache();
+  const [allFoods, setAllFoods] = useState<FoodEntity[]>(
+    everything?.allFoods ?? [],
+  );
   const setupQuickAdds = (
     existingQuickAdds: QuickAddEntity[],
   ): QuickAddEntity[] => {
@@ -124,205 +117,134 @@ export default function TabsView() {
       return defaultQuickAdds;
     }
   };
+  const [allQuickAdds, setAllQuickAdds] = useState<QuickAddEntity[]>(
+    everything?.allQuickAdds ? setupQuickAdds(everything.allQuickAdds) : [],
+  );
+  const [allState, setAllState] = useState<
+    | {
+        // allFoods: FoodEntity[];
+        // allQuickAdds: QuickAddEntity[];
+        goal?: GoalEntity;
+        preferences: PreferencesEntity;
+        weight: WeightEntity;
+        height: HeightEntity;
+        healthKitCaches: HealthKitCacheEntity[];
+        streak: StreakInfo;
+        user: AuthUser;
+      }
+    | undefined
+  >(everything);
+
+  const handleOptimisticAddFood = async (
+    food: FoodEntity,
+    filterFn: (food: FoodEntity) => boolean,
+  ) => {
+    if (!allState) return;
+    console.log("OPTIMISTIC addfood");
+    const newAllFoods = [...allFoods, food];
+    const todaysCalories = newAllFoods
+      .filter((food) => food.day === new Date().toLocaleDateString())
+      .reduce((acc, food) => acc + food.calories, 0);
+    setTodaysCaloriesPreferences(todaysCalories);
+    const streak = await getStreakInfo(
+      newAllFoods.filter(filterFn),
+      new Date(),
+      allState.healthKitCaches,
+      allState.preferences,
+    );
+    setAllState({
+      ...allState,
+      streak,
+    });
+    setAllFoods(newAllFoods.filter(filterFn));
+  };
+
+  const handleOptimisticRemoveFood = async (deletedFood: FoodEntity) => {
+    if (!allState) return;
+    console.log("OPTIMISTIC deletefood");
+    const newAllFoods = allFoods.filter((food) => food.id !== deletedFood.id);
+    const streak = await getStreakInfo(
+      newAllFoods,
+      new Date(),
+      allState.healthKitCaches,
+      allState.preferences,
+    );
+    setAllState({
+      ...allState,
+      // allFoods: newAllFoods,
+      streak,
+    });
+    setAllFoods(newAllFoods);
+  };
+
+  const setup = async (bypassCache = false) => {
+    const everything = await getEverything(bypassCache);
+    if (!everything) return;
+
+    const {
+      allFoods,
+      allQuickAdds,
+      goal,
+      preferences,
+      weight,
+      height,
+      healthKitCaches,
+      streak,
+      user,
+    } = everything;
+    setAllState({
+      // allFoods,
+      // allQuickAdds: setupQuickAdds(allQuickAdds),
+      goal,
+      preferences,
+      weight,
+      height,
+      healthKitCaches,
+      streak,
+      user,
+    });
+    setAllQuickAdds(setupQuickAdds(allQuickAdds));
+    setAllFoods(allFoods);
+    setRandomNumber(Math.random());
+  };
 
   useEffect(() => {
-    const setup = async () => {
-      const user = await getCurrentUser();
-      const {
-        allFoods,
-        allQuickAdds,
-        goal,
-        preferences,
-        weight,
-        height,
-        healthKitCaches,
-        streak,
-      } = await getEverything();
-      setAllState({
-        allFoods,
-        allQuickAdds: setupQuickAdds(allQuickAdds),
-        goal,
-        preferences,
-        weight,
-        height,
-        healthKitCaches,
-        streak,
-        user,
-      });
-    };
-    setup();
+    console.log("SETUP EFFECT RUNNING");
+    setup(true);
   }, []);
 
+  const onSubscriptionEvent = async () => {
+    console.log("onSubscriptionEvent RUNNING");
+    await setup();
+    console.log("onSubscriptionEvent COMPLETE");
+  };
   useEffect(() => {
-    const createFoodSubscription = createFoodListener(
-      async (food: FoodEntity) => {
-        if (!allState) return;
-        const newAllFoods = [...allState.allFoods, food];
-        const todaysCalories = newAllFoods
-          .filter((food) => food.day === new Date().toLocaleDateString())
-          .reduce((acc, food) => acc + food.calories, 0);
-        setTodaysCaloriesPreferences(todaysCalories);
-        const streak = await getStreakInfo(
-          newAllFoods,
-          new Date(),
-          allState.healthKitCaches,
-          allState.preferences,
-        );
-        setAllState({
-          ...allState,
-          allFoods: newAllFoods,
-          streak,
-        });
-      },
-    );
-    const updateFoodSubscription = updateFoodListener(
-      async (food: FoodEntity) => {
-        if (!allState) return;
-        const newAllFoods = allState.allFoods.map((f) =>
-          f.id === food.id ? food : f,
-        );
-        const todaysCalories = newAllFoods
-          .filter((food) => food.day === new Date().toLocaleDateString())
-          .reduce((acc, food) => acc + food.calories, 0);
-        setTodaysCaloriesPreferences(todaysCalories);
-        setAllState({
-          ...allState,
-          allFoods: newAllFoods,
-        });
-      },
-    );
-    const deleteFoodSubscription = deleteFoodListener(
-      async (deletedFood: FoodEntity) => {
-        if (!allState) return;
-        const newAllFoods = allState.allFoods.filter(
-          (food) => food.id !== deletedFood.id,
-        );
-        const streak = await getStreakInfo(
-          newAllFoods,
-          new Date(),
-          allState.healthKitCaches,
-          allState.preferences,
-        );
-        setAllState({
-          ...allState,
-          allFoods: newAllFoods,
-          streak,
-        });
-      },
-    );
-    const createGoalSubscription = createGoalListener(
-      async (goal: GoalEntity) => {
-        if (!allState) return;
-        setAllState({
-          ...allState,
-          goal,
-        });
-      },
-    );
-    const deleteGoalSubscription = deleteGoalListener(async () => {
-      if (!allState) return;
-      setAllState({
-        ...allState,
-        goal: undefined,
-      });
-    });
-    const createQuickAddSubscription = createQuickAddListener(
-      (createdQuickAdd: QuickAddEntity) => {
-        if (!allState) return;
-        const isDefault = !!allState.allQuickAdds.find((quickAdd) =>
-          quickAdd.id.startsWith("dqa-100"),
-        );
-        let quickAdds = [];
-        if (isDefault) {
-          quickAdds = setupQuickAdds([createdQuickAdd]);
-        } else {
-          const updatedQuickAdds = [...allState.allQuickAdds, createdQuickAdd];
-          quickAdds = setupQuickAdds(updatedQuickAdds);
-        }
-        setAllState({
-          ...allState,
-          allQuickAdds: quickAdds,
-        });
-      },
-    );
-    const deleteQuickAddSubscription = deleteQuickAddListener(
-      (deletedQuickAdd: QuickAddEntity) => {
-        if (!allState) return;
-        const updatedQuickAdds = allState.allQuickAdds.filter(
-          (quickAdd) => quickAdd.id !== deletedQuickAdd.id,
-        );
-        const quickAdds = setupQuickAdds(updatedQuickAdds);
-        setAllState({
-          ...allState,
-          allQuickAdds: quickAdds,
-        });
-        setupQuickAdds(updatedQuickAdds);
-      },
-    );
-    const createPreferencesSubscription = createPreferencesListener(
-      async (preferences: PreferencesEntity) => {
-        if (!allState) return;
-        const streak = await getStreakInfo(
-          allState.allFoods,
-          new Date(),
-          allState.healthKitCaches,
-          preferences,
-        );
-        setAllState({
-          ...allState,
-          preferences,
-          streak,
-        });
-      },
-    );
-    const updatePreferencesSubscription = updatePreferencesListener(
-      async (preferences: PreferencesEntity) => {
-        if (!allState) return;
-        const streak = await getStreakInfo(
-          allState.allFoods,
-          new Date(),
-          allState.healthKitCaches,
-          preferences,
-        );
-        setAllState({
-          ...allState,
-          preferences,
-          streak,
-        });
-      },
-    );
-
-    const createWeightSubscription = createWeightListener(
-      async (weight: WeightEntity) => {
-        if (!allState) return;
-        setAllState({
-          ...allState,
-          weight,
-        });
-      },
-    );
-    const createHeightSubscription = createHeightListener(
-      async (height: HeightEntity) => {
-        if (!allState) return;
-        setAllState({
-          ...allState,
-          height,
-        });
-      },
-    );
+    console.log("SUBSCRIPTIONS EFFECT RUNNING");
+    const createFoodSubscription = createFoodListener(onSubscriptionEvent);
+    const updateFoodSubscription = updateFoodListener(onSubscriptionEvent);
+    const deleteFoodSubscription = deleteFoodListener(onSubscriptionEvent);
+    const createGoalSubscription = createGoalListener(onSubscriptionEvent);
+    const deleteGoalSubscription = deleteGoalListener(onSubscriptionEvent);
+    const createQuickAddSubscription =
+      createQuickAddListener(onSubscriptionEvent);
+    const deleteQuickAddSubscription =
+      deleteQuickAddListener(onSubscriptionEvent);
+    const createPreferencesSubscription =
+      createPreferencesListener(onSubscriptionEvent);
+    const updatePreferencesSubscription =
+      updatePreferencesListener(onSubscriptionEvent);
+    const createWeightSubscription = createWeightListener(onSubscriptionEvent);
+    const createHeightSubscription = createHeightListener(onSubscriptionEvent);
     App.addListener("appStateChange", async ({ isActive }) => {
-      if (isActive && allState) {
-        const streak = await getStreakInfo(
-          allState.allFoods,
-          new Date(),
-          allState.healthKitCaches,
-          allState.preferences,
-        );
-        setAllState({
-          ...allState,
-          streak,
-        });
-        setToggleListeners(!toggleListeners);
+      if (isActive) {
+        setup();
+        setRandomNumber(Math.random());
+      }
+      if (!isActive) {
+        const todaysCalories = allFoods
+          .filter((food) => food.day === new Date().toLocaleDateString())
+          .reduce((acc, food) => acc + food.calories, 0);
+        setTodaysCaloriesPreferences(todaysCalories);
       }
     });
     return () => {
@@ -341,20 +263,19 @@ export default function TabsView() {
       ]);
       App.removeAllListeners();
     };
-  }, [allState, toggleListeners]);
+  }, [randomNumber]);
 
   if (!allState) return <Loader variation="linear" />;
-  const todaysCalories = allState.allFoods
-    .filter((food) => food.day === new Date().toLocaleDateString())
-    .reduce((acc, food) => acc + food.calories, 0);
-  setTodaysCaloriesPreferences(todaysCalories);
-
   return (
     <>
       <Tabs
         justifyContent="flex-start"
         spacing="equal"
-        onValueChange={() => setRandomNumber(Math.random())}
+        onValueChange={(value: string) => {
+          if (value === "Chat") {
+            setRandomNumber(Math.random());
+          }
+        }}
         defaultValue="Calories"
         items={[
           {
@@ -362,13 +283,17 @@ export default function TabsView() {
             value: "Calories",
             content: (
               <CaloriePage
-                allFoods={allState.allFoods}
-                quickAdds={allState.allQuickAdds}
+                allFoods={allFoods}
+                quickAdds={allQuickAdds}
                 goal={allState.goal}
                 preferences={allState.preferences}
                 streakInfo={allState.streak!}
                 dayInfo={allState.streak!.today}
                 healthKitCaches={allState.healthKitCaches}
+                onAdd={(food: FoodEntity) =>
+                  handleOptimisticAddFood(food, () => true)
+                }
+                onRemove={handleOptimisticRemoveFood}
               />
             ),
           },
@@ -389,7 +314,7 @@ export default function TabsView() {
             value: "Stats",
             content: (
               <StatsPage
-                allFoods={allState.allFoods}
+                allFoods={allFoods}
                 streakInfo={allState.streak}
                 preferences={allState.preferences}
                 healthKitCaches={allState.healthKitCaches}
@@ -414,7 +339,7 @@ export default function TabsView() {
             content: (
               <SettingsPage
                 preferences={allState.preferences}
-                quickAdds={allState.allQuickAdds}
+                quickAdds={allQuickAdds}
               />
             ),
           },

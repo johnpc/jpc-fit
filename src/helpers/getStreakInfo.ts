@@ -25,6 +25,7 @@ export type StreakInfo = {
   fourDaysAgo: DayInfo;
   fiveDaysAgo: DayInfo;
   sixDaysAgo: DayInfo;
+  allStreakDays: DayInfo[];
 };
 
 export const getDayInfo = async (
@@ -67,24 +68,24 @@ export const getStreakInfo = async (
   let trackedFoodsOnDay: FoodEntity[] = [];
   let lastCheckedDay = today;
   let itr = 0;
+  const allStreakDays: DayInfo[] = [];
   do {
     const dayToCheck = subDays(today, itr);
     lastCheckedDay = dayToCheck;
     const dayString = dayToCheck.toLocaleDateString();
     trackedFoodsOnDay = allFoods.filter((food) => food.day === dayString);
+    const dayInfo = await getDayInfo(
+      trackedFoodsOnDay,
+      dayToCheck,
+      healthKitCaches,
+      preferences,
+    );
+    allStreakDays.push(dayInfo);
     currentStreakNetCalories +=
       trackedFoodsOnDay.reduce(
         (sum: number, food: FoodEntity) => sum + food.calories,
         0,
-      ) -
-      (
-        await getDayInfo(
-          trackedFoodsOnDay,
-          dayToCheck,
-          healthKitCaches,
-          preferences,
-        )
-      ).burnedCalories;
+      ) - dayInfo.burnedCalories;
     if (trackedFoodsOnDay.length) {
       currentStreak++;
     }
@@ -134,5 +135,6 @@ export const getStreakInfo = async (
       healthKitCaches,
       preferences,
     ),
+    allStreakDays,
   };
 };

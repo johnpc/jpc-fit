@@ -1,5 +1,5 @@
 import { StorageManager, StorageImage } from "@aws-amplify/ui-react-storage";
-import { Card, Button, Accordion } from "@aws-amplify/ui-react";
+import { Card, Button, Accordion, Text } from "@aws-amplify/ui-react";
 import { FoodEntity, updateFood } from "../data/entities";
 import FoodUpdateForm from "../ui-components/FoodUpdateForm";
 import { useState } from "react";
@@ -40,6 +40,7 @@ export const FoodDetailPage = (props: {
         isResumable
         onUploadSuccess={handleFileUpload}
       />
+      <Text>{props.food.id}</Text>
       <FoodUpdateForm
         food={props.food}
         overrides={{

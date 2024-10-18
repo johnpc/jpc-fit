@@ -3,7 +3,7 @@ import { generateClient } from "aws-amplify/api";
 import { Subscription } from "rxjs";
 import config from "../../amplify_outputs.json";
 import { Schema } from "../../amplify/data/resource";
-import { getCurrentUser } from "aws-amplify/auth";
+import { AuthUser, getCurrentUser } from "aws-amplify/auth";
 import { getStreakInfo, StreakInfo } from "../helpers/getStreakInfo";
 Amplify.configure(config);
 const client = generateClient<Schema>({
@@ -379,16 +379,60 @@ export const deleteFood = async (food: FoodEntity) => {
   await client.models.Food.delete({ id: food.id });
 };
 
-export const getEverything = async (): Promise<{
-  allFoods: FoodEntity[];
-  allQuickAdds: QuickAddEntity[];
-  goal?: GoalEntity;
-  preferences: PreferencesEntity;
-  weight: WeightEntity;
-  height: HeightEntity;
-  healthKitCaches: HealthKitCacheEntity[];
-  streak: StreakInfo;
-}> => {
+export const refreshEverythingCache = () => {
+  getEverything();
+};
+
+export const getEverythingCache = ():
+  | {
+      allFoods: FoodEntity[];
+      allQuickAdds: QuickAddEntity[];
+      goal?: GoalEntity;
+      preferences: PreferencesEntity;
+      weight: WeightEntity;
+      height: HeightEntity;
+      healthKitCaches: HealthKitCacheEntity[];
+      streak: StreakInfo;
+      user: AuthUser;
+    }
+  | undefined => {
+  const json = localStorage.getItem("everything");
+  if (!json) return undefined;
+  return JSON.parse(json);
+};
+
+const sleep = (durationMs: number) =>
+  new Promise((resolve) => setTimeout(resolve, durationMs));
+
+export const getEverything = async (
+  overrideLock = false,
+): Promise<
+  | {
+      allFoods: FoodEntity[];
+      allQuickAdds: QuickAddEntity[];
+      goal?: GoalEntity;
+      preferences: PreferencesEntity;
+      weight: WeightEntity;
+      height: HeightEntity;
+      healthKitCaches: HealthKitCacheEntity[];
+      streak: StreakInfo;
+      user: AuthUser;
+    }
+  | undefined
+> => {
+  let lock = localStorage.getItem("everything_lock");
+  let count = 0;
+  if (!overrideLock) {
+    while (lock === "locked") {
+      await sleep(1000);
+      count += 1;
+      if (count > 3) break;
+      lock = localStorage.getItem("everything_lock");
+    }
+  }
+
+  localStorage.setItem("everything_lock", "locked");
+
   const [
     allFoods,
     allQuickAdds,
@@ -412,7 +456,9 @@ export const getEverything = async (): Promise<{
     healthKitCaches,
     preferences,
   );
-  return {
+  const user = await getCurrentUser();
+
+  const everything = {
     allFoods,
     allQuickAdds,
     goal,
@@ -421,7 +467,12 @@ export const getEverything = async (): Promise<{
     height: height ?? { currentHeight: 0 },
     healthKitCaches,
     streak,
+    user,
   };
+
+  localStorage.setItem("everything", JSON.stringify(everything));
+  localStorage.setItem("everything_lock", "unlocked");
+  return everything;
 };
 
 export const createFoodListener = (fn: (food: FoodEntity) => void) => {

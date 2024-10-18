@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { StreakInfo, getStreakInfo } from "../../helpers/getStreakInfo";
+import { useState } from "react";
+import { DayInfo, StreakInfo } from "../../helpers/getStreakInfo";
 import {
   FoodEntity,
   HealthKitCacheEntity,
@@ -18,35 +18,42 @@ import {
 import { addDays, subDays } from "date-fns";
 import { ArrowBackIos, ArrowForwardIos } from "@mui/icons-material";
 
+const dateToDayString = (date: Date) => {
+  const [d, m] = date.toLocaleDateString().split("/");
+  return [d, m].join("/");
+}
+
 export default function WeeklyOverview(props: {
   allFoods: FoodEntity[];
   streakInfo: StreakInfo;
   preferences: PreferencesEntity;
   healthKitCaches: HealthKitCacheEntity[];
 }) {
-  const [streakInfo, setStreakInfo] = useState<StreakInfo>(props.streakInfo);
   const [date, setDate] = useState<Date>(new Date());
+  const defaultDayInfo: DayInfo = {
+    day: date.toLocaleDateString(),
+    tracked: false,
+    consumedCalories: 0,
+    burnedCalories: 0,
+    steps: 0,
+    activeCalories: 0,
+    baseCalories: 0,
+  };
+  const streakInfo: StreakInfo = {
+    ...props.streakInfo,
+    today: props.streakInfo.allStreakDays?.find(day => day.day === dateToDayString(date)) ?? {...defaultDayInfo, day: dateToDayString(date)},
+    yesterday: props.streakInfo.allStreakDays?.find(day => day.day === dateToDayString(subDays(date, 1))) ?? {...defaultDayInfo, day: dateToDayString(subDays(date, 1))},
+    twoDaysAgo: props.streakInfo.allStreakDays?.find(day => day.day === dateToDayString(subDays(date, 2))) ?? {...defaultDayInfo, day: dateToDayString(subDays(date, 2))},
+    threeDaysAgo: props.streakInfo.allStreakDays?.find(day => day.day === dateToDayString(subDays(date, 3))) ?? {...defaultDayInfo, day: dateToDayString(subDays(date, 3))},
+    fourDaysAgo: props.streakInfo.allStreakDays?.find(day => day.day === dateToDayString(subDays(date, 4))) ?? {...defaultDayInfo, day: dateToDayString(subDays(date, 4))},
+    fiveDaysAgo: props.streakInfo.allStreakDays?.find(day => day.day === dateToDayString(subDays(date, 5))) ?? {...defaultDayInfo, day: dateToDayString(subDays(date, 5))},
+    sixDaysAgo: props.streakInfo.allStreakDays?.find(day => day.day === dateToDayString(subDays(date, 6))) ?? {...defaultDayInfo, day: dateToDayString(subDays(date, 6))},
+  }
 
-  useEffect(() => {
-    const setup = async () => {
-      if (props.streakInfo.today.day !== date.toLocaleDateString()) {
-        const s = await getStreakInfo(
-          props.allFoods,
-          date,
-          props.healthKitCaches,
-          props.preferences,
-        );
-        setStreakInfo(s);
-      }
-    };
-    setup();
-  }, [
-    props.allFoods,
-    date,
-    props.preferences,
-    props.streakInfo.today,
-    props.healthKitCaches,
-  ]);
+
+  console.log({streakInfo, pStreakInfo: props.streakInfo})
+
+  // const streakInfo = props.streakInfo;
 
   const { burnedCalories, consumedCalories } = (
     Object.keys(streakInfo) as unknown as ("today" | "yesterday")[]

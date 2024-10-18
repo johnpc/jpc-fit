@@ -8,7 +8,6 @@ import {
   Heading,
   Text,
   Button,
-  useTheme,
 } from "@aws-amplify/ui-react";
 import { useEffect, useState } from "react";
 import {
@@ -18,7 +17,6 @@ import {
   PreferencesEntity,
   QuickAddEntity,
   createGoal,
-  deleteFood,
   deleteGoal,
 } from "../../data/entities";
 import AddCalorieFab from "./AddCalorieFab";
@@ -31,6 +29,7 @@ import {
 import { addDays, subDays } from "date-fns";
 import { DayInfo, StreakInfo, getDayInfo } from "../../helpers/getStreakInfo";
 import { FoodDetailPage } from "../FoodDetailPage";
+import { FoodTableRow } from "./FoodTableRow";
 
 export const CalorieData = (props: {
   goal?: GoalEntity;
@@ -40,8 +39,9 @@ export const CalorieData = (props: {
   streakInfo: StreakInfo;
   dayInfo: DayInfo;
   healthKitCaches: HealthKitCacheEntity[];
+  onAdd: (food: FoodEntity) => void;
+  onRemove: (food: FoodEntity) => void;
 }) => {
-  const { tokens } = useTheme();
   const [foodDetail, setFoodDetail] = useState<string>();
   const [date, setDate] = useState<Date>(new Date());
   const [dayInfo, setDayInfo] = useState<DayInfo>(props.dayInfo);
@@ -54,6 +54,7 @@ export const CalorieData = (props: {
   };
 
   useEffect(() => {
+    console.log("CalorieData Effect Running");
     const setup = async () => {
       if (date.toLocaleDateString() === props.streakInfo.today.day) {
         setDayInfo(props.streakInfo.today);
@@ -90,13 +91,7 @@ export const CalorieData = (props: {
       }
     };
     setup();
-  }, [
-    date,
-    props.streakInfo,
-    props.allFoods,
-    props.preferences,
-    props.healthKitCaches,
-  ]);
+  }, [date]);
 
   const handleEditGoal = async () => {
     const newGoal = parseInt(prompt("Enter new goal")!);
@@ -245,26 +240,13 @@ export const CalorieData = (props: {
             </TableHead>
             <TableBody>
               {foods.map((food) => (
-                <TableRow key={food.id}>
-                  <TableCell>
-                    {food.createdAt
-                      .toLocaleTimeString()
-                      .split(":")
-                      .slice(0, 2)
-                      .join(":")}
-                  </TableCell>
-                  <TableCell
-                    color={tokens.colors.primary[60]}
-                    onClick={() => setFoodDetail(food.id)}
-                  >
-                    {food.name ?? "No name"}
-                  </TableCell>
-                  <TableCell>{food.calories}</TableCell>
-                  {props.preferences?.hideProtein ? null : (
-                    <TableCell>{food.protein ?? 0}g</TableCell>
-                  )}
-                  <TableCell onClick={() => deleteFood(food)}>❌</TableCell>
-                </TableRow>
+                <FoodTableRow
+                  key={food.id}
+                  food={food}
+                  preferences={props.preferences}
+                  setFoodDetail={setFoodDetail}
+                  onRemove={props.onRemove}
+                />
               ))}
             </TableBody>
           </Table>
@@ -274,6 +256,7 @@ export const CalorieData = (props: {
         preferences={props.preferences}
         quickAdds={props.quickAdds}
         date={date}
+        onAdd={props.onAdd}
       />
     </>
   );

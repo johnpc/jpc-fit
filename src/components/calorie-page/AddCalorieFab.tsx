@@ -4,6 +4,7 @@ import SpeedDial from "@mui/material/SpeedDial";
 import SpeedDialIcon from "@mui/material/SpeedDialIcon";
 import SpeedDialAction from "@mui/material/SpeedDialAction";
 import {
+  FoodEntity,
   PreferencesEntity,
   QuickAddEntity,
   createFood,
@@ -15,12 +16,13 @@ export default function AddCalorieFab(props: {
   preferences?: PreferencesEntity;
   quickAdds: QuickAddEntity[];
   date: Date;
+  onAdd: (food: FoodEntity) => void;
 }) {
   const [open, setOpen] = React.useState(false);
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
-  const handleAction = async (quickAdd: QuickAddEntity) => {
+  const handleAction = (quickAdd: QuickAddEntity) => {
     let calorieAmount = 0;
     let proteinAmount = quickAdd.protein ?? 0;
     if (quickAdd.id === customQuickAdd.id) {
@@ -42,8 +44,22 @@ export default function AddCalorieFab(props: {
       calorieAmount = quickAdd.calories;
     }
 
-    await createFood(quickAdd.name, calorieAmount, proteinAmount, props.date);
     handleClose();
+    // Prioritize closing the FAB
+    setTimeout(() => {
+      props.onAdd({
+        id: "optimisticAdd",
+        createdAt: new Date(),
+        name: quickAdd.name,
+        calories: calorieAmount,
+        protein: proteinAmount,
+        day: props.date.toLocaleDateString(),
+      });
+    }, 250);
+
+    setTimeout(async () => {
+      await createFood(quickAdd.name, calorieAmount, proteinAmount, props.date);
+    }, 500);
   };
 
   const css = `
@@ -67,9 +83,35 @@ export default function AddCalorieFab(props: {
         onClose={handleClose}
         onOpen={handleOpen}
         open={open}
+        transitionDuration={{
+          // enter: 10000,
+          exit: 10000,
+          appear: 10000,
+        }}
+        TransitionProps={{
+          enter: false,
+          exit: false,
+          appear: false,
+        }}
+        FabProps={{
+          variant: "circular",
+          size: "large",
+          disabled: false,
+          disableFocusRipple: true,
+          disableRipple: true,
+          disableTouchRipple: true,
+        }}
       >
         {props.quickAdds.map((action) => (
           <SpeedDialAction
+            FabProps={{
+              variant: "extended",
+              size: "small",
+              disabled: false,
+              disableFocusRipple: true,
+              disableRipple: true,
+              disableTouchRipple: true,
+            }}
             key={action.name}
             style={{ textAlign: "right", width: "100%" }}
             icon={findIcon(action.icon)}

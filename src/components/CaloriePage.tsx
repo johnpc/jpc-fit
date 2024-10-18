@@ -16,6 +16,8 @@ export default function CaloriePage(props: {
   streakInfo: StreakInfo;
   dayInfo: DayInfo;
   healthKitCaches: HealthKitCacheEntity[];
+  onAdd: (food: FoodEntity) => void;
+  onRemove: (food: FoodEntity) => void;
 }) {
   return (
     <>
