@@ -12,7 +12,8 @@
     "prod-config": "ampx generate outputs --app-id d14lkx3uodtpjt --branch main --profile personal",
     "ios": "npm run prod-config && npm run dev-ios",
     "dev-ios": "npm run build && cap sync && cap copy ios && cap open ios",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "analyze": "source-map-explorer 'dist/assets/*.js'"
   },
   "overrides": {
     "@aws-amplify/data-construct": "ai",
@@ -58,6 +59,7 @@
     "husky": "^8.0.0",
     "lint-staged": "^15.2.2",
     "prettier": "^3.2.5",
+    "source-map-explorer": "^2.5.3",
     "tsx": "^4.7.2",
     "typescript": "^5.4.4",
     "vite": "^5.2.0"

@@ -9,11 +9,13 @@ import { getHealthKitData } from "./getHealthKitData";
 export type DayInfo = {
   tracked: boolean;
   day: string;
+  dateString: string;
   consumedCalories: number;
   burnedCalories: number;
   activeCalories: number;
   baseCalories: number;
   steps: number;
+  netCalories: number;
 };
 export type StreakInfo = {
   currentStreakDays: number;
@@ -34,6 +36,12 @@ export const getDayInfo = async (
   healthKitCaches: HealthKitCacheEntity[],
   preferences?: PreferencesEntity,
 ): Promise<DayInfo> => {
+  const dayInfoCacheKey = `dayinfo-${allFoods.length}-${day.getTime()}`;
+  const stored = localStorage.getItem(dayInfoCacheKey);
+  if (stored) {
+    return JSON.parse(stored);
+  }
+
   const healthKitData = await getHealthKitData(
     day,
     healthKitCaches,
@@ -47,7 +55,7 @@ export const getDayInfo = async (
   const burnedCalories =
     healthKitData.activeCalories + healthKitData.baseCalories;
   const [d, m] = day.toLocaleDateString().split("/");
-  return {
+  const dayInfo = {
     tracked,
     day: [d, m].join("/"),
     consumedCalories,
@@ -55,7 +63,13 @@ export const getDayInfo = async (
     steps: healthKitData.steps,
     activeCalories: healthKitData.activeCalories,
     baseCalories: healthKitData.baseCalories,
+    dateString: dayString,
+    netCalories: consumedCalories - burnedCalories,
   };
+  if (day.toLocaleDateString() != new Date().toLocaleDateString()) {
+    localStorage.setItem(dayInfoCacheKey, JSON.stringify(dayInfo));
+  }
+  return dayInfo;
 };
 export const getStreakInfo = async (
   allFoods: FoodEntity[],
@@ -63,78 +77,81 @@ export const getStreakInfo = async (
   healthKitCaches: HealthKitCacheEntity[],
   preferences?: PreferencesEntity,
 ): Promise<StreakInfo> => {
-  let currentStreak = 0;
-  let currentStreakNetCalories = 0;
-  let trackedFoodsOnDay: FoodEntity[] = [];
-  let lastCheckedDay = today;
+  const cachedStreak: DayInfo[] = localStorage.getItem("streak")
+    ? JSON.parse(localStorage.getItem("streak")!)
+    : [];
+  const oldestFood = allFoods
+    .sort(
+      (a: FoodEntity, b: FoodEntity) =>
+        a.createdAt.getTime() - b.createdAt.getTime(),
+    )
+    .find((t) => t);
+  const daysToCheck: Date[] = [];
+  let day = today;
   let itr = 0;
-  const allStreakDays: DayInfo[] = [];
   do {
-    const dayToCheck = subDays(today, itr);
-    lastCheckedDay = dayToCheck;
+    day = subDays(today, itr);
+    const cachedDay = cachedStreak.find(
+      (d) => d.dateString === day.toLocaleDateString(),
+    );
+    if (!cachedDay || itr === 0) {
+      daysToCheck.push(day);
+    }
+    itr++;
+  } while (oldestFood && oldestFood.createdAt.getTime() < day.getTime());
+
+  const dayInfoPromises = daysToCheck.map(async (dayToCheck) => {
     const dayString = dayToCheck.toLocaleDateString();
-    trackedFoodsOnDay = allFoods.filter((food) => food.day === dayString);
+    const trackedFoodsOnDay = allFoods.filter((food) => food.day === dayString);
     const dayInfo = await getDayInfo(
       trackedFoodsOnDay,
       dayToCheck,
       healthKitCaches,
       preferences,
     );
-    allStreakDays.push(dayInfo);
-    currentStreakNetCalories +=
-      trackedFoodsOnDay.reduce(
-        (sum: number, food: FoodEntity) => sum + food.calories,
-        0,
-      ) - dayInfo.burnedCalories;
-    if (trackedFoodsOnDay.length) {
-      currentStreak++;
-    }
-    itr++;
-  } while (
-    trackedFoodsOnDay.length ||
-    lastCheckedDay.toDateString() === today.toDateString()
-  );
+    return dayInfo;
+  });
+  const allStreakDays = [
+    ...(await Promise.all(dayInfoPromises)),
+    ...cachedStreak,
+  ];
+  localStorage.setItem("streak", JSON.stringify(allStreakDays));
 
-  return {
-    currentStreakDays: currentStreak,
-    currentStreakNetCalories,
-    today: await getDayInfo(allFoods, today, healthKitCaches, preferences),
-    yesterday: await getDayInfo(
-      allFoods,
-      subDays(today, 1),
-      healthKitCaches,
-      preferences,
+  const streakInfo = {
+    currentStreakDays: allStreakDays.length,
+    currentStreakNetCalories: allStreakDays.reduce(
+      (acc, dayInfo) => acc + dayInfo.netCalories,
+      0,
     ),
-    twoDaysAgo: await getDayInfo(
-      allFoods,
-      subDays(today, 2),
-      healthKitCaches,
-      preferences,
-    ),
-    threeDaysAgo: await getDayInfo(
-      allFoods,
-      subDays(today, 3),
-      healthKitCaches,
-      preferences,
-    ),
-    fourDaysAgo: await getDayInfo(
-      allFoods,
-      subDays(today, 4),
-      healthKitCaches,
-      preferences,
-    ),
-    fiveDaysAgo: await getDayInfo(
-      allFoods,
-      subDays(today, 5),
-      healthKitCaches,
-      preferences,
-    ),
-    sixDaysAgo: await getDayInfo(
-      allFoods,
-      subDays(today, 6),
-      healthKitCaches,
-      preferences,
-    ),
+    today: allStreakDays.find(
+      (dayInfo) => dayInfo.dateString === today.toLocaleDateString(),
+    )!,
+    yesterday: allStreakDays.find(
+      (dayInfo) =>
+        dayInfo.dateString === subDays(today, 1).toLocaleDateString(),
+    )!,
+    twoDaysAgo: allStreakDays.find(
+      (dayInfo) =>
+        dayInfo.dateString === subDays(today, 2).toLocaleDateString(),
+    )!,
+    threeDaysAgo: allStreakDays.find(
+      (dayInfo) =>
+        dayInfo.dateString === subDays(today, 3).toLocaleDateString(),
+    )!,
+    fourDaysAgo: allStreakDays.find(
+      (dayInfo) =>
+        dayInfo.dateString === subDays(today, 4).toLocaleDateString(),
+    )!,
+    fiveDaysAgo: allStreakDays.find(
+      (dayInfo) =>
+        dayInfo.dateString === subDays(today, 5).toLocaleDateString(),
+    )!,
+    sixDaysAgo: allStreakDays.find(
+      (dayInfo) =>
+        dayInfo.dateString === subDays(today, 6).toLocaleDateString(),
+    )!,
     allStreakDays,
   };
+  console.log({ streakInfo });
+  return streakInfo;
 };

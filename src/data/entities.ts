@@ -450,6 +450,7 @@ export const getEverything = async (
     getHeight(),
     listHealthKitCaches(),
   ]);
+
   const streak = await getStreakInfo(
     allFoods,
     new Date(),

@@ -38,6 +38,8 @@ export default function WeeklyOverview(props: {
     steps: 0,
     activeCalories: 0,
     baseCalories: 0,
+    netCalories: 0,
+    dateString: date.toLocaleDateString(),
   };
   const streakInfo: StreakInfo = {
     ...props.streakInfo,
