@@ -15,9 +15,10 @@ import {
 import { App as CapacitorApp } from "@capacitor/app";
 import { Capacitor } from "@capacitor/core";
 import TabsView from "./components/TabsView";
+import { getCache, HAS_PERMISSION_KEY } from "./data/cache";
 function App() {
   const [permission, setPermission] = useState<boolean>(
-    localStorage.getItem("hasPermission") === "hasPermission",
+    getCache(HAS_PERMISSION_KEY) === HAS_PERMISSION_KEY,
   );
   const setup = async () => {
     const p = await hasPermission();

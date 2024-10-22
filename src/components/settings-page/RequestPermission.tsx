@@ -2,6 +2,7 @@ import { Card, Button, Label } from "@aws-amplify/ui-react";
 import { LocalNotifications } from "@capacitor/local-notifications";
 import { CapacitorHealthkit } from "@perfood/capacitor-healthkit";
 import { useState } from "react";
+import { getCache, HAS_PERMISSION_KEY, setCache } from "../../data/cache";
 
 export const RequestPermission = (props: {
   onPermissionGranted: () => Promise<void>;
@@ -44,7 +45,7 @@ export const RequestPermission = (props: {
         },
       ],
     });
-    localStorage.setItem("hasPermission", "hasPermission");
+    setCache(HAS_PERMISSION_KEY, HAS_PERMISSION_KEY);
     await props.onPermissionGranted();
     setLoading(false);
   };
@@ -66,7 +67,7 @@ export const RequestPermission = (props: {
         app. Grant permission?
       </Label>
       <br />
-      {!localStorage.getItem("hasPermission") ? (
+      {!getCache(HAS_PERMISSION_KEY) ? (
         <Button
           variation="primary"
           isLoading={loading}

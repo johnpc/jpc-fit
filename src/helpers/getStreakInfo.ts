@@ -5,6 +5,7 @@ import {
 } from "../data/entities";
 import { subDays } from "date-fns";
 import { getHealthKitData } from "./getHealthKitData";
+import { getCache, setCache, STREAK_KEY } from "../data/cache";
 
 export type DayInfo = {
   tracked: boolean;
@@ -37,7 +38,7 @@ export const getDayInfo = async (
   preferences?: PreferencesEntity,
 ): Promise<DayInfo> => {
   const dayInfoCacheKey = `dayinfo-${allFoods.length}-${day.getTime()}`;
-  const stored = localStorage.getItem(dayInfoCacheKey);
+  const stored = getCache(dayInfoCacheKey);
   if (stored) {
     return JSON.parse(stored);
   }
@@ -67,7 +68,7 @@ export const getDayInfo = async (
     netCalories: consumedCalories - burnedCalories,
   };
   if (day.toLocaleDateString() != new Date().toLocaleDateString()) {
-    localStorage.setItem(dayInfoCacheKey, JSON.stringify(dayInfo));
+    setCache(dayInfoCacheKey, JSON.stringify(dayInfo));
   }
   return dayInfo;
 };
@@ -77,29 +78,30 @@ export const getStreakInfo = async (
   healthKitCaches: HealthKitCacheEntity[],
   preferences?: PreferencesEntity,
 ): Promise<StreakInfo> => {
-  const cachedStreak: DayInfo[] = localStorage.getItem("streak")
-    ? JSON.parse(localStorage.getItem("streak")!)
+  console.log({ allFoods });
+  const cachedStreak: DayInfo[] = getCache(STREAK_KEY)
+    ? JSON.parse(getCache(STREAK_KEY)!)
     : [];
-  const oldestFood = allFoods
-    .sort(
-      (a: FoodEntity, b: FoodEntity) =>
-        a.createdAt.getTime() - b.createdAt.getTime(),
-    )
-    .find((t) => t);
+
   const daysToCheck: Date[] = [];
+
+  const foodDays = new Set(allFoods.map((food) => food.day));
   let day = today;
+  let dayString = day.toLocaleDateString();
+
   let itr = 0;
   do {
     day = subDays(today, itr);
+    dayString = day.toLocaleDateString();
     const cachedDay = cachedStreak.find(
       (d) => d.dateString === day.toLocaleDateString(),
     );
-    if (!cachedDay || itr === 0) {
+    console.log({ cachedDay, foodDays, dayString });
+    if ((!cachedDay && foodDays.has(dayString)) || itr === 0) {
       daysToCheck.push(day);
     }
     itr++;
-  } while (oldestFood && oldestFood.createdAt.getTime() < day.getTime());
-
+  } while (foodDays.has(dayString) || itr === 1);
   const dayInfoPromises = daysToCheck.map(async (dayToCheck) => {
     const dayString = dayToCheck.toLocaleDateString();
     const trackedFoodsOnDay = allFoods.filter((food) => food.day === dayString);
@@ -115,7 +117,7 @@ export const getStreakInfo = async (
     ...(await Promise.all(dayInfoPromises)),
     ...cachedStreak,
   ];
-  localStorage.setItem("streak", JSON.stringify(allStreakDays));
+  setCache(STREAK_KEY, JSON.stringify(allStreakDays));
 
   const streakInfo = {
     currentStreakDays: allStreakDays.length,

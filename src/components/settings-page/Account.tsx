@@ -1,5 +1,6 @@
 import { Button, Card, useTheme } from "@aws-amplify/ui-react";
 import { deleteUser, signOut } from "aws-amplify/auth";
+import { clearCache } from "../../data/cache";
 
 export default function Account() {
   const { tokens } = useTheme();
@@ -16,8 +17,14 @@ export default function Account() {
   const onSignOut = async () => {
     await signOut();
   };
+  const onClearCache = async () => {
+    await clearCache();
+  };
   return (
     <Card textAlign={"center"}>
+      <Button margin={tokens.space.medium} onClick={onClearCache}>
+        Clear Cache
+      </Button>{" "}
       <Button
         margin={tokens.space.medium}
         variation="warning"

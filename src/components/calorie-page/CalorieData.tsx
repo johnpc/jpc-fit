@@ -53,6 +53,7 @@ export const CalorieData = (props: {
     setFoodDetail(undefined);
   };
 
+  console.log({ s: props.streakInfo });
   useEffect(() => {
     console.log("CalorieData Effect Running");
     const setup = async () => {

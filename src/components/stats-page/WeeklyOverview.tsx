@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { DayInfo, StreakInfo } from "../../helpers/getStreakInfo";
+import { StreakInfo } from "../../helpers/getStreakInfo";
 import {
   FoodEntity,
   HealthKitCacheEntity,
@@ -18,42 +18,63 @@ import {
 import { addDays, subDays } from "date-fns";
 import { ArrowBackIos, ArrowForwardIos } from "@mui/icons-material";
 
-const dateToDayString = (date: Date) => {
+export const dateToDayString = (date: Date) => {
   const [d, m] = date.toLocaleDateString().split("/");
   return [d, m].join("/");
-}
+};
+
+export const defaultDayInfo = (date: Date) => ({
+  day: dateToDayString(date),
+  tracked: false,
+  consumedCalories: 0,
+  burnedCalories: 0,
+  steps: 0,
+  activeCalories: 0,
+  baseCalories: 0,
+  netCalories: 0,
+  dateString: date.toLocaleDateString(),
+});
 
 export default function WeeklyOverview(props: {
   allFoods: FoodEntity[];
-  streakInfo: StreakInfo;
+  streakInfo?: StreakInfo;
   preferences: PreferencesEntity;
   healthKitCaches: HealthKitCacheEntity[];
 }) {
   const [date, setDate] = useState<Date>(new Date());
-  const defaultDayInfo: DayInfo = {
-    day: date.toLocaleDateString(),
-    tracked: false,
-    consumedCalories: 0,
-    burnedCalories: 0,
-    steps: 0,
-    activeCalories: 0,
-    baseCalories: 0,
-    netCalories: 0,
-    dateString: date.toLocaleDateString(),
-  };
+
   const streakInfo: StreakInfo = {
-    ...props.streakInfo,
-    today: props.streakInfo.allStreakDays?.find(day => day.day === dateToDayString(date)) ?? {...defaultDayInfo, day: dateToDayString(date)},
-    yesterday: props.streakInfo.allStreakDays?.find(day => day.day === dateToDayString(subDays(date, 1))) ?? {...defaultDayInfo, day: dateToDayString(subDays(date, 1))},
-    twoDaysAgo: props.streakInfo.allStreakDays?.find(day => day.day === dateToDayString(subDays(date, 2))) ?? {...defaultDayInfo, day: dateToDayString(subDays(date, 2))},
-    threeDaysAgo: props.streakInfo.allStreakDays?.find(day => day.day === dateToDayString(subDays(date, 3))) ?? {...defaultDayInfo, day: dateToDayString(subDays(date, 3))},
-    fourDaysAgo: props.streakInfo.allStreakDays?.find(day => day.day === dateToDayString(subDays(date, 4))) ?? {...defaultDayInfo, day: dateToDayString(subDays(date, 4))},
-    fiveDaysAgo: props.streakInfo.allStreakDays?.find(day => day.day === dateToDayString(subDays(date, 5))) ?? {...defaultDayInfo, day: dateToDayString(subDays(date, 5))},
-    sixDaysAgo: props.streakInfo.allStreakDays?.find(day => day.day === dateToDayString(subDays(date, 6))) ?? {...defaultDayInfo, day: dateToDayString(subDays(date, 6))},
-  }
+    currentStreakDays: props.streakInfo?.allStreakDays?.length || 0,
+    currentStreakNetCalories:
+      props.streakInfo?.allStreakDays?.reduce(
+        (acc, day) => acc + day.netCalories,
+        0,
+      ) || 0,
+    allStreakDays: props.streakInfo?.allStreakDays || [],
+    today: props.streakInfo?.allStreakDays?.find(
+      (day) => day.day === dateToDayString(date),
+    ) ?? { ...defaultDayInfo(date) },
+    yesterday: props.streakInfo?.allStreakDays?.find(
+      (day) => day.day === dateToDayString(subDays(date, 1)),
+    ) ?? { ...defaultDayInfo(subDays(date, 1)) },
+    twoDaysAgo: props.streakInfo?.allStreakDays?.find(
+      (day) => day.day === dateToDayString(subDays(date, 2)),
+    ) ?? { ...defaultDayInfo(subDays(date, 2)) },
+    threeDaysAgo: props.streakInfo?.allStreakDays?.find(
+      (day) => day.day === dateToDayString(subDays(date, 3)),
+    ) ?? { ...defaultDayInfo(subDays(date, 3)) },
+    fourDaysAgo: props.streakInfo?.allStreakDays?.find(
+      (day) => day.day === dateToDayString(subDays(date, 4)),
+    ) ?? { ...defaultDayInfo(subDays(date, 4)) },
+    fiveDaysAgo: props.streakInfo?.allStreakDays?.find(
+      (day) => day.day === dateToDayString(subDays(date, 5)),
+    ) ?? { ...defaultDayInfo(subDays(date, 5)) },
+    sixDaysAgo: props.streakInfo?.allStreakDays?.find(
+      (day) => day.day === dateToDayString(subDays(date, 6)),
+    ) ?? { ...defaultDayInfo(subDays(date, 6)) },
+  };
 
-
-  console.log({streakInfo, pStreakInfo: props.streakInfo})
+  console.log({ streakInfo, pStreakInfo: props.streakInfo });
 
   // const streakInfo = props.streakInfo;
 

@@ -44,6 +44,7 @@ import MonitorWeightIcon from "@mui/icons-material/MonitorWeight";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
 import { AuthUser } from "aws-amplify/auth";
 import { isIos } from "../helpers/getHealthKitData";
+import { dateToDayString } from "./stats-page/WeeklyOverview";
 
 const WIDGET_PREFERENCES_GROUP = "group.com.johncorser.fit.prefs";
 const CONSUMED_CALORIES_PREFERENCES_KEY = "consumedCalories";
@@ -143,7 +144,7 @@ export default function TabsView() {
     console.log("OPTIMISTIC addfood");
     const newAllFoods = [...allFoods, food];
     const todaysCalories = newAllFoods
-      .filter((food) => food.day === new Date().toLocaleDateString())
+      .filter((food) => food.day === dateToDayString(new Date()))
       .reduce((acc, food) => acc + food.calories, 0);
     setTodaysCaloriesPreferences(todaysCalories);
     const streak = await getStreakInfo(

@@ -11,6 +11,7 @@ import {
   HealthKitCacheEntity,
   PreferencesEntity,
 } from "../data/entities";
+import { getCache, HAS_PERMISSION_KEY, setCache } from "../data/cache";
 
 type HealthKitData = {
   activeCalories: number;
@@ -28,7 +29,7 @@ export const hasPermission = async (): Promise<boolean> => {
     return true;
   }
 
-  return localStorage.getItem("hasPermission") === "hasPermission";
+  return getCache(HAS_PERMISSION_KEY) === HAS_PERMISSION_KEY;
 };
 
 const aggregateHealthData = (data: QueryOutput<OtherData>) => {
@@ -69,7 +70,7 @@ export const getHealthKitData = async (
     today.getTime() < endOfDay(subDays(new Date(), 1)).getTime()
   );
   // null or "expireTimestamp-{json}"
-  const localCache = localStorage.getItem(today.toLocaleDateString());
+  const localCache = getCache(today.toLocaleDateString());
 
   if (localCache && isToday) {
     const [expireTimestamp, jsonString] = localCache.split("-");
@@ -150,7 +151,7 @@ export const getHealthKitData = async (
 
   if (isToday) {
     console.log(`updated Local cache for TODAY ${today.toLocaleDateString()}`);
-    localStorage.setItem(
+    setCache(
       today.toLocaleDateString(),
       // Cache for five minutes
       `${Date.now() + 1000 * 60 * 5}-${JSON.stringify(calculatedHealthKitData)}`,

@@ -5,6 +5,12 @@ import config from "../../amplify_outputs.json";
 import { Schema } from "../../amplify/data/resource";
 import { AuthUser, getCurrentUser } from "aws-amplify/auth";
 import { getStreakInfo, StreakInfo } from "../helpers/getStreakInfo";
+import {
+  EVERYTHING_KEY,
+  EVERYTHING_LOCK_KEY,
+  getCache,
+  setCache,
+} from "./cache";
 Amplify.configure(config);
 const client = generateClient<Schema>({
   authMode: "userPool",
@@ -396,7 +402,7 @@ export const getEverythingCache = ():
       user: AuthUser;
     }
   | undefined => {
-  const json = localStorage.getItem("everything");
+  const json = getCache(EVERYTHING_KEY);
   if (!json) return undefined;
   return JSON.parse(json);
 };
@@ -420,18 +426,18 @@ export const getEverything = async (
     }
   | undefined
 > => {
-  let lock = localStorage.getItem("everything_lock");
+  let lock = getCache(EVERYTHING_LOCK_KEY);
   let count = 0;
   if (!overrideLock) {
     while (lock === "locked") {
       await sleep(1000);
       count += 1;
       if (count > 3) break;
-      lock = localStorage.getItem("everything_lock");
+      lock = getCache(EVERYTHING_LOCK_KEY);
     }
   }
 
-  localStorage.setItem("everything_lock", "locked");
+  setCache(EVERYTHING_LOCK_KEY, "locked");
 
   const [
     allFoods,
@@ -471,8 +477,8 @@ export const getEverything = async (
     user,
   };
 
-  localStorage.setItem("everything", JSON.stringify(everything));
-  localStorage.setItem("everything_lock", "unlocked");
+  setCache(EVERYTHING_KEY, JSON.stringify(everything));
+  setCache(EVERYTHING_LOCK_KEY, "unlocked");
   return everything;
 };
 
