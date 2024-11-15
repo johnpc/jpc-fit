@@ -60,97 +60,125 @@ func generateOutput(results: [HKSample]?) -> [[String: Any]]? {
     return output
 }
 
-func getHealthKitDataAggregate(completion: @escaping ((Double, Int) -> Void)) -> Void {
+class HealthKitManager {
+    static let shared = HealthKitManager()
+    private let healthStore = HKHealthStore()
 
-        let oneDayAgo = Calendar.current.startOfDay(for: Date())
-        let activeEnergySampleType = HKQuantityType.quantityType(forIdentifier: HKQuantityTypeIdentifier.activeEnergyBurned)!
-        let basalEnergySampleType = HKQuantityType.quantityType(forIdentifier: HKQuantityTypeIdentifier.basalEnergyBurned)!
+    private let calendar = Calendar.current
+    private let dateFormatter: ISO8601DateFormatter = {
+        let formatter = ISO8601DateFormatter()
+        return formatter
+    }()
 
-        let predicate = HKQuery.predicateForSamples(withStart: oneDayAgo, end: .now, options: HKQueryOptions.strictStartDate)
-        let query = HKSampleQuery(sampleType: activeEnergySampleType, predicate: predicate, limit: 0, sortDescriptors: nil) {
-            _, results, _ in
-            let outputs: [[String: Any]] = generateOutput(results: results)!
-            //            print(outputs)
-            var filtered = outputs.filter({ ($0["sourceBundleId"] as! String).contains("com.apple.health") })
+    struct CalorieData {
+        let burnedCalories: Double
+        let consumedCalories: Int
+    }
 
-            filtered = filtered.filter({ (($0["device"] as! [String: Any])["name"] as! String).contains("Apple Watch") })
-
-            let numbers = filtered.map({ $0["value"] as! Double })
-            let activeSum = numbers.reduce(0, { x, y in
-                x + y
-            })
-            let query = HKSampleQuery(sampleType: basalEnergySampleType, predicate: predicate, limit: 0, sortDescriptors: nil) {
-                _, results, _ in
-                let outputs: [[String: Any]] = generateOutput(results: results)!
-                var filtered = outputs.filter({ ($0["sourceBundleId"] as! String).contains("com.apple.health") })
-
-                filtered = filtered.filter({ (($0["device"] as! [String: Any])["name"] as! String).contains("Apple Watch") })
-
-                let numbers = filtered.map({ $0["value"] as! Double })
-                let basalSum = numbers.reduce(0, { x, y in
-                    x + y
-                })
-                var totalCalories = basalSum + activeSum
-                let nonSharedDefaults = UserDefaults.standard
-                if (totalCalories == 0) {
-                    // When iPhone is locked, HealthKit doesn't work, so we should use the last known value instead
-                    totalCalories = nonSharedDefaults.double(forKey: "cachedTotalCalories")
-                } else {
-                    nonSharedDefaults.setValue(totalCalories, forKey: "cachedTotalCalories")
+    private func fetchCalorieData(for type: HKQuantityType, from startDate: Date) async throws -> Double {
+        let predicate = HKQuery.predicateForSamples(withStart: startDate, end: .now, options: .strictStartDate)
+        let results = try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Double, Error>) in
+            let query = HKSampleQuery(sampleType: type, predicate: predicate, limit: 0, sortDescriptors: nil) { _, results, error in
+                if let error = error {
+                    continuation.resume(throwing: error)
+                    return
                 }
-                if let userDefaults = UserDefaults(suiteName: "group.com.johncorser.fit.prefs") {
-                    print(userDefaults.dictionaryRepresentation().keys)
-                    let consumedCalories = Int(userDefaults.string(forKey: "consumedCalories") ?? "0")
-                    print(consumedCalories!)
-                    let dateFormatter = DateFormatter()
-                    dateFormatter.dateStyle = .medium
-                    dateFormatter.timeStyle = .none
-                    let formattedDate = dateFormatter.string(from: Date())
+                let outputs = generateOutput(results: results) ?? []
+                let filtered = outputs
+                    .filter { ($0["sourceBundleId"] as! String).contains("com.apple.health") }
+                    .filter { (($0["device"] as! [String: Any])["name"] as! String).contains("Apple Watch") }
 
+                let sum = filtered
+                    .map { $0["value"] as! Double }
+                    .reduce(0, +)
 
-                    let consumedCaloriesDay = userDefaults.string(forKey: "consumedCaloriesDay") ?? ""
-
-                    print("consumedCalories: " + String(consumedCalories!))
-                    print("formattedDate: " + formattedDate)
-                    print("consumedCaloriesDay (cache): " + consumedCaloriesDay)
-                    if (formattedDate != consumedCaloriesDay) {
-                        completion(totalCalories, 0)
-                    }
-
-                    else {
-                        print(consumedCalories!)
-                        completion(totalCalories, consumedCalories ?? 0)
-                    }
-                }
-                else {
-                    completion(totalCalories, 0)
-                }
+                continuation.resume(returning: sum)
             }
             healthStore.execute(query)
         }
-        healthStore.execute(query)
+        return results
     }
 
+    func getTotalCalories() async throws -> CalorieData {
+        let startOfDay = calendar.startOfDay(for: Date())
+        let activeType = HKQuantityType.quantityType(forIdentifier: .activeEnergyBurned)!
+        let basalType = HKQuantityType.quantityType(forIdentifier: .basalEnergyBurned)!
+
+        async let activeCalories = fetchCalorieData(for: activeType, from: startOfDay)
+        async let basalCalories = fetchCalorieData(for: basalType, from: startOfDay)
+
+        let totalCalories = try await activeCalories + basalCalories
+
+        // Handle cached values
+        let nonSharedDefaults = UserDefaults.standard
+        if totalCalories == 0 {
+            return CalorieData(
+                burnedCalories: nonSharedDefaults.double(forKey: "cachedTotalCalories"),
+                consumedCalories: 0
+            )
+        }
+
+        nonSharedDefaults.setValue(totalCalories, forKey: "cachedTotalCalories")
+
+        // Get consumed calories from shared defaults
+        let consumedCalories = try await getConsumedCalories()
+
+        return CalorieData(burnedCalories: totalCalories, consumedCalories: consumedCalories)
+    }
+
+    private func getConsumedCalories() async throws -> Int {
+        guard let userDefaults = UserDefaults(suiteName: "group.com.johncorser.fit.prefs") else {
+            return 0
+        }
+
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateStyle = .medium
+        dateFormatter.timeStyle = .none
+        let formattedDate = dateFormatter.string(from: Date())
+
+        let consumedCalories = Int(userDefaults.string(forKey: "consumedCalories") ?? "0") ?? 0
+        let consumedCaloriesDay = userDefaults.string(forKey: "consumedCaloriesDay") ?? ""
+
+        return formattedDate != consumedCaloriesDay ? 0 : consumedCalories
+    }
+}
 
 struct Provider: TimelineProvider {
     func placeholder(in context: Context) -> SimpleEntry {
-        SimpleEntry(date: Date(), burnedCalories: 1736, consumedCalories: 1000 )
+        SimpleEntry(date: Date(), burnedCalories: 1736, consumedCalories: 1000)
     }
 
     func getSnapshot(in context: Context, completion: @escaping (SimpleEntry) -> ()) {
-        func handler(burnedCalories: Double, consumedCalories: Int) -> Void {
-            let entry = SimpleEntry(date: Date(), burnedCalories: Int(burnedCalories), consumedCalories: consumedCalories)
-            completion(entry)
+        Task {
+            do {
+                let calorieData = try await HealthKitManager.shared.getTotalCalories()
+                let entry = SimpleEntry(
+                    date: Date(),
+                    burnedCalories: Int(calorieData.burnedCalories),
+                    consumedCalories: calorieData.consumedCalories
+                )
+                completion(entry)
+            } catch {
+                completion(placeholder(in: context))
+            }
         }
-        getHealthKitDataAggregate(completion: handler)
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<Entry>) -> ()) {
-        func handler(burnedCalories: Double, consumedCalories: Int) -> Void {
-            let entry = SimpleEntry(date: Date(), burnedCalories: Int(burnedCalories), consumedCalories: consumedCalories)
-            completion(Timeline(entries: [entry], policy: .after(Calendar.current.date(byAdding: .minute, value: 15, to: Date())!)))
+        Task {
+            do {
+                let calorieData = try await HealthKitManager.shared.getTotalCalories()
+                let entry = SimpleEntry(
+                    date: Date(),
+                    burnedCalories: Int(calorieData.burnedCalories),
+                    consumedCalories: calorieData.consumedCalories
+                )
+                let nextUpdate = Calendar.current.date(byAdding: .minute, value: 15, to: Date())!
+                completion(Timeline(entries: [entry], policy: .after(nextUpdate)))
+            } catch {
+                completion(Timeline(entries: [placeholder(in: context)], policy: .after(Date())))
+            }
         }
-        getHealthKitDataAggregate(completion: handler)
     }
 }
 
