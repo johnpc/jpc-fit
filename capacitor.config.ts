@@ -4,6 +4,10 @@ const config: CapacitorConfig = {
   appId: "com.johncorser.fit",
   appName: "fit.jpc",
   webDir: "dist",
+  server: {
+    hostname: "fit.jpc.io",
+    androidScheme: "https",
+  },
   bundledWebRuntime: true,
   ios: {
     contentInset: "always",
