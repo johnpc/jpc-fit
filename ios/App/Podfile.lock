@@ -1,16 +1,16 @@
 PODS:
-  - Capacitor (6.1.2):
+  - Capacitor (6.2.1):
     - CapacitorCordova
-  - CapacitorApp (6.0.1):
+  - CapacitorApp (6.0.2):
     - Capacitor
-  - CapacitorCordova (6.1.2)
-  - CapacitorLocalNotifications (6.1.0):
+  - CapacitorCordova (6.2.1)
+  - CapacitorLocalNotifications (6.1.2):
     - Capacitor
-  - CapacitorPreferences (6.0.2):
+  - CapacitorPreferences (6.0.3):
     - Capacitor
   - CapacitorWidgetsbridgePlugin (0.1.2):
     - Capacitor
-  - PerfoodCapacitorHealthkit (1.3.1):
+  - PerfoodCapacitorHealthkit (1.3.2):
     - Capacitor
 
 DEPENDENCIES:
@@ -39,14 +39,14 @@ EXTERNAL SOURCES:
     :path: "../../node_modules/@perfood/capacitor-healthkit"
 
 SPEC CHECKSUMS:
-  Capacitor: 679f9673fdf30597493a6362a5d5bf233d46abc2
-  CapacitorApp: 0bc633b4eae40a1f32cd2834788fad3bc42da6a1
-  CapacitorCordova: f48c89f96c319101cd2f0ce8a2b7449b5fb8b3dd
-  CapacitorLocalNotifications: 6bac9e948b2b8852506c6d74abb2cde140250f86
-  CapacitorPreferences: e8284bf740cf8c6d3f25409af3c01df87dfeb5a1
-  CapacitorWidgetsbridgePlugin: 384cf6a56ba2a3ee6d199579f5403723e766b958
-  PerfoodCapacitorHealthkit: cb4aa401dab186607c117f4406fb44060c8a135e
+  Capacitor: c95400d761e376be9da6be5a05f226c0e865cebf
+  CapacitorApp: e1e6b7d05e444d593ca16fd6d76f2b7c48b5aea7
+  CapacitorCordova: 8d93e14982f440181be7304aa9559ca631d77fff
+  CapacitorLocalNotifications: 65d718c32cbcb753697627bea76dd4336ef85dc2
+  CapacitorPreferences: f3eadae2369ac3ab8e21743a2959145b0d1286a3
+  CapacitorWidgetsbridgePlugin: 2b25b0ed502849687a3cd4cc63a4409b94119f25
+  PerfoodCapacitorHealthkit: 0708728954308c0217daa6912deeb73df7cba050
 
 PODFILE CHECKSUM: 0a0b61bec1d46fec2ea7766a8eddd7b9b2f00c50
 
-COCOAPODS: 1.15.2
+COCOAPODS: 1.16.2

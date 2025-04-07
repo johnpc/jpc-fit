@@ -98,20 +98,24 @@ const schema = a
       tools: [
         {
           // query: a.ref("getWeights"),
+          name: "listWeights",
           query: a.ref("listWeights"),
           description: "How much the user weighs.",
         },
         {
+          name: "listHeights",
           query: a.ref("listHeights"),
           // query: a.ref("getHeights"),
           description: "How tall the user is.",
         },
         {
+          name: "listFoods",
           query: a.ref("listFoods"),
           // query: a.ref("getFoods"),
           description: "The food the user has eaten.",
         },
         {
+          name: "getCurrentDate",
           query: a.ref("getCurrentDate"),
           description: "Provides the current day and time",
         },
