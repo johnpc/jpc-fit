@@ -3,7 +3,7 @@ import { WidgetsBridgePlugin } from "capacitor-widgetsbridge-plugin";
 import CaloriePage from "./CaloriePage";
 import WeightPage from "./WeightPage";
 import SettingsPage from "./SettingsPage";
-import ChatPage from "./ChatPage";
+// import ChatPage from "./ChatPage";
 import StatsPage from "./StatsPage";
 import { useEffect, useState } from "react";
 import {
@@ -38,7 +38,7 @@ import { App } from "@capacitor/app";
 import AphorismsPage from "./AphorismsPage";
 import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
 import FormatQuoteIcon from "@mui/icons-material/FormatQuote";
-import ChatIcon from "@mui/icons-material/Chat";
+// import ChatIcon from "@mui/icons-material/Chat";
 import QueryStatsIcon from "@mui/icons-material/QueryStats";
 import MonitorWeightIcon from "@mui/icons-material/MonitorWeight";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
@@ -327,13 +327,13 @@ export default function TabsView() {
             value: "Aphorisms",
             content: <AphorismsPage />,
           },
-          {
-            label: <ChatIcon />,
-            value: "Chat",
-            content: (
-              <ChatPage user={allState.user} randomNumber={randomNumber} />
-            ),
-          },
+          // {
+          //   label: <ChatIcon />,
+          //   value: "Chat",
+          //   content: (
+          //     <ChatPage user={allState.user} randomNumber={randomNumber} />
+          //   ),
+          // },
           {
             label: <ManageAccountsIcon />,
             value: "Settings",
