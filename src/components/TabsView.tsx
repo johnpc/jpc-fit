@@ -43,7 +43,7 @@ import QueryStatsIcon from "@mui/icons-material/QueryStats";
 import MonitorWeightIcon from "@mui/icons-material/MonitorWeight";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
 import { AuthUser } from "aws-amplify/auth";
-import { isIos } from "../helpers/getHealthKitData";
+import { getHealthKitData, isIos } from "../helpers/getHealthKitData";
 import { dateToDayString } from "./stats-page/WeeklyOverview";
 
 const WIDGET_PREFERENCES_GROUP = "group.com.johncorser.fit.prefs";
@@ -55,31 +55,55 @@ const setTodaysCaloriesPreferences = async (calories: number) => {
     return;
   }
 
-  await WidgetsBridgePlugin.setItem({
-    group: WIDGET_PREFERENCES_GROUP,
-    key: CONSUMED_CALORIES_PREFERENCES_KEY,
-    value: calories.toString(),
-  });
-  // Widget in date format like Sep 8, 2024
-  await WidgetsBridgePlugin.setItem({
-    group: WIDGET_PREFERENCES_GROUP,
-    key: CONSUMED_CALORIES_DAY_PREFERENCES_KEY,
-    value:
-      new Date().toLocaleDateString(undefined, {
-        month: "short",
-      }) +
-      " " +
-      new Date().toLocaleDateString(undefined, {
-        day: "numeric",
-      }) +
-      ", " +
-      new Date().toLocaleDateString(undefined, {
-        year: "numeric",
-      }),
-  });
+  try {
+    // Set the consumed calories
+    await WidgetsBridgePlugin.setItem({
+      group: WIDGET_PREFERENCES_GROUP,
+      key: CONSUMED_CALORIES_PREFERENCES_KEY,
+      value: calories.toString(),
+    });
 
-  await WidgetsBridgePlugin.reloadAllTimelines();
-  await getTodaysCaloriesPreferences();
+    // Set the date in the format the widget expects
+    await WidgetsBridgePlugin.setItem({
+      group: WIDGET_PREFERENCES_GROUP,
+      key: CONSUMED_CALORIES_DAY_PREFERENCES_KEY,
+      value:
+        new Date().toLocaleDateString(undefined, {
+          month: "short",
+        }) +
+        " " +
+        new Date().toLocaleDateString(undefined, {
+          day: "numeric",
+        }) +
+        ", " +
+        new Date().toLocaleDateString(undefined, {
+          year: "numeric",
+        }),
+    });
+
+    // Also set the burned calories from HealthKit if available
+    const healthKitData = await getHealthKitData(new Date(), []);
+    if (healthKitData && healthKitData.activeCalories + healthKitData.baseCalories > 0) {
+      const totalBurned = healthKitData.activeCalories + healthKitData.baseCalories;
+      await WidgetsBridgePlugin.setItem({
+        group: WIDGET_PREFERENCES_GROUP,
+        key: "burnedCalories",
+        value: totalBurned.toString(),
+      });
+
+      await WidgetsBridgePlugin.setItem({
+        group: WIDGET_PREFERENCES_GROUP,
+        key: "burnedCaloriesDate",
+        value: new Date().toISOString(),
+      });
+    }
+
+    // Force widget to update
+    await WidgetsBridgePlugin.reloadAllTimelines();
+    await getTodaysCaloriesPreferences();
+  } catch (error) {
+    console.error("Error setting widget preferences:", error);
+  }
 };
 
 const getTodaysCaloriesPreferences = async () => {

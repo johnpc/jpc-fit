@@ -51,5 +51,20 @@
 	<string>Read Health Data</string>
 	<key>NSCameraUsageDescription</key>
 	<string>Add photos of food or nutrition facts</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>com.johncorser.fit</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>jpcfit</string>
+			</array>
+		</dict>
+	</array>
+	<key>AppGroupIdentifier</key>
+	<string>group.com.johncorser.fit.prefs</string>
 </dict>
 </plist>
