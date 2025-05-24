@@ -7,5 +7,9 @@
 		<key>NSExtensionPointIdentifier</key>
 		<string>com.apple.widgetkit-extension</string>
 	</dict>
+	<key>NSHealthShareUsageDescription</key>
+	<string>This widget needs access to your health data to display calories burned</string>
+	<key>NSHealthUpdateUsageDescription</key>
+	<string>This widget needs access to your health data to display calories burned</string>
 </dict>
 </plist>
