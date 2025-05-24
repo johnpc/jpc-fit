@@ -92,40 +92,6 @@ const schema = a
       .returns(a.ref("StringType"))
       .handler(a.handler.function(getEverything))
       .authorization((allow) => allow.authenticated()),
-    chat: a.conversation({
-      aiModel: a.ai.model("Claude 3.5 Sonnet"),
-      systemPrompt: `You are motivating users to lose weight. You answer in three sentences or less, using simple english words.`,
-      tools: [
-        {
-          // query: a.ref("getWeights"),
-          name: "listWeights",
-          query: a.ref("listWeights"),
-          description: "How much the user weighs.",
-        },
-        {
-          name: "listHeights",
-          query: a.ref("listHeights"),
-          // query: a.ref("getHeights"),
-          description: "How tall the user is.",
-        },
-        {
-          name: "listFoods",
-          query: a.ref("listFoods"),
-          // query: a.ref("getFoods"),
-          description: "The food the user has eaten.",
-        },
-        {
-          name: "getCurrentDate",
-          query: a.ref("getCurrentDate"),
-          description: "Provides the current day and time",
-        },
-      ],
-      inferenceConfiguration: {
-        maxTokens: 500,
-        temperature: 1,
-        topP: 0.5,
-      },
-    }),
   })
   .authorization((allow) => [
     allow.resource(getCurrentDate),
