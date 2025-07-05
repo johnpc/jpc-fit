@@ -83,8 +83,12 @@ const setTodaysCaloriesPreferences = async (calories: number) => {
 
     // Also set the burned calories from HealthKit if available
     const healthKitData = await getHealthKitData(new Date(), []);
-    if (healthKitData && healthKitData.activeCalories + healthKitData.baseCalories > 0) {
-      const totalBurned = healthKitData.activeCalories + healthKitData.baseCalories;
+    if (
+      healthKitData &&
+      healthKitData.activeCalories + healthKitData.baseCalories > 0
+    ) {
+      const totalBurned =
+        healthKitData.activeCalories + healthKitData.baseCalories;
       await WidgetsBridgePlugin.setItem({
         group: WIDGET_PREFERENCES_GROUP,
         key: "burnedCalories",

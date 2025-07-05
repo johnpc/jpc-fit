@@ -1,7 +1,6 @@
 export const HAS_PERMISSION_KEY = "hasPermission";
 export const EVERYTHING_KEY = "everything";
 export const EVERYTHING_LOCK_KEY = "everything_lock";
-export const STREAK_KEY = "streak";
 
 const usedKeys: string[] = [];
 export const setCache = (key: string, value: string) => {

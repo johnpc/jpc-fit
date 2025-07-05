@@ -5,7 +5,7 @@ import {
 } from "../data/entities";
 import { subDays } from "date-fns";
 import { getHealthKitData } from "./getHealthKitData";
-import { getCache, setCache, STREAK_KEY } from "../data/cache";
+import { getCache, setCache } from "../data/cache";
 
 export type DayInfo = {
   tracked: boolean;
@@ -79,81 +79,83 @@ export const getStreakInfo = async (
   preferences?: PreferencesEntity,
 ): Promise<StreakInfo> => {
   console.log({ allFoods });
-  const cachedStreak: DayInfo[] = getCache(STREAK_KEY)
-    ? JSON.parse(getCache(STREAK_KEY)!)
-    : [];
 
-  const daysToCheck: Date[] = [];
+  // Get all unique days that need day info (last 7 days for the UI)
+  const daysToProcess: Date[] = [];
+  for (let i = 0; i < 7; i++) {
+    daysToProcess.push(subDays(today, i));
+  }
 
-  const foodDays = new Set(allFoods.map((food) => food.day));
-  let day = today;
-  let dayString = day.toLocaleDateString();
-
-  let itr = 0;
-  do {
-    day = subDays(today, itr);
-    dayString = day.toLocaleDateString();
-    const cachedDay = cachedStreak.find(
-      (d) => d.dateString === day.toLocaleDateString(),
-    );
-    console.log({ cachedDay, foodDays, dayString });
-    if ((!cachedDay && foodDays.has(dayString)) || itr === 0) {
-      daysToCheck.push(day);
-    }
-    itr++;
-  } while (foodDays.has(dayString) || itr === 1);
-  const dayInfoPromises = daysToCheck.map(async (dayToCheck) => {
-    const dayString = dayToCheck.toLocaleDateString();
+  // Get day info for all days we need
+  const dayInfoPromises = daysToProcess.map(async (day) => {
+    const dayString = day.toLocaleDateString();
     const trackedFoodsOnDay = allFoods.filter((food) => food.day === dayString);
     const dayInfo = await getDayInfo(
       trackedFoodsOnDay,
-      dayToCheck,
+      day,
       healthKitCaches,
       preferences,
     );
     return dayInfo;
   });
-  const allStreakDays = [
-    ...(await Promise.all(dayInfoPromises)),
-    ...cachedStreak,
-  ];
-  setCache(STREAK_KEY, JSON.stringify(allStreakDays));
+
+  const allDayInfos = await Promise.all(dayInfoPromises);
+
+  // Sort by date (most recent first)
+  allDayInfos.sort(
+    (a, b) =>
+      new Date(b.dateString).getTime() - new Date(a.dateString).getTime(),
+  );
+
+  // Calculate current streak by counting consecutive tracked days from today backwards
+  let currentStreakDays = 0;
+  let currentStreakNetCalories = 0;
+
+  for (const dayInfo of allDayInfos) {
+    if (dayInfo.tracked) {
+      currentStreakDays++;
+      currentStreakNetCalories += dayInfo.netCalories;
+    } else {
+      // Break the streak if we hit an untracked day
+      break;
+    }
+  }
+
+  // Find specific days for the UI
+  const findDayInfo = (daysBack: number): DayInfo => {
+    const targetDate = subDays(today, daysBack).toLocaleDateString();
+    return (
+      allDayInfos.find((dayInfo) => dayInfo.dateString === targetDate) || {
+        tracked: false,
+        day: subDays(today, daysBack)
+          .toLocaleDateString()
+          .split("/")
+          .slice(0, 2)
+          .join("/"),
+        dateString: targetDate,
+        consumedCalories: 0,
+        burnedCalories: 0,
+        activeCalories: 0,
+        baseCalories: 0,
+        steps: 0,
+        netCalories: 0,
+      }
+    );
+  };
 
   const streakInfo = {
-    currentStreakDays: allStreakDays.length,
-    currentStreakNetCalories: allStreakDays.reduce(
-      (acc, dayInfo) => acc + dayInfo.netCalories,
-      0,
-    ),
-    today: allStreakDays.find(
-      (dayInfo) => dayInfo.dateString === today.toLocaleDateString(),
-    )!,
-    yesterday: allStreakDays.find(
-      (dayInfo) =>
-        dayInfo.dateString === subDays(today, 1).toLocaleDateString(),
-    )!,
-    twoDaysAgo: allStreakDays.find(
-      (dayInfo) =>
-        dayInfo.dateString === subDays(today, 2).toLocaleDateString(),
-    )!,
-    threeDaysAgo: allStreakDays.find(
-      (dayInfo) =>
-        dayInfo.dateString === subDays(today, 3).toLocaleDateString(),
-    )!,
-    fourDaysAgo: allStreakDays.find(
-      (dayInfo) =>
-        dayInfo.dateString === subDays(today, 4).toLocaleDateString(),
-    )!,
-    fiveDaysAgo: allStreakDays.find(
-      (dayInfo) =>
-        dayInfo.dateString === subDays(today, 5).toLocaleDateString(),
-    )!,
-    sixDaysAgo: allStreakDays.find(
-      (dayInfo) =>
-        dayInfo.dateString === subDays(today, 6).toLocaleDateString(),
-    )!,
-    allStreakDays,
+    currentStreakDays,
+    currentStreakNetCalories,
+    today: findDayInfo(0),
+    yesterday: findDayInfo(1),
+    twoDaysAgo: findDayInfo(2),
+    threeDaysAgo: findDayInfo(3),
+    fourDaysAgo: findDayInfo(4),
+    fiveDaysAgo: findDayInfo(5),
+    sixDaysAgo: findDayInfo(6),
+    allStreakDays: allDayInfos.filter((day) => day.tracked),
   };
+
   console.log({ streakInfo });
   return streakInfo;
 };

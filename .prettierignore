@@ -10,3 +10,4 @@ dist
 .husky
 .gitignore
 .prettierignore
+apple-app-site-association
