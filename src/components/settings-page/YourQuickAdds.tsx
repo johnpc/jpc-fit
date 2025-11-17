@@ -1,4 +1,11 @@
-import { Card, Table, TableBody, TableHead, TableRow, TableCell } from "@aws-amplify/ui-react";
+import {
+  Card,
+  Table,
+  TableBody,
+  TableHead,
+  TableRow,
+  TableCell,
+} from "@aws-amplify/ui-react";
 import { Delete } from "@mui/icons-material";
 import { findIcon } from "../../helpers/iconMap";
 import { useQuickAdd, useDeleteQuickAdd } from "../../hooks/useQuickAdd";
@@ -39,7 +46,9 @@ export function YourQuickAdds() {
               <TableCell>{quickAdd.name}</TableCell>
               <TableCell>{findIcon(quickAdd.icon)}</TableCell>
               <TableCell>{quickAdd.calories}</TableCell>
-              {!preferences?.hideProtein && <TableCell>{quickAdd.protein}</TableCell>}
+              {!preferences?.hideProtein && (
+                <TableCell>{quickAdd.protein}</TableCell>
+              )}
               <TableCell onClick={() => handleDelete(quickAdd.id)}>
                 {quickAdd.id.startsWith("dqa-") ? null : <Delete />}
               </TableCell>

@@ -15,8 +15,8 @@ export function TShirtSizeDisclaimer() {
       textDecoration="none"
       margin={tokens.space.small}
     >
-      <HelpOutline fontSize={tokens.fontSizes.small.name as "small"} /> Why
-      does jpc.fit default to t-shirt sizes when reporting calories consumed?
+      <HelpOutline fontSize={tokens.fontSizes.small.name as "small"} /> Why does
+      jpc.fit default to t-shirt sizes when reporting calories consumed?
       <Text
         variation="primary"
         as="span"
@@ -27,8 +27,8 @@ export function TShirtSizeDisclaimer() {
         textDecoration="none"
         margin={tokens.space.small}
       >
-        The philosophy of jpc.fit is that mindful eating is more important
-        than counting every calorie exactly perfectly.
+        The philosophy of jpc.fit is that mindful eating is more important than
+        counting every calorie exactly perfectly.
       </Text>
       <Text
         variation="primary"

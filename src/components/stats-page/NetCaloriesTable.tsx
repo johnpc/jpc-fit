@@ -1,5 +1,14 @@
 import { useState } from "react";
-import { View, Text, Table, TableHead, TableRow, TableCell, TableBody, Button } from "@aws-amplify/ui-react";
+import {
+  View,
+  Text,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  Button,
+} from "@aws-amplify/ui-react";
 import { addDays, subDays } from "date-fns";
 import { ArrowBackIos, ArrowForwardIos } from "@mui/icons-material";
 import { useFood } from "../../hooks/useFood";
@@ -12,9 +21,13 @@ export function NetCaloriesTable() {
   const { data: healthKitCaches = [] } = useHealthKitCache();
 
   // Fetch HealthKit data for all 7 days in the week
-  for (let i = 0; i < 7; i++) {
-    useFetchHealthKitData(subDays(date, i));
-  }
+  useFetchHealthKitData(subDays(date, 0));
+  useFetchHealthKitData(subDays(date, 1));
+  useFetchHealthKitData(subDays(date, 2));
+  useFetchHealthKitData(subDays(date, 3));
+  useFetchHealthKitData(subDays(date, 4));
+  useFetchHealthKitData(subDays(date, 5));
+  useFetchHealthKitData(subDays(date, 6));
 
   const getDayData = (daysAgo: number) => {
     const day = subDays(date, daysAgo);
@@ -25,30 +38,47 @@ export function NetCaloriesTable() {
     const cache = healthKitCaches.find((c) => c.day === dayString);
     const burned = (cache?.activeCalories || 0) + (cache?.baseCalories || 0);
     const [d, m] = dayString.split("/");
-    return { day: `${d}/${m}`, consumed, burned, net: consumed - burned, tracked };
+    return {
+      day: `${d}/${m}`,
+      consumed,
+      burned,
+      net: consumed - burned,
+      tracked,
+    };
   };
 
   const days = Array.from({ length: 7 }, (_, i) => getDayData(i));
-  
+
   // Only count net for tracked days
-  const trackedDays = days.filter(d => d.tracked);
+  const trackedDays = days.filter((d) => d.tracked);
   const weekNet = trackedDays.reduce((sum, d) => sum + d.net, 0);
   const trackedCount = trackedDays.length;
 
   const tableCaption = (
     <>
-      <ArrowBackIos style={{ paddingTop: "10px" }} onClick={() => setDate(subDays(date, 7))} />
+      <ArrowBackIos
+        style={{ paddingTop: "10px" }}
+        onClick={() => setDate(subDays(date, 7))}
+      />
       <Text as="span" fontWeight={"bold"} margin={"15%"}>
         {subDays(date, 6).toLocaleDateString()} - {date.toLocaleDateString()}
       </Text>
-      <ArrowForwardIos style={{ paddingTop: "10px" }} onClick={() => setDate(addDays(date, 7))} />
+      <ArrowForwardIos
+        style={{ paddingTop: "10px" }}
+        onClick={() => setDate(addDays(date, 7))}
+      />
     </>
   );
 
   return (
     <>
-      <View columnSpan={4} textAlign={"center"} style={{ color: weekNet > 0 ? "red" : "green" }}>
-        Net {weekNet} calories for {trackedCount} tracked day{trackedCount !== 1 ? 's' : ''}
+      <View
+        columnSpan={4}
+        textAlign={"center"}
+        style={{ color: weekNet > 0 ? "red" : "green" }}
+      >
+        Net {weekNet} calories for {trackedCount} tracked day
+        {trackedCount !== 1 ? "s" : ""}
       </View>
       <View columnSpan={4} textAlign={"center"}>
         1 lb of fat is ~3500 calories

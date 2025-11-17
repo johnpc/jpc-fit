@@ -6,7 +6,10 @@ const CONSUMED_CALORIES_KEY = "consumedCalories";
 const CONSUMED_CALORIES_DAY_KEY = "consumedCaloriesDay";
 const BURNED_CALORIES_KEY = "burnedCalories";
 
-export const updateWidget = async (consumedCalories: number, burnedCalories?: number) => {
+export const updateWidget = async (
+  consumedCalories: number,
+  burnedCalories?: number,
+) => {
   if (Capacitor.getPlatform() !== "ios") return;
 
   try {

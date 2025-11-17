@@ -26,7 +26,9 @@ export function useUpdateGoal() {
         });
         return data;
       } else {
-        const { data } = await client.models.Goal.create(goal as { dietCalories: number });
+        const { data } = await client.models.Goal.create(
+          goal as { dietCalories: number },
+        );
         return data;
       }
     },

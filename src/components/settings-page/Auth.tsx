@@ -6,7 +6,7 @@ export function Auth() {
 
   const handleDeleteUser = async () => {
     const shouldDelete = confirm(
-      "Are you sure? This will delete your account and all associated data."
+      "Are you sure? This will delete your account and all associated data.",
     );
     if (!shouldDelete) {
       return;

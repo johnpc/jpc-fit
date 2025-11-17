@@ -12,7 +12,8 @@ export function useFood(day?: string) {
       }
       const { data } = await client.models.Food.list({ limit: 10000 });
       return (data as FoodEntity[]).sort(
-        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
       );
     },
   });
@@ -22,7 +23,13 @@ export function useCreateFood() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (food: { name?: string; calories: number; protein?: number; day: string; notes?: string }) => {
+    mutationFn: async (food: {
+      name?: string;
+      calories: number;
+      protein?: number;
+      day: string;
+      notes?: string;
+    }) => {
       const { data } = await client.models.Food.create(food);
       return data;
     },
@@ -30,11 +37,12 @@ export function useCreateFood() {
       queryClient.invalidateQueries({ queryKey: ["food"] });
       if (data?.day) {
         queryClient.invalidateQueries({ queryKey: ["food", data.day] });
-        
+
         // Update widget if it's today
         if (data.day === new Date().toLocaleDateString()) {
           const { updateWidget } = await import("../helpers/updateWidget");
-          const allFoods = queryClient.getQueryData<any[]>(["food"]) || [];
+          const allFoods =
+            queryClient.getQueryData<FoodEntity[]>(["food"]) || [];
           const todaysCalories = allFoods
             .filter((f) => f.day === data.day)
             .reduce((sum, f) => sum + f.calories, 0);
@@ -71,10 +79,10 @@ export function useDeleteFood() {
     },
     onSuccess: async () => {
       queryClient.invalidateQueries({ queryKey: ["food"] });
-      
+
       // Update widget for today
       const { updateWidget } = await import("../helpers/updateWidget");
-      const allFoods = queryClient.getQueryData<any[]>(["food"]) || [];
+      const allFoods = queryClient.getQueryData<FoodEntity[]>(["food"]) || [];
       const todaysCalories = allFoods
         .filter((f) => f.day === new Date().toLocaleDateString())
         .reduce((sum, f) => sum + f.calories, 0);

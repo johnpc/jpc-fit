@@ -109,19 +109,19 @@ class HealthKitManager {
 
         let totalCalories = try await activeCalories + basalCalories
 
+        // Get consumed calories from shared defaults
+        let consumedCalories = try await getConsumedCalories()
+
         // Handle cached values
         let nonSharedDefaults = UserDefaults.standard
         if totalCalories == 0 {
             return CalorieData(
                 burnedCalories: nonSharedDefaults.double(forKey: "cachedTotalCalories"),
-                consumedCalories: 0
+                consumedCalories: consumedCalories
             )
         }
 
         nonSharedDefaults.setValue(totalCalories, forKey: "cachedTotalCalories")
-
-        // Get consumed calories from shared defaults
-        let consumedCalories = try await getConsumedCalories()
 
         return CalorieData(burnedCalories: totalCalories, consumedCalories: consumedCalories)
     }

@@ -45,19 +45,24 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
         next: () => queryClient.invalidateQueries({ queryKey: ["quickAdd"] }),
       }),
       client.models.Preferences.onCreate().subscribe({
-        next: () => queryClient.invalidateQueries({ queryKey: ["preferences"] }),
+        next: () =>
+          queryClient.invalidateQueries({ queryKey: ["preferences"] }),
       }),
       client.models.Preferences.onUpdate().subscribe({
-        next: () => queryClient.invalidateQueries({ queryKey: ["preferences"] }),
+        next: () =>
+          queryClient.invalidateQueries({ queryKey: ["preferences"] }),
       }),
       client.models.HealthKitCache.onCreate().subscribe({
-        next: () => queryClient.invalidateQueries({ queryKey: ["healthKitCache"] }),
+        next: () =>
+          queryClient.invalidateQueries({ queryKey: ["healthKitCache"] }),
       }),
       client.models.HealthKitCache.onUpdate().subscribe({
-        next: () => queryClient.invalidateQueries({ queryKey: ["healthKitCache"] }),
+        next: () =>
+          queryClient.invalidateQueries({ queryKey: ["healthKitCache"] }),
       }),
       client.models.HealthKitCache.onDelete().subscribe({
-        next: () => queryClient.invalidateQueries({ queryKey: ["healthKitCache"] }),
+        next: () =>
+          queryClient.invalidateQueries({ queryKey: ["healthKitCache"] }),
       }),
     ];
 

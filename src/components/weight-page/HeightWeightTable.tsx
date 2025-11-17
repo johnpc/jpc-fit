@@ -1,4 +1,11 @@
-import { Card, Table, TableBody, TableCell, TableHead, TableRow } from "@aws-amplify/ui-react";
+import {
+  Card,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+} from "@aws-amplify/ui-react";
 import { Height, MonitorWeight } from "@mui/icons-material";
 import { useWeight, useCreateWeight } from "../../hooks/useWeight";
 import { useHeight, useCreateHeight } from "../../hooks/useHeight";
@@ -19,10 +26,13 @@ export function HeightWeightTable() {
     const newWeight = parseInt(prompt("Enter your weight in lbs") || "");
     if (!isNaN(newWeight) && newWeight > 0) {
       console.log("Creating weight:", newWeight);
-      createWeight.mutate({ currentWeight: newWeight }, {
-        onSuccess: (data) => console.log("Weight created:", data),
-        onError: (error) => console.error("Weight error:", error),
-      });
+      createWeight.mutate(
+        { currentWeight: newWeight },
+        {
+          onSuccess: (data) => console.log("Weight created:", data),
+          onError: (error) => console.error("Weight error:", error),
+        },
+      );
     }
   };
 
@@ -30,15 +40,18 @@ export function HeightWeightTable() {
     const newHeight = parseInt(prompt("Enter your height in inches") || "");
     if (!isNaN(newHeight) && newHeight > 0) {
       console.log("Creating height:", newHeight);
-      createHeight.mutate({ currentHeight: newHeight }, {
-        onSuccess: (data) => console.log("Height created:", data),
-        onError: (error) => console.error("Height error:", error),
-      });
+      createHeight.mutate(
+        { currentHeight: newHeight },
+        {
+          onSuccess: (data) => console.log("Height created:", data),
+          onError: (error) => console.error("Height error:", error),
+        },
+      );
     }
   };
 
   const bmi = (currentWeight / (currentHeight * currentHeight)) * 703;
-  
+
   const getBmiLabel = (bmi: number) => {
     if (bmi < 18.5) return "underweight";
     if (bmi < 25) return "healthy";

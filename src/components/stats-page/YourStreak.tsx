@@ -21,7 +21,7 @@ export function YourStreak() {
   };
 
   const days = [getDayInfo(3), getDayInfo(2), getDayInfo(1), getDayInfo(0)];
-  
+
   // Count streak from most recent day backwards
   let streakDays = 0;
   let streakNetCalories = 0;
@@ -33,7 +33,7 @@ export function YourStreak() {
       break;
     }
   }
-  
+
   const netLbs = streakNetCalories / 3500;
 
   return (

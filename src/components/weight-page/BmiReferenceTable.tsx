@@ -1,4 +1,12 @@
-import { Card, Table, TableBody, TableCell, TableHead, TableRow, Text } from "@aws-amplify/ui-react";
+import {
+  Card,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  Text,
+} from "@aws-amplify/ui-react";
 import { useHeight } from "../../hooks/useHeight";
 
 export function BmiReferenceTable() {
@@ -6,9 +14,17 @@ export function BmiReferenceTable() {
 
   const currentHeight = heights[0]?.currentHeight ?? 70;
 
-  const maxUnderweightLbs = ((18.5 / 703) * (currentHeight * currentHeight)).toFixed(1);
-  const maxHealthyLbs = ((25 / 703) * (currentHeight * currentHeight)).toFixed(1);
-  const maxOverweightLbs = ((30 / 703) * (currentHeight * currentHeight)).toFixed(1);
+  const maxUnderweightLbs = (
+    (18.5 / 703) *
+    (currentHeight * currentHeight)
+  ).toFixed(1);
+  const maxHealthyLbs = ((25 / 703) * (currentHeight * currentHeight)).toFixed(
+    1,
+  );
+  const maxOverweightLbs = (
+    (30 / 703) *
+    (currentHeight * currentHeight)
+  ).toFixed(1);
 
   return (
     <Card>

@@ -1,10 +1,24 @@
-import { Card, Table, TableHead, TableRow, TableCell, TableBody, Loader } from "@aws-amplify/ui-react";
+import {
+  Card,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  Loader,
+} from "@aws-amplify/ui-react";
 import { Delete } from "@mui/icons-material";
 import { useState } from "react";
 import { useDeleteFood } from "../../hooks/useFood";
 import { FoodEntity, PreferencesEntity } from "../../lib/types";
 
-export function FoodTable({ foods, preferences }: { foods: FoodEntity[]; preferences?: PreferencesEntity }) {
+export function FoodTable({
+  foods,
+  preferences,
+}: {
+  foods: FoodEntity[];
+  preferences?: PreferencesEntity;
+}) {
   return (
     <Card>
       <Table caption="Consumption data" highlightOnHover={false}>
@@ -13,8 +27,12 @@ export function FoodTable({ foods, preferences }: { foods: FoodEntity[]; prefere
             <TableCell as="th">Time</TableCell>
             <TableCell as="th">Name</TableCell>
             <TableCell as="th">Cals</TableCell>
-            {!preferences?.hideProtein && <TableCell as="th">Protein</TableCell>}
-            <TableCell as="th"><Delete /></TableCell>
+            {!preferences?.hideProtein && (
+              <TableCell as="th">Protein</TableCell>
+            )}
+            <TableCell as="th">
+              <Delete />
+            </TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -27,7 +45,13 @@ export function FoodTable({ foods, preferences }: { foods: FoodEntity[]; prefere
   );
 }
 
-function FoodRow({ food, preferences }: { food: FoodEntity; preferences?: PreferencesEntity }) {
+function FoodRow({
+  food,
+  preferences,
+}: {
+  food: FoodEntity;
+  preferences?: PreferencesEntity;
+}) {
   const [deleting, setDeleting] = useState(false);
   const deleteFood = useDeleteFood();
 

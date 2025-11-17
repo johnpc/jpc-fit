@@ -16,7 +16,12 @@ export function useCreateQuickAdd() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (quickAdd: { name: string; calories: number; protein?: number; icon: string }) => {
+    mutationFn: async (quickAdd: {
+      name: string;
+      calories: number;
+      protein?: number;
+      icon: string;
+    }) => {
       const { data } = await client.models.QuickAdd.create(quickAdd);
       return data;
     },

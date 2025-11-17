@@ -1,5 +1,8 @@
 import { Card, SwitchField } from "@aws-amplify/ui-react";
-import { usePreferences, useUpdatePreferences } from "../../hooks/usePreferences";
+import {
+  usePreferences,
+  useUpdatePreferences,
+} from "../../hooks/usePreferences";
 
 export function HiddenFieldsPreferences() {
   const { data: preferences } = usePreferences();

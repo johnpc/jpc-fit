@@ -1,11 +1,5 @@
-import {
-  FoodEntity,
-  HealthKitCacheEntity,
-  PreferencesEntity,
-} from "../data/entities";
+import { FoodEntity } from "../lib/types";
 import { subDays } from "date-fns";
-import { getHealthKitData } from "./getHealthKitData";
-import { getCache, setCache } from "../data/cache";
 
 export type DayInfo = {
   tracked: boolean;
@@ -18,6 +12,7 @@ export type DayInfo = {
   steps: number;
   netCalories: number;
 };
+
 export type StreakInfo = {
   currentStreakDays: number;
   currentStreakNetCalories: number;
@@ -31,83 +26,41 @@ export type StreakInfo = {
   allStreakDays: DayInfo[];
 };
 
-export const getDayInfo = async (
-  allFoods: FoodEntity[],
-  day: Date,
-  healthKitCaches: HealthKitCacheEntity[],
-  preferences?: PreferencesEntity,
-): Promise<DayInfo> => {
-  const dayInfoCacheKey = `dayinfo-${allFoods.length}-${day.getTime()}`;
-  const stored = getCache(dayInfoCacheKey);
-  if (stored) {
-    return JSON.parse(stored);
-  }
-
-  const healthKitData = await getHealthKitData(
-    day,
-    healthKitCaches,
-    preferences,
-  );
-  const dayString = day.toLocaleDateString();
-  const tracked = !!allFoods.find((food) => food.day === dayString);
-  const consumedCalories = allFoods
-    .filter((food) => food.day === dayString)
-    .reduce((sum: number, food: FoodEntity) => sum + food.calories, 0);
-  const burnedCalories =
-    healthKitData.activeCalories + healthKitData.baseCalories;
-  const [d, m] = day.toLocaleDateString().split("/");
-  const dayInfo = {
-    tracked,
-    day: [d, m].join("/"),
-    consumedCalories,
-    burnedCalories,
-    steps: healthKitData.steps,
-    activeCalories: healthKitData.activeCalories,
-    baseCalories: healthKitData.baseCalories,
-    dateString: dayString,
-    netCalories: consumedCalories - burnedCalories,
-  };
-  if (day.toLocaleDateString() != new Date().toLocaleDateString()) {
-    setCache(dayInfoCacheKey, JSON.stringify(dayInfo));
-  }
-  return dayInfo;
-};
-export const getStreakInfo = async (
-  allFoods: FoodEntity[],
-  today: Date,
-  healthKitCaches: HealthKitCacheEntity[],
-  preferences?: PreferencesEntity,
-): Promise<StreakInfo> => {
-  console.log({ allFoods });
-
-  // Get all unique days that need day info (last 7 days for the UI)
+export const getStreakInfo = (allFoods: FoodEntity[]): StreakInfo => {
+  const today = new Date();
   const daysToProcess: Date[] = [];
   for (let i = 0; i < 7; i++) {
     daysToProcess.push(subDays(today, i));
   }
 
-  // Get day info for all days we need
-  const dayInfoPromises = daysToProcess.map(async (day) => {
+  const allDayInfos = daysToProcess.map((day) => {
     const dayString = day.toLocaleDateString();
     const trackedFoodsOnDay = allFoods.filter((food) => food.day === dayString);
-    const dayInfo = await getDayInfo(
-      trackedFoodsOnDay,
-      day,
-      healthKitCaches,
-      preferences,
+    const tracked = trackedFoodsOnDay.length > 0;
+    const consumedCalories = trackedFoodsOnDay.reduce(
+      (sum, food) => sum + food.calories,
+      0,
     );
-    return dayInfo;
+    const [d, m] = day.toLocaleDateString().split("/");
+
+    return {
+      tracked,
+      day: [d, m].join("/"),
+      dateString: dayString,
+      consumedCalories,
+      burnedCalories: 0,
+      activeCalories: 0,
+      baseCalories: 0,
+      steps: 0,
+      netCalories: consumedCalories,
+    };
   });
 
-  const allDayInfos = await Promise.all(dayInfoPromises);
-
-  // Sort by date (most recent first)
   allDayInfos.sort(
     (a, b) =>
       new Date(b.dateString).getTime() - new Date(a.dateString).getTime(),
   );
 
-  // Calculate current streak by counting consecutive tracked days from today backwards
   let currentStreakDays = 0;
   let currentStreakNetCalories = 0;
 
@@ -116,12 +69,10 @@ export const getStreakInfo = async (
       currentStreakDays++;
       currentStreakNetCalories += dayInfo.netCalories;
     } else {
-      // Break the streak if we hit an untracked day
       break;
     }
   }
 
-  // Find specific days for the UI
   const findDayInfo = (daysBack: number): DayInfo => {
     const targetDate = subDays(today, daysBack).toLocaleDateString();
     return (
@@ -143,7 +94,7 @@ export const getStreakInfo = async (
     );
   };
 
-  const streakInfo = {
+  return {
     currentStreakDays,
     currentStreakNetCalories,
     today: findDayInfo(0),
@@ -155,7 +106,4 @@ export const getStreakInfo = async (
     sixDaysAgo: findDayInfo(6),
     allStreakDays: allDayInfos.filter((day) => day.tracked),
   };
-
-  console.log({ streakInfo });
-  return streakInfo;
 };

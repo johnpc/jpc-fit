@@ -5,13 +5,14 @@ import { useAuth } from "./useAuth";
 
 export function useHealthKitCache() {
   const { user } = useAuth();
-  
+
   return useQuery({
     queryKey: ["healthKitCache"],
     queryFn: async () => {
       const { data } = await client.models.HealthKitCache.list({ limit: 5000 });
       return (data as HealthKitCacheEntity[]).sort(
-        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
       );
     },
     enabled: !!user,
@@ -22,11 +23,11 @@ export function useCreateHealthKitCache() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (cache: { 
-      day: string; 
-      activeCalories: number; 
-      baseCalories: number; 
-      weight?: number; 
+    mutationFn: async (cache: {
+      day: string;
+      activeCalories: number;
+      baseCalories: number;
+      weight?: number;
       steps?: number;
     }) => {
       const { data } = await client.models.HealthKitCache.create(cache);
@@ -42,12 +43,12 @@ export function useUpdateHealthKitCache() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (cache: { 
+    mutationFn: async (cache: {
       id: string;
-      day: string; 
-      activeCalories: number; 
-      baseCalories: number; 
-      weight?: number; 
+      day: string;
+      activeCalories: number;
+      baseCalories: number;
+      weight?: number;
       steps?: number;
     }) => {
       const { data } = await client.models.HealthKitCache.update(cache);

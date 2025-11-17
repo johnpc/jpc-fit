@@ -8,7 +8,7 @@ const HAS_PERMISSION_KEY = "hasPermission";
 export function HealthKitPermission() {
   const [loading, setLoading] = useState(false);
   const [hasPermission, setHasPermission] = useState(
-    localStorage.getItem(HAS_PERMISSION_KEY) === HAS_PERMISSION_KEY
+    localStorage.getItem(HAS_PERMISSION_KEY) === HAS_PERMISSION_KEY,
   );
 
   const handleGrantPermission = async () => {

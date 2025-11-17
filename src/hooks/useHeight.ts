@@ -5,13 +5,14 @@ import { useAuth } from "./useAuth";
 
 export function useHeight() {
   const { user } = useAuth();
-  
+
   return useQuery({
     queryKey: ["height"],
     queryFn: async () => {
       const { data } = await client.models.Height.list({ limit: 5000 });
       return (data as HeightEntity[]).sort(
-        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
       );
     },
     enabled: !!user,

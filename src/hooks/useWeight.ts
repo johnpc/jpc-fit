@@ -5,13 +5,14 @@ import { useAuth } from "./useAuth";
 
 export function useWeight() {
   const { user } = useAuth();
-  
+
   return useQuery({
     queryKey: ["weight"],
     queryFn: async () => {
       const { data } = await client.models.Weight.list({ limit: 5000 });
       return (data as WeightEntity[]).sort(
-        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
       );
     },
     enabled: !!user,

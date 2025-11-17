@@ -17,7 +17,9 @@ export function useUpdatePreferences() {
 
   return useMutation({
     mutationFn: async (preferences: Partial<PreferencesEntity>) => {
-      const existing = queryClient.getQueryData<PreferencesEntity>(["preferences"]);
+      const existing = queryClient.getQueryData<PreferencesEntity>([
+        "preferences",
+      ]);
 
       if (existing?.id) {
         const { data } = await client.models.Preferences.update({
