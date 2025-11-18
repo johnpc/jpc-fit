@@ -23,17 +23,22 @@ export function AddCalorieFab({
     let calories = quickAdd.calories;
     let protein = quickAdd.protein ?? 0;
 
-    if (quickAdd.name === "Custom") {
+    if (quickAdd.id === "dqa-Custom") {
       const calorieInput = prompt("Enter calorie amount");
       calories = parseInt(calorieInput || "");
       if (isNaN(calories) || calories < 1) {
-        alert("Invalid calorie amount");
+        alert("Invalid integer");
         return;
       }
 
-      if (!preferences?.hideProtein) {
+      if (preferences?.hideProtein) {
+        protein = 0;
+      } else {
         const proteinInput = prompt("Enter protein in grams");
         protein = parseInt(proteinInput || "0");
+        if (isNaN(protein) || protein < 1) {
+          protein = 0;
+        }
       }
     }
 
