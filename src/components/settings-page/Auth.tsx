@@ -1,8 +1,10 @@
 import { Button, Card, Link, useTheme } from "@aws-amplify/ui-react";
 import { deleteUser, signOut } from "aws-amplify/auth";
+import { useQueryClient } from "@tanstack/react-query";
 
 export function Auth() {
   const { tokens } = useTheme();
+  const queryClient = useQueryClient();
 
   const handleDeleteUser = async () => {
     const shouldDelete = confirm(
@@ -20,8 +22,7 @@ export function Auth() {
   };
 
   const handleClearCache = () => {
-    localStorage.clear();
-    window.location.reload();
+    queryClient.invalidateQueries();
   };
 
   return (

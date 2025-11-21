@@ -5,15 +5,19 @@ import { FoodEntity } from "../lib/types";
 export function useFood(day?: string) {
   return useQuery({
     queryKey: day ? ["food", day] : ["food"],
+    refetchOnMount: true,
     queryFn: async () => {
       if (day) {
         const { data } = await client.models.Food.listFoodByDay({ day });
-        return data as FoodEntity[];
+        return (data as FoodEntity[]).sort(
+          (a, b) =>
+            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+        );
       }
       const { data } = await client.models.Food.list({ limit: 10000 });
       return (data as FoodEntity[]).sort(
         (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
       );
     },
   });
@@ -34,13 +38,14 @@ export function useCreateFood() {
       return data;
     },
     onSuccess: async (data) => {
-      queryClient.invalidateQueries({ queryKey: ["food"] });
+      await queryClient.invalidateQueries({ queryKey: ["food"] });
       if (data?.day) {
-        queryClient.invalidateQueries({ queryKey: ["food", data.day] });
+        await queryClient.invalidateQueries({ queryKey: ["food", data.day] });
 
         // Update widget if it's today
         if (data.day === new Date().toLocaleDateString()) {
           const { updateWidget } = await import("../helpers/updateWidget");
+          await queryClient.refetchQueries({ queryKey: ["food"] });
           const allFoods =
             queryClient.getQueryData<FoodEntity[]>(["food"]) || [];
           const todaysCalories = allFoods
@@ -78,10 +83,11 @@ export function useDeleteFood() {
       await client.models.Food.delete({ id });
     },
     onSuccess: async () => {
-      queryClient.invalidateQueries({ queryKey: ["food"] });
+      await queryClient.invalidateQueries({ queryKey: ["food"] });
 
       // Update widget for today
       const { updateWidget } = await import("../helpers/updateWidget");
+      await queryClient.refetchQueries({ queryKey: ["food"] });
       const allFoods = queryClient.getQueryData<FoodEntity[]>(["food"]) || [];
       const todaysCalories = allFoods
         .filter((f) => f.day === new Date().toLocaleDateString())
