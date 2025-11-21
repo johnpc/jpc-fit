@@ -24,7 +24,7 @@ import { useHealthKitCache } from "../../hooks/useHealthKitCache";
 import { useFetchHealthKitData } from "../../hooks/useFetchHealthKitData";
 import { AddCalorieFab } from "./AddCalorieFab";
 import { FoodTable } from "./FoodTable";
-import { defaultQuickAdds } from "./defaultQuickAdds";
+import { defaultQuickAdds, customQuickAdd } from "./defaultQuickAdds";
 
 export function CalorieData({
   date,
@@ -44,7 +44,7 @@ export function CalorieData({
   // Fetch HealthKit data for this date if needed
   useFetchHealthKitData(date);
 
-  const displayQuickAdds = quickAdds.length > 0 ? quickAdds : defaultQuickAdds;
+  const displayQuickAdds = quickAdds.length > 0 ? [...quickAdds, customQuickAdd] : defaultQuickAdds;
 
   const consumedCalories = foods.reduce((sum, food) => sum + food.calories, 0);
 
