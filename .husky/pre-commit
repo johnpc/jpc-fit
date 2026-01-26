@@ -2,5 +2,6 @@
 . "$(dirname -- "$0")/_/husky.sh"
 
 npx tsc --noEmit
+# Requires running `npx ampx sandbox` first to generate $amplify/env/* types
 npx tsc --noEmit -p amplify/tsconfig.json
 npx lint-staged
