@@ -1,35 +1,9 @@
 import type { Schema } from "../data/resource";
-import { Amplify } from "aws-amplify";
-import { generateClient } from "aws-amplify/api";
 import { env } from "$amplify/env/getSteps";
-import { listHealthKitCaches } from "./graphql/queries";
+import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
+import { DynamoDBDocumentClient, ScanCommand } from "@aws-sdk/lib-dynamodb";
 
-Amplify.configure(
-  {
-    API: {
-      GraphQL: {
-        endpoint: env.AMPLIFY_DATA_GRAPHQL_ENDPOINT,
-        region: env.AWS_REGION,
-        defaultAuthMode: "iam",
-      },
-    },
-  },
-  {
-    Auth: {
-      credentialsProvider: {
-        getCredentialsAndIdentityId: async () => ({
-          credentials: {
-            accessKeyId: env.AWS_ACCESS_KEY_ID,
-            secretAccessKey: env.AWS_SECRET_ACCESS_KEY,
-            sessionToken: env.AWS_SESSION_TOKEN,
-          },
-        }),
-        clearCredentialsAndIdentityId: () => {},
-      },
-    },
-  },
-);
-const client = generateClient<Schema>();
+const client = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
 export const handler: Schema["getSteps"]["functionHandler"] = async (args) => {
   const apiKey = args.arguments.apiKey;
@@ -39,7 +13,6 @@ export const handler: Schema["getSteps"]["functionHandler"] = async (args) => {
 
   const userId = args.arguments.userId;
   const now = new Date();
-  // Use EST/EDT timezone (UTC-5)
   const estOffset = -5 * 60;
   const localTime = new Date(
     now.getTime() + (estOffset + now.getTimezoneOffset()) * 60000,
@@ -48,18 +21,18 @@ export const handler: Schema["getSteps"]["functionHandler"] = async (args) => {
 
   console.log("Querying for userId:", userId, "day:", today);
 
-  const response = await client.graphql({
-    query: listHealthKitCaches,
-    variables: {
-      filter: { owner: { contains: userId }, day: { eq: today } },
-      limit: 1,
-    },
-  });
+  const response = await client.send(
+    new ScanCommand({
+      TableName: env.HEALTHKITCACHE_TABLE_NAME,
+      FilterExpression: "contains(#o, :uid) AND #d = :day",
+      ExpressionAttributeNames: { "#o": "owner", "#d": "day" },
+      ExpressionAttributeValues: { ":uid": userId, ":day": today },
+      Limit: 1,
+    }),
+  );
 
-  const caches = response.data?.listHealthKitCaches?.items || [];
-  console.log("DDB response:", JSON.stringify(caches));
+  console.log("DDB response:", JSON.stringify(response.Items));
 
-  const todayCache = caches[0];
-
+  const todayCache = response.Items?.[0];
   return { value: JSON.stringify({ steps: todayCache?.steps ?? 0 }) };
 };
