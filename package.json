@@ -21,6 +21,8 @@
     "@aws-amplify/ui-react": "^6.11.2",
     "@aws-amplify/ui-react-ai": "^1.5.0",
     "@aws-amplify/ui-react-storage": "^3.10.3",
+    "@aws-sdk/client-dynamodb": "^3.975.0",
+    "@aws-sdk/lib-dynamodb": "^3.975.0",
     "@capacitor/app": "^6.0.1",
     "@capacitor/core": "^7.4.4",
     "@capacitor/ios": "^6.1.2",
