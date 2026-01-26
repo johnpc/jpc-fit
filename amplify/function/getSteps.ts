@@ -27,7 +27,6 @@ export const handler: Schema["getSteps"]["functionHandler"] = async (args) => {
       FilterExpression: "contains(#o, :uid) AND #d = :day",
       ExpressionAttributeNames: { "#o": "owner", "#d": "day" },
       ExpressionAttributeValues: { ":uid": userId, ":day": today },
-      Limit: 1,
     }),
   );
 

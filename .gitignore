@@ -31,3 +31,6 @@ amplify_outputs.json
 
 # secrets
 .env
+
+# feature docs
+STEP_COUNT_FEATURE.md
