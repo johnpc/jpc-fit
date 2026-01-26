@@ -3,6 +3,7 @@ import { defineFunction, secret } from "@aws-amplify/backend";
 export const getSteps = defineFunction({
   name: "getSteps",
   entry: "./getSteps.ts",
+  resourceGroupName: "data",
   environment: {
     STEPS_API_KEY: secret("STEPS_API_KEY"),
   },
