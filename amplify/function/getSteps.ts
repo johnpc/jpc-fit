@@ -47,6 +47,7 @@ export const handler: Schema["getSteps"]["functionHandler"] = async (args) => {
     query: listHealthKitCaches,
     variables: {
       filter: { owner: { contains: userId }, day: { eq: today } },
+      limit: 1,
     },
   });
 
