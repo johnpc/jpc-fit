@@ -38,7 +38,11 @@ export const handler: Schema["getSteps"]["functionHandler"] = async (args) => {
   }
 
   const userId = args.arguments.userId;
-  const today = new Date().toISOString().split("T")[0];
+  const now = new Date();
+  const today = `${now.getMonth() + 1}/${now.getDate()}/${now.getFullYear()}`;
+
+  console.log("Querying for userId:", userId, "day:", today);
+
   const response = await client.graphql({
     query: listHealthKitCaches,
     variables: {
@@ -47,6 +51,8 @@ export const handler: Schema["getSteps"]["functionHandler"] = async (args) => {
   });
 
   const caches = response.data?.listHealthKitCaches?.items || [];
+  console.log("DDB response:", JSON.stringify(caches));
+
   const todayCache = caches[0];
 
   return { value: JSON.stringify({ steps: todayCache?.steps ?? 0 }) };
