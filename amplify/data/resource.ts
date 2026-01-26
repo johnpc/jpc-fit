@@ -52,10 +52,7 @@ const schema = a
         steps: a.float(),
         day: a.string().required(),
       })
-      .authorization((allow) => [
-        allow.owner(),
-        allow.resource(getSteps).to(["read"]),
-      ]),
+      .authorization((allow) => [allow.owner(), allow.resource(getSteps)]),
     Preferences: a
       .model({
         hideProtein: a.boolean(),
