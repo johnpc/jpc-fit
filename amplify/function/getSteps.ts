@@ -38,16 +38,16 @@ export const handler: Schema["getSteps"]["functionHandler"] = async (args) => {
   }
 
   const userId = args.arguments.userId;
+  const today = new Date().toISOString().split("T")[0];
   const response = await client.graphql({
     query: listHealthKitCaches,
     variables: {
-      filter: { owner: { eq: userId } },
+      filter: { owner: { contains: userId }, day: { eq: today } },
     },
   });
 
   const caches = response.data?.listHealthKitCaches?.items || [];
-  const today = new Date().toISOString().split("T")[0];
-  const todayCache = caches.find((c: { day: string }) => c.day === today);
+  const todayCache = caches[0];
 
   return { value: JSON.stringify({ steps: todayCache?.steps ?? 0 }) };
 };
