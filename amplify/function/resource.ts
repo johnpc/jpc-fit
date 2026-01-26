@@ -1,5 +1,12 @@
-import { defineFunction } from "@aws-amplify/backend";
+import { defineFunction, secret } from "@aws-amplify/backend";
 
+export const getSteps = defineFunction({
+  name: "getSteps",
+  entry: "./getSteps.ts",
+  environment: {
+    STEPS_API_KEY: secret("STEPS_API_KEY"),
+  },
+});
 export const getWeights = defineFunction({
   name: "getWeights",
   entry: "./getWeights.ts",

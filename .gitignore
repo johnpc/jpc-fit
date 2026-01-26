@@ -28,3 +28,6 @@ dist-ssr
 amplifyconfiguration*
 amplify_outputs.json
 .eslintcache
+
+# secrets
+.env

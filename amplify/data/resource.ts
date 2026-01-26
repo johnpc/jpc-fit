@@ -4,6 +4,7 @@ import {
   getEverything,
   getFoods,
   getHeights,
+  getSteps,
   getWeights,
 } from "../function/resource";
 
@@ -92,6 +93,15 @@ const schema = a
       .returns(a.ref("StringType"))
       .handler(a.handler.function(getEverything))
       .authorization((allow) => allow.authenticated()),
+    getSteps: a
+      .query()
+      .arguments({
+        apiKey: a.string().required(),
+        userId: a.string().required(),
+      })
+      .returns(a.ref("StringType"))
+      .handler(a.handler.function(getSteps))
+      .authorization((allow) => allow.guest()),
   })
   .authorization((allow) => [
     allow.resource(getCurrentDate),
@@ -99,6 +109,7 @@ const schema = a
     allow.resource(getWeights),
     allow.resource(getFoods),
     allow.resource(getEverything),
+    allow.resource(getSteps),
   ]);
 
 export type Schema = ClientSchema<typeof schema>;
