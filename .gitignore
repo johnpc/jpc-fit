@@ -34,3 +34,6 @@ amplify_outputs.json
 
 # feature docs
 STEP_COUNT_FEATURE.md
+test-getsteps-local.ts
+test-getsteps-local.sh
+test-getsteps-local.sh
