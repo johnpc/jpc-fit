@@ -101,7 +101,7 @@ const schema = a
       })
       .returns(a.ref("StringType"))
       .handler(a.handler.function(getSteps))
-      .authorization((allow) => allow.guest()),
+      .authorization((allow) => allow.publicApiKey()),
   })
   .authorization((allow) => [
     allow.resource(getCurrentDate),
@@ -118,5 +118,8 @@ export const data = defineData({
   schema,
   authorizationModes: {
     defaultAuthorizationMode: "userPool",
+    apiKeyAuthorizationMode: {
+      expiresInDays: 365,
+    },
   },
 });
