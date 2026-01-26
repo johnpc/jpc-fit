@@ -39,7 +39,12 @@ export const handler: Schema["getSteps"]["functionHandler"] = async (args) => {
 
   const userId = args.arguments.userId;
   const now = new Date();
-  const today = `${now.getMonth() + 1}/${now.getDate()}/${now.getFullYear()}`;
+  // Use EST/EDT timezone (UTC-5)
+  const estOffset = -5 * 60;
+  const localTime = new Date(
+    now.getTime() + (estOffset + now.getTimezoneOffset()) * 60000,
+  );
+  const today = `${localTime.getMonth() + 1}/${localTime.getDate()}/${localTime.getFullYear()}`;
 
   console.log("Querying for userId:", userId, "day:", today);
 
