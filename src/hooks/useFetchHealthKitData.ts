@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { Capacitor } from "@capacitor/core";
 import { endOfDay, subDays } from "date-fns";
 import { getHealthKitData } from "../helpers/getHealthKitData";
@@ -12,23 +12,26 @@ export function useFetchHealthKitData(date: Date) {
   const { data: caches = [] } = useHealthKitCache();
   const createCache = useCreateHealthKitCache();
   const updateCache = useUpdateHealthKitCache();
+  const fetchedRef = useRef<Set<string>>(new Set());
+
+  const dayString = date.toLocaleDateString();
+  const isToday = date.getTime() >= endOfDay(subDays(new Date(), 1)).getTime();
+  const existingCache = caches.find((c) => c.day === dayString);
 
   useEffect(() => {
     if (Capacitor.getPlatform() !== "ios") return;
 
-    const dayString = date.toLocaleDateString();
-    const isToday =
-      date.getTime() >= endOfDay(subDays(new Date(), 1)).getTime();
-    const existingCache = caches.find((c) => c.day === dayString);
+    // Skip if already fetched this day this session
+    if (fetchedRef.current.has(dayString)) return;
 
     // Skip if not today and we already have cache
     if (!isToday && existingCache) return;
 
-    // Fetch from HealthKit
+    fetchedRef.current.add(dayString);
+
     const fetchData = async () => {
       const data = await getHealthKitData(date);
 
-      // Only proceed if we got real data
       if (data.activeCalories === 0 && data.baseCalories === 0) return;
 
       const cacheData = {
@@ -40,14 +43,12 @@ export function useFetchHealthKitData(date: Date) {
       };
 
       if (existingCache) {
-        // Update existing cache (for today)
         updateCache.mutate({ id: existingCache.id, ...cacheData });
       } else {
-        // Create new cache
         createCache.mutate(cacheData);
       }
     };
 
     fetchData();
-  }, [date, caches, createCache, updateCache]);
+  }, [dayString, isToday, existingCache?.id]);
 }

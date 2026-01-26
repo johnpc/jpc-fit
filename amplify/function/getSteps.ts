@@ -32,6 +32,8 @@ export const handler: Schema["getSteps"]["functionHandler"] = async (args) => {
 
   console.log("DDB response:", JSON.stringify(response.Items));
 
-  const todayCache = response.Items?.[0];
-  return { value: JSON.stringify({ steps: todayCache?.steps ?? 0 }) };
+  const sorted = (response.Items ?? []).sort((a, b) =>
+    (b.updatedAt as string).localeCompare(a.updatedAt as string),
+  );
+  return { value: JSON.stringify({ steps: sorted[0]?.steps ?? 0 }) };
 };
