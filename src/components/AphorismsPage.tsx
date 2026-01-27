@@ -7,7 +7,7 @@ export default function AphorismsPage() {
   const quotes = aphorisms.aphorisms;
   const [usedIndexes, setUsedIndexes] = useState([] as number[]);
   const pushRandomIndex = () => {
-    console.log({ usedIndexes, quotes });
+
     if (usedIndexes.length === quotes.length) {
       return setUsedIndexes([]);
     }

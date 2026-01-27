@@ -14,7 +14,6 @@ export const getCache = (key: string) => {
 };
 
 export const clearCache = () => {
-  console.log("Clearing cache", { usedKeys });
   usedKeys.forEach((key) => {
     localStorage.removeItem(key);
   });

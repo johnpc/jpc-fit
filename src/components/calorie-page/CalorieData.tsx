@@ -8,6 +8,7 @@ import {
   Heading,
   Text,
   Button,
+  Loader,
 } from "@aws-amplify/ui-react";
 import {
   ArrowBackIos,
@@ -38,17 +39,15 @@ export function CalorieData({
   const { data: goal } = useGoal();
   const { data: quickAdds = [] } = useQuickAdd();
   const { data: preferences } = usePreferences();
-  const { data: healthKitCaches = [] } = useHealthKitCache();
+  const { data: healthKitCaches = [] } = useHealthKitCache(dayString);
   const updateGoal = useUpdateGoal();
-
-  // Fetch HealthKit data for this date if needed
-  useFetchHealthKitData(date);
+  const { isFetching: healthKitFetching } = useFetchHealthKitData(date);
 
   const displayQuickAdds = quickAdds.length > 0 ? [...quickAdds, customQuickAdd] : defaultQuickAdds;
 
   const consumedCalories = foods.reduce((sum, food) => sum + food.calories, 0);
 
-  const cache = healthKitCaches.find((c) => c.day === dayString);
+  const cache = healthKitCaches[0];
   const steps = cache?.steps ?? 0;
   const activeCalories = cache?.activeCalories ?? 0;
   const baseCalories = cache?.baseCalories ?? 0;
@@ -100,7 +99,7 @@ export function CalorieData({
       </Card>
 
       <Card>
-        <Table caption="Healthkit data" highlightOnHover={false}>
+        <Table caption={<>Healthkit data {healthKitFetching && <Loader size="small" />}</>} highlightOnHover={false}>
           <TableHead>
             <TableRow>
               <TableCell as="th">Data Type</TableCell>
@@ -118,12 +117,12 @@ export function CalorieData({
             )}
             <TableRow>
               <TableCell>Active Calories</TableCell>
-              <TableCell>{activeCalories} cals</TableCell>
+              <TableCell>{healthKitFetching ? <Loader size="small" /> : `${activeCalories} cals`}</TableCell>
               <TableCell></TableCell>
             </TableRow>
             <TableRow>
               <TableCell>Base Calories</TableCell>
-              <TableCell>{baseCalories} cals</TableCell>
+              <TableCell>{healthKitFetching ? <Loader size="small" /> : `${baseCalories} cals`}</TableCell>
               <TableCell></TableCell>
             </TableRow>
             <TableRow>

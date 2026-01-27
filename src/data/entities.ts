@@ -40,15 +40,9 @@ export const createHealthKitCache = async (
       year: "numeric",
     });
 
-  const createdHealthKitCacheEntity = await client.models.HealthKitCache.create(
-    {
-      ...cacheEntity,
-      id: currentUser.userId + dayString,
-      day: cacheEntity.day.toLocaleDateString(),
-    },
-  );
-  console.log({
-    createdHealthKitCacheEntity: createdHealthKitCacheEntity?.data,
-    errors: createdHealthKitCacheEntity?.errors,
+  await client.models.HealthKitCache.create({
+    ...cacheEntity,
+    id: currentUser.userId + dayString,
+    day: cacheEntity.day.toLocaleDateString(),
   });
 };

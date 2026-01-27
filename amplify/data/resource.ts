@@ -52,6 +52,7 @@ const schema = a
         steps: a.float(),
         day: a.string().required(),
       })
+      .secondaryIndexes((index) => [index("day")])
       .authorization((allow) => [allow.owner()]),
     Preferences: a
       .model({

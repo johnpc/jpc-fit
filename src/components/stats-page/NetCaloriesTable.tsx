@@ -18,7 +18,7 @@ import { useFetchHealthKitData } from "../../hooks/useFetchHealthKitData";
 export function NetCaloriesTable() {
   const [date, setDate] = useState(new Date());
   const { data: foods = [] } = useFood();
-  const { data: healthKitCaches = [] } = useHealthKitCache();
+  const { data: healthKitCaches = [] } = useHealthKitCache(); // All caches for week view
 
   // Fetch HealthKit data for all 7 days in the week
   useFetchHealthKitData(subDays(date, 0));

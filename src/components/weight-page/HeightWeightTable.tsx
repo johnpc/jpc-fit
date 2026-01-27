@@ -16,8 +16,7 @@ export function HeightWeightTable() {
   const createWeight = useCreateWeight();
   const createHeight = useCreateHeight();
 
-  console.log("Weights:", weights);
-  console.log("Heights:", heights);
+
 
   const currentWeight = weights[0]?.currentWeight ?? 180;
   const currentHeight = heights[0]?.currentHeight ?? 70;
@@ -25,28 +24,14 @@ export function HeightWeightTable() {
   const handleEditWeight = () => {
     const newWeight = parseInt(prompt("Enter your weight in lbs") || "");
     if (!isNaN(newWeight) && newWeight > 0) {
-      console.log("Creating weight:", newWeight);
-      createWeight.mutate(
-        { currentWeight: newWeight },
-        {
-          onSuccess: (data) => console.log("Weight created:", data),
-          onError: (error) => console.error("Weight error:", error),
-        },
-      );
+      createWeight.mutate({ currentWeight: newWeight });
     }
   };
 
   const handleEditHeight = () => {
     const newHeight = parseInt(prompt("Enter your height in inches") || "");
     if (!isNaN(newHeight) && newHeight > 0) {
-      console.log("Creating height:", newHeight);
-      createHeight.mutate(
-        { currentHeight: newHeight },
-        {
-          onSuccess: (data) => console.log("Height created:", data),
-          onError: (error) => console.error("Height error:", error),
-        },
-      );
+      createHeight.mutate({ currentHeight: newHeight });
     }
   };
 
