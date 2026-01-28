@@ -2,6 +2,7 @@ import { useEffect, ReactNode } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { client } from "../lib/amplify-client";
 import { useAuth } from "../hooks/useAuth";
+import { FoodEntity, HealthKitCacheEntity } from "../lib/types";
 
 export function SubscriptionProvider({ children }: { children: ReactNode }) {
   const queryClient = useQueryClient();
@@ -12,13 +13,22 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
 
     const subscriptions = [
       client.models.Food.onCreate().subscribe({
-        next: () => queryClient.invalidateQueries({ queryKey: ["food"] }),
+        next: (data) => {
+          const food = data as FoodEntity;
+          queryClient.invalidateQueries({ queryKey: ["food", food.day] });
+        },
       }),
       client.models.Food.onUpdate().subscribe({
-        next: () => queryClient.invalidateQueries({ queryKey: ["food"] }),
+        next: (data) => {
+          const food = data as FoodEntity;
+          queryClient.invalidateQueries({ queryKey: ["food", food.day] });
+        },
       }),
       client.models.Food.onDelete().subscribe({
-        next: () => queryClient.invalidateQueries({ queryKey: ["food"] }),
+        next: (data) => {
+          const food = data as FoodEntity;
+          queryClient.invalidateQueries({ queryKey: ["food", food.day] });
+        },
       }),
       client.models.Goal.onCreate().subscribe({
         next: () => queryClient.invalidateQueries({ queryKey: ["goal"] }),
@@ -53,16 +63,22 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
           queryClient.invalidateQueries({ queryKey: ["preferences"] }),
       }),
       client.models.HealthKitCache.onCreate().subscribe({
-        next: () =>
-          queryClient.invalidateQueries({ queryKey: ["healthKitCache"] }),
+        next: (data) => {
+          const cache = data as HealthKitCacheEntity;
+          queryClient.invalidateQueries({ queryKey: ["healthKitCache", cache.day] });
+        },
       }),
       client.models.HealthKitCache.onUpdate().subscribe({
-        next: () =>
-          queryClient.invalidateQueries({ queryKey: ["healthKitCache"] }),
+        next: (data) => {
+          const cache = data as HealthKitCacheEntity;
+          queryClient.invalidateQueries({ queryKey: ["healthKitCache", cache.day] });
+        },
       }),
       client.models.HealthKitCache.onDelete().subscribe({
-        next: () =>
-          queryClient.invalidateQueries({ queryKey: ["healthKitCache"] }),
+        next: (data) => {
+          const cache = data as HealthKitCacheEntity;
+          queryClient.invalidateQueries({ queryKey: ["healthKitCache", cache.day] });
+        },
       }),
     ];
 

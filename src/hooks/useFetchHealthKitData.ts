@@ -23,15 +23,6 @@ export function useFetchHealthKitData(date: Date) {
   const isToday = dayString === todayString;
   const existingCache = caches[0];
 
-  console.log(
-    "[HealthKit] day:",
-    dayString,
-    "caches:",
-    caches.length,
-    "found:",
-    existingCache?.activeCalories,
-  );
-
   useEffect(() => {
     if (Capacitor.getPlatform() !== "ios") return;
     if (cachesLoading) return;
@@ -48,7 +39,6 @@ export function useFetchHealthKitData(date: Date) {
 
       try {
         const data = await getHealthKitData(date);
-        console.log("[HealthKit]", dayString, data);
 
         // Skip save if no data
         if (data.activeCalories === 0 && data.baseCalories === 0) return;
@@ -62,23 +52,20 @@ export function useFetchHealthKitData(date: Date) {
         };
 
         if (existingCache) {
-          console.log("[HealthKit] updating cache", existingCache.id);
           updateCache.mutate({ id: existingCache.id, ...cacheData });
         } else {
-          console.log("[HealthKit] creating cache");
           createCache.mutate(cacheData);
         }
       } finally {
         setIsFetching(false);
-        // Allow refetch after 30 seconds for today, immediately on error
+        // Allow refetch after 30 seconds for today
         if (isToday) {
           setTimeout(() => fetchingDays.delete(dayString), 30000);
         }
       }
     };
 
-    fetchData().catch((err) => {
-      console.error("[HealthKit] fetch failed:", err);
+    fetchData().catch(() => {
       fetchingDays.delete(dayString);
     });
   }, [dayString, isToday, existingCache?.id, cachesLoading]);

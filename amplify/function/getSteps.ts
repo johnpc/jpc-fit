@@ -1,7 +1,7 @@
 import type { Schema } from "../data/resource";
 import { env } from "$amplify/env/getSteps";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { DynamoDBDocumentClient, ScanCommand } from "@aws-sdk/lib-dynamodb";
+import { DynamoDBDocumentClient, QueryCommand } from "@aws-sdk/lib-dynamodb";
 
 const client = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
@@ -22,11 +22,13 @@ export const handler: Schema["getSteps"]["functionHandler"] = async (args) => {
   console.log("Querying for userId:", userId, "day:", today);
 
   const response = await client.send(
-    new ScanCommand({
+    new QueryCommand({
       TableName: env.HEALTHKITCACHE_TABLE_NAME,
-      FilterExpression: "contains(#o, :uid) AND #d = :day",
-      ExpressionAttributeNames: { "#o": "owner", "#d": "day" },
-      ExpressionAttributeValues: { ":uid": userId, ":day": today },
+      IndexName: "healthKitCachesByDay",
+      KeyConditionExpression: "#d = :day",
+      FilterExpression: "contains(#o, :uid)",
+      ExpressionAttributeNames: { "#d": "day", "#o": "owner" },
+      ExpressionAttributeValues: { ":day": today, ":uid": userId },
     }),
   );
 

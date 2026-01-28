@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Capacitor } from "@capacitor/core";
 import { App as CapacitorApp } from "@capacitor/app";
 import { useAuth } from "./hooks/useAuth";
@@ -15,7 +15,8 @@ const HAS_PERMISSION_KEY = "hasPermission";
 
 function App() {
   const { user, loading } = useAuth();
-  const { data: foods = [] } = useFood();
+  const todayString = new Date().toLocaleDateString();
+  const { data: foods = [] } = useFood(todayString);
   const [hasPermission, setHasPermission] = useState(
     Capacitor.getPlatform() !== "ios" ||
       localStorage.getItem(HAS_PERMISSION_KEY) === HAS_PERMISSION_KEY,
@@ -28,31 +29,34 @@ function App() {
     setHasPermission(permitted);
   };
 
+  const foodsRef = useRef(foods);
+  foodsRef.current = foods;
+
   useEffect(() => {
     if (Capacitor.getPlatform() !== "ios") return;
 
     checkPermission();
 
-    CapacitorApp.addListener("appStateChange", ({ isActive }) => {
+    const stateListener = CapacitorApp.addListener("appStateChange", ({ isActive }) => {
       if (isActive) {
         checkPermission();
       } else {
         // Update widget when app goes to background
-        const todaysCalories = foods
-          .filter((f) => f.day === new Date().toLocaleDateString())
+        const todaysCalories = foodsRef.current
           .reduce((sum, f) => sum + f.calories, 0);
         updateWidget(todaysCalories);
       }
     });
 
-    CapacitorApp.addListener("resume", () => {
+    const resumeListener = CapacitorApp.addListener("resume", () => {
       checkPermission();
     });
 
     return () => {
-      CapacitorApp.removeAllListeners();
+      stateListener.then(l => l.remove());
+      resumeListener.then(l => l.remove());
     };
-  }, [foods]);
+  }, []);
 
   if (loading) {
     return <div>Loading...</div>;

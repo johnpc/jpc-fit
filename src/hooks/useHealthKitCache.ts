@@ -4,29 +4,15 @@ import { HealthKitCacheEntity } from "../lib/types";
 import { useAuth } from "./useAuth";
 import { clearFetchingDay } from "./useFetchHealthKitData";
 
-export function useHealthKitCache(day?: string) {
+export function useHealthKitCache(day: string) {
   const { user } = useAuth();
 
   return useQuery({
-    queryKey: day ? ["healthKitCache", day] : ["healthKitCache"],
+    queryKey: ["healthKitCache", day],
     queryFn: async () => {
-      if (day) {
-        const { data } =
-          await client.models.HealthKitCache.listHealthKitCacheByDay({ day });
-        console.log(
-          "[HealthKitCache] fetched",
-          data.length,
-          "entries for",
-          day,
-        );
-        return data as HealthKitCacheEntity[];
-      }
-      const { data } = await client.models.HealthKitCache.list({ limit: 5000 });
-      console.log("[HealthKitCache] fetched", data.length, "entries");
-      return (data as HealthKitCacheEntity[]).sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-      );
+      const { data } =
+        await client.models.HealthKitCache.listHealthKitCacheByDay({ day });
+      return data as HealthKitCacheEntity[];
     },
     enabled: !!user,
   });
@@ -86,7 +72,6 @@ export function useCreateHealthKitCache() {
       queryClient.invalidateQueries({
         queryKey: ["healthKitCache", variables.day],
       });
-      queryClient.invalidateQueries({ queryKey: ["healthKitCache"] });
     },
   });
 }
@@ -114,7 +99,6 @@ export function useUpdateHealthKitCache() {
       queryClient.invalidateQueries({
         queryKey: ["healthKitCache", variables.day],
       });
-      queryClient.invalidateQueries({ queryKey: ["healthKitCache"] });
     },
   });
 }

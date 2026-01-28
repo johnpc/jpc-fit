@@ -5,16 +5,25 @@ import { useHealthKitCache } from "../../hooks/useHealthKitCache";
 
 export function YourStreak() {
   const { tokens } = useTheme();
-  const { data: foods = [] } = useFood();
-  const { data: healthKitCaches = [] } = useHealthKitCache();
+
+  // Get day strings for last 4 days
+  const dayStrings = Array.from({ length: 4 }, (_, i) =>
+    subDays(new Date(), i).toLocaleDateString()
+  );
+
+  // Query each day
+  const day0 = { foods: useFood(dayStrings[0]), cache: useHealthKitCache(dayStrings[0]) };
+  const day1 = { foods: useFood(dayStrings[1]), cache: useHealthKitCache(dayStrings[1]) };
+  const day2 = { foods: useFood(dayStrings[2]), cache: useHealthKitCache(dayStrings[2]) };
+  const day3 = { foods: useFood(dayStrings[3]), cache: useHealthKitCache(dayStrings[3]) };
+  const dayQueries = [day0, day1, day2, day3];
 
   const getDayInfo = (daysAgo: number) => {
-    const date = subDays(new Date(), daysAgo);
-    const dayString = date.toLocaleDateString();
-    const dayFoods = foods.filter((f) => f.day === dayString);
+    const dayString = dayStrings[daysAgo];
+    const dayFoods = dayQueries[daysAgo].foods.data ?? [];
+    const cache = dayQueries[daysAgo].cache.data?.[0];
     const tracked = dayFoods.length > 0;
     const consumed = dayFoods.reduce((sum, f) => sum + f.calories, 0);
-    const cache = healthKitCaches.find((c) => c.day === dayString);
     const burned = (cache?.activeCalories || 0) + (cache?.baseCalories || 0);
     const [d, m] = dayString.split("/");
     return { tracked, day: `${d}/${m}`, net: consumed - burned };

@@ -17,10 +17,23 @@ import { useFetchHealthKitData } from "../../hooks/useFetchHealthKitData";
 
 export function NetCaloriesTable() {
   const [date, setDate] = useState(new Date());
-  const { data: foods = [] } = useFood();
-  const { data: healthKitCaches = [] } = useHealthKitCache(); // All caches for week view
 
-  // Fetch HealthKit data for all 7 days in the week
+  // Get day strings for the week
+  const dayStrings = Array.from({ length: 7 }, (_, i) =>
+    subDays(date, i).toLocaleDateString()
+  );
+
+  // Query each day individually
+  const day0 = { foods: useFood(dayStrings[0]), cache: useHealthKitCache(dayStrings[0]) };
+  const day1 = { foods: useFood(dayStrings[1]), cache: useHealthKitCache(dayStrings[1]) };
+  const day2 = { foods: useFood(dayStrings[2]), cache: useHealthKitCache(dayStrings[2]) };
+  const day3 = { foods: useFood(dayStrings[3]), cache: useHealthKitCache(dayStrings[3]) };
+  const day4 = { foods: useFood(dayStrings[4]), cache: useHealthKitCache(dayStrings[4]) };
+  const day5 = { foods: useFood(dayStrings[5]), cache: useHealthKitCache(dayStrings[5]) };
+  const day6 = { foods: useFood(dayStrings[6]), cache: useHealthKitCache(dayStrings[6]) };
+  const dayQueries = [day0, day1, day2, day3, day4, day5, day6];
+
+  // Fetch HealthKit data for all 7 days
   useFetchHealthKitData(subDays(date, 0));
   useFetchHealthKitData(subDays(date, 1));
   useFetchHealthKitData(subDays(date, 2));
@@ -30,12 +43,11 @@ export function NetCaloriesTable() {
   useFetchHealthKitData(subDays(date, 6));
 
   const getDayData = (daysAgo: number) => {
-    const day = subDays(date, daysAgo);
-    const dayString = day.toLocaleDateString();
-    const dayFoods = foods.filter((f) => f.day === dayString);
+    const dayString = dayStrings[daysAgo];
+    const dayFoods = dayQueries[daysAgo].foods.data ?? [];
+    const cache = dayQueries[daysAgo].cache.data?.[0];
     const tracked = dayFoods.length > 0;
     const consumed = dayFoods.reduce((sum, f) => sum + f.calories, 0);
-    const cache = healthKitCaches.find((c) => c.day === dayString);
     const burned = (cache?.activeCalories || 0) + (cache?.baseCalories || 0);
     const [d, m] = dayString.split("/");
     return {

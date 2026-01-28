@@ -13,30 +13,34 @@ export const updateWidget = async (
   if (Capacitor.getPlatform() !== "ios") return;
 
   try {
-    await WidgetsBridgePlugin.setItem({
-      group: WIDGET_PREFERENCES_GROUP,
-      key: CONSUMED_CALORIES_KEY,
-      value: consumedCalories.toString(),
-    });
-
-    await WidgetsBridgePlugin.setItem({
-      group: WIDGET_PREFERENCES_GROUP,
-      key: CONSUMED_CALORIES_DAY_KEY,
-      value: new Date().toLocaleDateString(undefined, {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
+    const setItems = [
+      WidgetsBridgePlugin.setItem({
+        group: WIDGET_PREFERENCES_GROUP,
+        key: CONSUMED_CALORIES_KEY,
+        value: consumedCalories.toString(),
       }),
-    });
+      WidgetsBridgePlugin.setItem({
+        group: WIDGET_PREFERENCES_GROUP,
+        key: CONSUMED_CALORIES_DAY_KEY,
+        value: new Date().toLocaleDateString(undefined, {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+        }),
+      }),
+    ];
 
     if (burnedCalories !== undefined && burnedCalories > 0) {
-      await WidgetsBridgePlugin.setItem({
-        group: WIDGET_PREFERENCES_GROUP,
-        key: BURNED_CALORIES_KEY,
-        value: burnedCalories.toString(),
-      });
+      setItems.push(
+        WidgetsBridgePlugin.setItem({
+          group: WIDGET_PREFERENCES_GROUP,
+          key: BURNED_CALORIES_KEY,
+          value: burnedCalories.toString(),
+        }),
+      );
     }
 
+    await Promise.all(setItems);
     await WidgetsBridgePlugin.reloadAllTimelines();
   } catch (error) {
     console.error("Failed to update widget:", error);

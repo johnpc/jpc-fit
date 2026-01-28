@@ -2,19 +2,11 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { client } from "../lib/amplify-client";
 import { FoodEntity } from "../lib/types";
 
-export function useFood(day?: string) {
+export function useFood(day: string) {
   return useQuery({
-    queryKey: day ? ["food", day] : ["food"],
-    refetchOnMount: true,
+    queryKey: ["food", day],
     queryFn: async () => {
-      if (day) {
-        const { data } = await client.models.Food.listFoodByDay({ day });
-        return (data as FoodEntity[]).sort(
-          (a, b) =>
-            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
-        );
-      }
-      const { data } = await client.models.Food.list({ limit: 10000 });
+      const { data } = await client.models.Food.listFoodByDay({ day });
       return (data as FoodEntity[]).sort(
         (a, b) =>
           new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
