@@ -12,6 +12,11 @@ const backend = defineBackend({
   getSteps,
 });
 
+// Extend refresh token validity to 10 years (max allowed)
+const { cfnUserPoolClient } = backend.auth.resources.cfnResources;
+cfnUserPoolClient.refreshTokenValidity = 3650;
+cfnUserPoolClient.tokenValidityUnits = { refreshToken: "days" };
+
 const healthKitCacheTable = backend.data.resources.tables["HealthKitCache"];
 healthKitCacheTable.grantReadData(backend.getSteps.resources.lambda);
 backend.getSteps.resources.lambda.addToRolePolicy(
